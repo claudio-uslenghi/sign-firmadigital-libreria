@@ -31,12 +31,10 @@ import java.nio.file.Paths;
  */
 public class FileUtils {
 
-    private static final Integer MAX_TEXT_WIDTH = 105;
-
     public static String getFileExtension(File file) {
         String name = file.getName();
         try {
-            return name.substring(name.lastIndexOf(".") + 1);
+            return name.substring(name.lastIndexOf(".") + 1).toLowerCase();
         } catch (Exception e) {
             return null;
         }
@@ -44,7 +42,7 @@ public class FileUtils {
 
     public static String getFileExtension(String fileName) {
         try {
-            return fileName.substring(fileName.lastIndexOf(".") + 1);
+            return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
         } catch (Exception e) {
             return null;
         }
@@ -53,7 +51,6 @@ public class FileUtils {
     public static String removeP7MExtension(File file) {
         String name = file.getName();
         int lastPeriodPos = name.lastIndexOf('.');
-        System.out.println("Int: " + lastPeriodPos);
         return null;
     }
 
@@ -88,13 +85,9 @@ public class FileUtils {
         // TODO validar si hay otro archivo de momento lo sobre escribe
         // USAR solo getAbsolutPath, talvez sin ruta
         String nombreCompleto = documento.getAbsolutePath();
-
         String nombre = nombreCompleto.replaceFirst("[.][^.]+$", "");
-
         //String extension = getFileExtension(documento);
         String extension = FileUtils.getFileExtension(documento);
-
-        System.out.println(nombre + "-signed." + extension);
         return nombre + "-signed." + extension;
     }
 
@@ -135,7 +128,7 @@ public class FileUtils {
             java.io.File file = new java.io.File(jFileChooser.getSelectedFile().toString());
             if (file.exists() && file.isFile()) {
                 for (String filtre : filtro.getExtensions()) {
-                    if (file.getName().toUpperCase().equals(filtre)) {
+                    if (getFileExtension(file).equals(filtre)) {
                         ruta = file.toString();
                     }
                 }
