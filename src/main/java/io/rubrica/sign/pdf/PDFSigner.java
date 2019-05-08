@@ -46,12 +46,12 @@ import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.PdfTemplate;
 
-import io.rubrica.core.RubricaException;
-import io.rubrica.sign.InvalidFormatException;
+import io.rubrica.exceptions.RubricaException;
+import io.rubrica.exceptions.InvalidFormatException;
 import io.rubrica.sign.SignInfo;
 import io.rubrica.sign.Signer;
-import io.rubrica.util.BouncyCastleUtils;
-import io.rubrica.util.Utils;
+import io.rubrica.utils.BouncyCastleUtils;
+import io.rubrica.utils.Utils;
 
 public class PDFSigner implements Signer {
 
@@ -193,8 +193,7 @@ public class PDFSigner implements Signer {
 
 			X509Certificate x509Certificate = (X509Certificate) certChain[0];
 			String informacionCertificado = x509Certificate.getSubjectDN().getName();
-			String nombreFirmante = (informacionCertificado.substring(informacionCertificado.lastIndexOf("CN=") + 3,
-					informacionCertificado.indexOf(","))).toUpperCase();
+			String nombreFirmante = (Utils.getCN(x509Certificate)).toUpperCase();
 			try {
 				// Creating the appearance for layer 0
 				PdfTemplate pdfTemplate = sap.getLayer(0);
@@ -236,7 +235,7 @@ public class PDFSigner implements Signer {
 					text = text + "FECHA: " + signTime + "\n";
 					text = text + infoQR;
 					try {
-						bufferedImage = io.rubrica.util.QRCode.generateQR(text, (int) height, (int) height);
+						bufferedImage = io.rubrica.utils.QRCode.generateQR(text, (int) height, (int) height);
 					} catch (Exception e) {
 						e.printStackTrace();
 					}

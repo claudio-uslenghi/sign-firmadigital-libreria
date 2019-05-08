@@ -17,7 +17,7 @@
 
 package io.rubrica.sign.xades;
 
-import io.rubrica.sign.odf.FormatFileException;
+import io.rubrica.exceptions.FormatFileException;
 
 /**
  * Excepci&oacute;n para notificar que se ha encontrado un objeto que no es un

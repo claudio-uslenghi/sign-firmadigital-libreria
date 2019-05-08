@@ -17,13 +17,14 @@
 
 package io.rubrica.sign;
 
+import io.rubrica.exceptions.InvalidFormatException;
 import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.util.List;
 import java.util.Properties;
 
-import io.rubrica.core.RubricaException;
+import io.rubrica.exceptions.RubricaException;
 
 /**
  * Permite la firma digital de documentos.

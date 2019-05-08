@@ -17,7 +17,7 @@
 
 package io.rubrica.sign.xades;
 
-import io.rubrica.core.RubricaException;
+import io.rubrica.exceptions.RubricaException;
 
 /**
  * Excepci&oacute;n lanzada cuando se detecta una firma con un formato no

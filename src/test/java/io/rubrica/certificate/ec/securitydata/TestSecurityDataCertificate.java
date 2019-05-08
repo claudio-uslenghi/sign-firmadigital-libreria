@@ -25,8 +25,8 @@ import java.util.List;
 
 import io.rubrica.certificate.CrlUtils;
 import io.rubrica.certificate.ValidationResult;
-import io.rubrica.util.CertificateUtils;
-import io.rubrica.util.OcspUtils;
+import io.rubrica.utils.CertificateUtils;
+import io.rubrica.utils.OcspUtils;
 
 public class TestSecurityDataCertificate {
 

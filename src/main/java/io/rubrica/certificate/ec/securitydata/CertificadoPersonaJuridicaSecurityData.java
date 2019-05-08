@@ -19,7 +19,7 @@ package io.rubrica.certificate.ec.securitydata;
 
 import java.security.cert.X509Certificate;
 
-import io.rubrica.certificate.DatoCertificadoNoIncluidoException;
+import io.rubrica.exceptions.DatoCertificadoNoIncluidoException;
 import io.rubrica.certificate.ec.CertificadoPersonaJuridica;
 
 /**

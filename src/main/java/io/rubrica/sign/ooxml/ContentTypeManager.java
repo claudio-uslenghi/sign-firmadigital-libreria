@@ -33,7 +33,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import io.rubrica.core.RubricaException;
+import io.rubrica.exceptions.RubricaException;
 
 /**
  * Clase para la lectura de los content types declarados en un documento OOXML y

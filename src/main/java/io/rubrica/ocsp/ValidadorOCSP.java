@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.ocsp;
 
 import java.io.BufferedOutputStream;
@@ -29,9 +28,7 @@ import java.security.Provider;
 import java.security.Security;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
-import java.util.List;
 import java.util.Random;
-import java.util.logging.Logger;
 
 import org.bouncycastle.asn1.DEROctetString;
 import org.bouncycastle.asn1.ocsp.OCSPObjectIdentifiers;
@@ -52,7 +49,8 @@ import org.bouncycastle.operator.DigestCalculatorProvider;
 import org.bouncycastle.operator.OperatorCreationException;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 
-import io.rubrica.core.RubricaException;
+import io.rubrica.exceptions.RubricaException;
+import java.text.SimpleDateFormat;
 
 /**
  * Clase que permite la validacion de un certificado utilizando OCSP.
@@ -61,105 +59,92 @@ import io.rubrica.core.RubricaException;
  */
 public class ValidadorOCSP {
 
-	private static final Logger logger = Logger.getLogger(ValidadorOCSP.class.getName());
+    private static final int TIME_OUT = 2000; //set timeout to 2 seconds
 
-	public void validar(X509Certificate checkCert, X509Certificate rootCert, List<String> urls)
-			throws IOException, OcspValidationException, RubricaException {
+    public static String ValidarOCSP(X509Certificate checkCert, X509Certificate rootCert, String ocspURL) throws IOException, RubricaException {
+        OCSPReq request;
+        try {
+            request = generateOCSPRequest(rootCert, checkCert.getSerialNumber());
+        } catch (CertificateEncodingException | OperatorCreationException | OCSPException e) {
+            throw new RubricaException(e);
+        }
 
-		for (String url : urls) {
-			validar(checkCert, rootCert, url);
-		}
-	}
+        byte[] array = request.getEncoded();
 
-	public void validar(X509Certificate checkCert, X509Certificate rootCert, String ocspURL)
-			throws IOException, OcspValidationException, RubricaException {
+        // Enviar la peticion al servidor OCSP:
+        URL url = new URL(ocspURL);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestProperty("Content-Type", "application/ocsp-request");
+        con.setRequestProperty("Accept", "application/ocsp-response");
+        con.setConnectTimeout(TIME_OUT);
+        con.setDoOutput(true);
 
-		OCSPReq request;
+        OutputStream out = con.getOutputStream();
+        DataOutputStream dataOut = new DataOutputStream(new BufferedOutputStream(out));
+        dataOut.write(array);
+        dataOut.flush();
+        dataOut.close();
 
-		try {
-			request = generateOCSPRequest(rootCert, checkCert.getSerialNumber());
-		} catch (CertificateEncodingException | OperatorCreationException | OCSPException e) {
-			throw new RubricaException(e);
-		}
+        if (con.getResponseCode() / 100 != 2) {
+            throw new RubricaException("Respuesta HTTP inválida: " + con.getResponseCode());
+        }
 
-		byte[] array = request.getEncoded();
+        // Get Response
+        InputStream in = (InputStream) con.getContent();
+        OCSPResp ocspResponse = new OCSPResp(in);
 
-		// Enviar la peticion al servidor OCSP:
-		URL url = new URL(ocspURL);
-		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		con.setRequestProperty("Content-Type", "application/ocsp-request");
-		con.setRequestProperty("Accept", "application/ocsp-response");
-		con.setDoOutput(true);
+        if (ocspResponse.getStatus() != 0) {
+            throw new RubricaException("Status HTTP inválido: " + ocspResponse.getStatus());
+        }
 
-		OutputStream out = con.getOutputStream();
-		DataOutputStream dataOut = new DataOutputStream(new BufferedOutputStream(out));
-		dataOut.write(array);
-		dataOut.flush();
-		dataOut.close();
+        BasicOCSPResp basicResponse;
+        try {
+            basicResponse = (BasicOCSPResp) ocspResponse.getResponseObject();
+        } catch (OCSPException e) {
+            throw new RubricaException("Problema al decodificar respuesta", e);
+        }
 
-		if (con.getResponseCode() / 100 != 2) {
-			throw new RubricaException("Respuesta HTTP inválida: " + con.getResponseCode());
-		}
+        if (basicResponse == null) {
+            throw new RubricaException("Respuesta OCSP inválida");
+        }
 
-		// Get Response
-		InputStream in = (InputStream) con.getContent();
-		OCSPResp ocspResponse = new OCSPResp(in);
+        SingleResp[] responses = basicResponse.getResponses();
+        SingleResp response = responses[0];
+        CertificateStatus certStatus = response.getCertStatus();
 
-		System.out.println("ocspResponse.getStatus()" + ocspResponse.getStatus());
-		if (ocspResponse.getStatus() != 0) {
-			throw new RubricaException("Status HTTP inválido: " + ocspResponse.getStatus());
-		}
+        if (certStatus instanceof RevokedStatus) {
+            RevokedStatus revokedStatus = (RevokedStatus) certStatus;
+            return (String) new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(revokedStatus.getRevocationTime());
+        } else {
+            UnknownStatus unknownStatus = (UnknownStatus) certStatus;
+            System.out.println("unknownStatus.: " + unknownStatus);
+            return "unknownStatus";
+        }
+    }
+    
+    private static OCSPReq generateOCSPRequest(X509Certificate issuerCert, BigInteger serialNumber)
+            throws OperatorCreationException, CertificateEncodingException, OCSPException, IOException {
+        // Add provider BC
+        Provider prov = new BouncyCastleProvider();
+        Security.addProvider(prov);
 
-		BasicOCSPResp basicResponse;
-		try {
-			basicResponse = (BasicOCSPResp) ocspResponse.getResponseObject();
-		} catch (OCSPException e) {
-			throw new RubricaException("Problema al decodificar respuesta", e);
-		}
+        DigestCalculatorProvider digCalcProv = new JcaDigestCalculatorProviderBuilder().setProvider(prov).build();
+        CertificateID id = new CertificateID(digCalcProv.get(CertificateID.HASH_SHA1),
+                new JcaX509CertificateHolder(issuerCert), serialNumber);
 
-		if (basicResponse == null) {
-			throw new RubricaException("Respuesta OCSP inválida");
-		}
+        // Basic request generation with nonce
+        OCSPReqBuilder gen = new OCSPReqBuilder();
+        gen.addRequest(id);
 
-		SingleResp[] responses = basicResponse.getResponses();
-		SingleResp response = responses[0];
-		CertificateStatus certStatus = response.getCertStatus();
+        // Add nonce extension
+        ExtensionsGenerator extGen = new ExtensionsGenerator();
+        byte[] nonce = new byte[16];
+        Random rand = new Random();
+        rand.nextBytes(nonce);
+        extGen.addExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false, new DEROctetString(nonce));
+        gen.setRequestExtensions(extGen.generate());
 
-		if (certStatus == CertificateStatus.GOOD) {
-			System.out.println("yeah");
-			return;
-		} else if (certStatus instanceof RevokedStatus) {
-			RevokedStatus revokedStatus = (RevokedStatus) certStatus;
-			throw new OcspValidationException(revokedStatus.getRevocationReason(), revokedStatus.getRevocationTime());
-		} else {
-			UnknownStatus unknownStatus = (UnknownStatus) certStatus;
-			throw new OcspValidationException();
-		}
-	}
-
-	private static OCSPReq generateOCSPRequest(X509Certificate issuerCert, BigInteger serialNumber)
-			throws OperatorCreationException, CertificateEncodingException, OCSPException, IOException {
-		// Add provider BC
-		Provider prov = new BouncyCastleProvider();
-		Security.addProvider(prov);
-
-		DigestCalculatorProvider digCalcProv = new JcaDigestCalculatorProviderBuilder().setProvider(prov).build();
-		CertificateID id = new CertificateID(digCalcProv.get(CertificateID.HASH_SHA1),
-				new JcaX509CertificateHolder(issuerCert), serialNumber);
-
-		// Basic request generation with nonce
-		OCSPReqBuilder gen = new OCSPReqBuilder();
-		gen.addRequest(id);
-
-		// Add nonce extension
-		ExtensionsGenerator extGen = new ExtensionsGenerator();
-		byte[] nonce = new byte[16];
-		Random rand = new Random();
-		rand.nextBytes(nonce);
-		extGen.addExtension(OCSPObjectIdentifiers.id_pkix_ocsp_nonce, false, new DEROctetString(nonce));
-		gen.setRequestExtensions(extGen.generate());
-
-		// Build request
-		return gen.build();
-	}
+        // Build request
+        return gen.build();
+    }
 }

@@ -14,9 +14,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.certificate;
 
+import io.rubrica.exceptions.EntidadCertificadoraNoValidaException;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.security.PublicKey;
@@ -34,135 +34,150 @@ import javax.naming.NamingException;
 import javax.naming.directory.Attribute;
 import javax.naming.directory.InitialDirContext;
 
-import io.rubrica.core.RubricaException;
-import io.rubrica.util.CertificateUtils;
-import io.rubrica.util.HttpClient;
-import io.rubrica.util.OcspUtils;
+import io.rubrica.exceptions.RubricaException;
+import io.rubrica.utils.CertificateUtils;
+import io.rubrica.utils.HttpClient;
+import io.rubrica.utils.OcspUtils;
+import java.security.cert.X509CRLEntry;
+import java.text.SimpleDateFormat;
 
 public class CrlUtils {
 
-	private static final Logger logger = Logger.getLogger(CrlUtils.class.getName());
+    private static final Logger logger = Logger.getLogger(CrlUtils.class.getName());
+    private static String revocationDate;
 
-	public static ValidationResult verifyCertificateCRLs(X509Certificate cert, PublicKey vaPublicKey,
-			List<String> overridingDistributionPoints) throws RubricaException {
+    public CrlUtils() {
+    }
 
-		if (cert == null) {
-			return ValidationResult.CORRUPT;
-		}
+    public String getRevocationDate() {
+        return revocationDate;
+    }
 
-		List<String> crlDistPoints;
+    public static ValidationResult verifyCertificateCRLs(X509Certificate cert, PublicKey vaPublicKey,
+            List<String> overridingDistributionPoints) throws RubricaException, EntidadCertificadoraNoValidaException {
 
-		try {
-			List<String> ocspUrls = CertificateUtils.getAuthorityInformationAccess(cert);
-			for (String ocsp : ocspUrls) {
-				System.out.println("OCSP=" + ocsp);
-			}
+        if (cert == null) {
+            return ValidationResult.CORRUPT;
+        }
 
-			System.out.println("Valid? " + OcspUtils.isValidCertificate(cert));
-			crlDistPoints = overridingDistributionPoints == null || overridingDistributionPoints.isEmpty()
-					? CertificateUtils.getCrlDistributionPoints(cert)
-					: overridingDistributionPoints;
-		} catch (IOException e) {
-			logger.severe("Error obteniendo los puntos de distribucion de CRL: " + e);
-			return ValidationResult.SERVER_ERROR;
-		}
+        List<String> crlDistPoints;
 
-		logger.fine("El certificado con serie '" + cert.getSerialNumber() + "' tiene asociadas las siguientes CRL: "
-				+ crlDistPoints);
+        try {
+            List<String> ocspUrls = CertificateUtils.getAuthorityInformationAccess(cert);
+            for (String ocsp : ocspUrls) {
+                System.out.println("OCSP=" + ocsp);
+            }
 
-		CertificateFactory cf;
+            System.out.println("Valid? " + OcspUtils.isValidCertificate(cert));
+            crlDistPoints = overridingDistributionPoints == null || overridingDistributionPoints.isEmpty()
+                    ? CertificateUtils.getCrlDistributionPoints(cert)
+                    : overridingDistributionPoints;
+        } catch (IOException e) {
+            logger.severe("Error obteniendo los puntos de distribucion de CRL: " + e);
+            return ValidationResult.SERVER_ERROR;
+        }
 
-		try {
-			cf = CertificateFactory.getInstance("X.509");
-		} catch (CertificateException e) {
-			logger.severe("Error instanciando la factoria de certificados: " + e);
-			return ValidationResult.SERVER_ERROR;
-		}
+        logger.fine("El certificado con serie '" + cert.getSerialNumber() + "' tiene asociadas las siguientes CRL: "
+                + crlDistPoints);
 
-		boolean checked = false;
-		boolean cannotDownload = false;
+        CertificateFactory cf;
 
-		for (String crlDP : crlDistPoints) {
-			// Ignorar los URL que contengan la cadena de texto "ocsp":
-			if (crlDP.toLowerCase().contains("ocsp")) {
-				continue;
-			}
+        try {
+            cf = CertificateFactory.getInstance("X.509");
+        } catch (CertificateException e) {
+            logger.severe("Error instanciando la factoria de certificados: " + e);
+            return ValidationResult.SERVER_ERROR;
+        }
 
-			// Descargamos
-			byte[] crlBytes;
+        boolean checked = false;
+        boolean cannotDownload = false;
 
-			try {
-				crlBytes = downloadCRL(crlDP);
-			} catch (Exception e) {
-				logger.severe("No se ha podido descargar la CRL (" + crlDP
-						+ "), se continuara con el siguiente punto de distribucion: " + e);
-				cannotDownload = true;
-				continue;
-			}
+        for (String crlDP : crlDistPoints) {
+            // Ignorar los URL que contengan la cadena de texto "ocsp":
+            if (crlDP.toLowerCase().contains("ocsp")) {
+                continue;
+            }
 
-			X509CRL crl;
+            // Descargamos
+            byte[] crlBytes;
 
-			try {
-				crl = (X509CRL) cf.generateCRL(new ByteArrayInputStream(crlBytes));
-			} catch (Exception e) {
-				logger.warning("Error analizando la lista de revocacion: " + e);
-				return ValidationResult.SERVER_ERROR;
-			}
+            try {
+                crlBytes = downloadCRL(crlDP);
+            } catch (Exception e) {
+                logger.severe("No se ha podido descargar la CRL (" + crlDP
+                        + "), se continuara con el siguiente punto de distribucion: " + e);
+                cannotDownload = true;
+                continue;
+            }
 
-			// Comprobamos la firma de la CRL
-			if (vaPublicKey != null) {
-				try {
-					crl.verify(vaPublicKey);
-				} catch (Exception e) {
-					logger.severe("No se ha podido comprobar la firma de la CRL: " + e);
-					return ValidationResult.SERVER_ERROR;
-				}
-			}
-			if (crl.isRevoked(cert)) {
-				return ValidationResult.REVOKED;
-			}
+            X509CRL crl;
 
-			checked = true;
-		}
+            try {
+                crl = (X509CRL) cf.generateCRL(new ByteArrayInputStream(crlBytes));
+                X509CRLEntry entry = crl.getRevokedCertificate(cert);
+                revocationDate = (String) new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(entry.getRevocationDate());
+//                System.out.println("serial number = " + entry.getSerialNumber().toString(16));
+//                System.out.println("revocation date = " + (String) new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(entry.getRevocationDate()));
+//                System.out.println("extensions = " + entry.hasExtensions());
+            } catch (Exception e) {
+                logger.warning("Error analizando la lista de revocacion: " + e);
+                return ValidationResult.SERVER_ERROR;
+            }
 
-		if (checked) {
-			return ValidationResult.VALID;
-		}
+            // Comprobamos la firma de la CRL
+            if (vaPublicKey != null) {
+                try {
+                    crl.verify(vaPublicKey);
+                } catch (Exception e) {
+                    logger.severe("No se ha podido comprobar la firma de la CRL: " + e);
+                    return ValidationResult.SERVER_ERROR;
+                }
+            }
+            if (crl.isRevoked(cert)) {
+                return ValidationResult.REVOKED;
+            }
 
-		if (cannotDownload) {
-			return ValidationResult.CANNOT_DOWNLOAD_CRL;
-		}
+            checked = true;
+        }
 
-		return ValidationResult.UNKNOWN;
-	}
+        if (checked) {
+            return ValidationResult.VALID;
+        }
 
-	private static byte[] downloadCRL(final String crlURL) throws IOException, NamingException, CRLException {
-		if (crlURL.startsWith("http://") || crlURL.startsWith("https://")) {
-			return downloadCRLFromWeb(crlURL);
-		} else if (crlURL.startsWith("ldap://")) {
-			return downloadCRLFromLDAP(crlURL);
-		} else {
-			throw new CRLException("No se soporta el protocolo del punto de distribucion de CRL: " + crlURL);
-		}
-	}
+        if (cannotDownload) {
+            return ValidationResult.CANNOT_DOWNLOAD_CRL;
+        }
 
-	private static byte[] downloadCRLFromLDAP(final String ldapURL) throws NamingException {
-		Hashtable<String, String> env = new Hashtable<>();
-		env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-		env.put(Context.PROVIDER_URL, ldapURL);
+        return ValidationResult.UNKNOWN;
+    }
 
-		Attribute aval = new InitialDirContext(env).getAttributes("").get("certificateRevocationList;binary");
-		byte[] val = (byte[]) aval.get();
+    private static byte[] downloadCRL(final String crlURL) throws IOException, NamingException, CRLException {
+        if (crlURL.startsWith("http://") || crlURL.startsWith("https://")) {
+            return downloadCRLFromWeb(crlURL);
+        } else if (crlURL.startsWith("ldap://")) {
+            return downloadCRLFromLDAP(crlURL);
+        } else {
+            throw new CRLException("No se soporta el protocolo del punto de distribucion de CRL: " + crlURL);
+        }
+    }
 
-		if (val == null || val.length == 0) {
-			throw new NamingException("No se ha podido descargar la CRL desde " + ldapURL);
-		} else {
-			return val;
-		}
-	}
+    private static byte[] downloadCRLFromLDAP(final String ldapURL) throws NamingException {
+        Hashtable<String, String> env = new Hashtable<>();
+        env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
+        env.put(Context.PROVIDER_URL, ldapURL);
 
-	private static byte[] downloadCRLFromWeb(String url) throws IOException, CRLException {
-		HttpClient httpClient = new HttpClient();
-		return httpClient.download(url);
-	}
+        Attribute aval = new InitialDirContext(env).getAttributes("").get("certificateRevocationList;binary");
+        byte[] val = (byte[]) aval.get();
+
+        if (val == null || val.length == 0) {
+            throw new NamingException("No se ha podido descargar la CRL desde " + ldapURL);
+        } else {
+            return val;
+        }
+    }
+
+    private static byte[] downloadCRLFromWeb(String url) throws IOException, CRLException {
+        HttpClient httpClient = new HttpClient();
+        return httpClient.download(url);
+    }
 }

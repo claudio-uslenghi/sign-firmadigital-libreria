@@ -30,8 +30,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipFile;
 
-import io.rubrica.core.RubricaException;
-import io.rubrica.sign.InvalidFormatException;
+import io.rubrica.exceptions.RubricaException;
+import io.rubrica.exceptions.InvalidFormatException;
 import io.rubrica.sign.SignInfo;
 import io.rubrica.sign.Signer;
 import io.rubrica.sign.ooxml.relprovider.OOXMLProvider;

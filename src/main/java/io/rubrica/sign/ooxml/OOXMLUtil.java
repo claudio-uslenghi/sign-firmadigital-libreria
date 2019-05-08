@@ -28,7 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.xml.sax.SAXException;
 
-import io.rubrica.util.Utils;
+import io.rubrica.utils.Utils;
 import io.rubrica.xml.FileUtils;
 
 /** Clase con m&eacute;todos de utilidad para las firmas OOXML. */

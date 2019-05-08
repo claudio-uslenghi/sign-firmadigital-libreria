@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.certificate.ec.cj;
 
 import java.io.ByteArrayInputStream;
@@ -38,212 +37,196 @@ import java.util.Date;
 import java.util.Set;
 
 /**
- * Certificado raiz del Banco Central del Ecuador, representado como un objeto
+ * Certificado raiz de Consejo de la Judicatura, representado como un objeto
  * <code>X509Certificate</code>.
  *
  * @author Ricardo Arguello <ricardo.arguello@soportelibre.com>
  */
 public class ConsejoJudicaturaCaCert extends X509Certificate {
 
-	private X509Certificate certificate;
+    private X509Certificate certificate;
 
-	public ConsejoJudicaturaCaCert() {
-		super();
+    public ConsejoJudicaturaCaCert() {
+        super();
 
-		StringBuffer cer = new StringBuffer();
-		cer.append("-----BEGIN CERTIFICATE-----\n");
-		cer.append("MIIJMzCCBxugAwIBAgIETj/6bTANBgkqhkiG9w0BAQsFADCBwjELMAkGA1UEBhMC\n");
-		cer.append("RUMxIjAgBgNVBAoTGUJBTkNPIENFTlRSQUwgREVMIEVDVUFET1IxNzA1BgNVBAsT\n");
-		cer.append("LkVOVElEQUQgREUgQ0VSVElGSUNBQ0lPTiBERSBJTkZPUk1BQ0lPTi1FQ0lCQ0Ux\n");
-		cer.append("DjAMBgNVBAcTBVFVSVRPMUYwRAYDVQQDEz1BVVRPUklEQUQgREUgQ0VSVElGSUNB\n");
-		cer.append("Q0lPTiBSQUlaIERFTCBCQU5DTyBDRU5UUkFMIERFTCBFQ1VBRE9SMB4XDTExMDgw\n");
-		cer.append("ODE0MzIwNVoXDTMxMDgwODE1MDIwNVowgcIxCzAJBgNVBAYTAkVDMSIwIAYDVQQK\n");
-		cer.append("ExlCQU5DTyBDRU5UUkFMIERFTCBFQ1VBRE9SMTcwNQYDVQQLEy5FTlRJREFEIERF\n");
-		cer.append("IENFUlRJRklDQUNJT04gREUgSU5GT1JNQUNJT04tRUNJQkNFMQ4wDAYDVQQHEwVR\n");
-		cer.append("VUlUTzFGMEQGA1UEAxM9QVVUT1JJREFEIERFIENFUlRJRklDQUNJT04gUkFJWiBE\n");
-		cer.append("RUwgQkFOQ08gQ0VOVFJBTCBERUwgRUNVQURPUjCCAiIwDQYJKoZIhvcNAQEBBQAD\n");
-		cer.append("ggIPADCCAgoCggIBALw9wH7DgFMR3kHUp72Wpug1N8JWFRthnhqxMWxOXVnGoYbG\n");
-		cer.append("sdVTaycXSeVnWt03AZDGw8x7FNh3A2Hh9vtOZGnFCOWJZyDqF5KiGHN6Jiy1mAD4\n");
-		cer.append("qAgFghWCh78OBO19ThI3PAflevMwqnWF5DJsqBdV8lqvOh8L5DX54PDYcs2zXlBI\n");
-		cer.append("76hz/Ye4BXI1dMSmlKbAVaiBMMG+Ye/szAL4RQCZNpyi65nbgXKztbvWjwJiJIbW\n");
-		cer.append("KND9Cu40+wZ6tm+OcTKyNQfhvdSfqRZ7tQv2LDwhPotuztyS6RljyMyNe1l3A6hW\n");
-		cer.append("D/JnS65gHi46H0WjrRqtH5ObqhTEwZszOPdU32VFcLhUtZhPQp0M74Wa2dXy9d+s\n");
-		cer.append("DBCdI9GZcaY+nzaNMbPEdT5lFg1Uc6ksWbWvj5udZMBhygZj1PtaWFjmqpZcdd9v\n");
-		cer.append("Z29GGbOtKB6bx162YGaK5sGjB385WVDRAi6Uzjl+0CpoDJjP7YS9tZrXlDs4gepp\n");
-		cer.append("KETthU2cpk73jYflzBeFFavuxNHGk6cVNgFrrhht0X0/eMhgq0Go4NUyY11g/r7f\n");
-		cer.append("3Upf0YR7OxOacjDbLpIbNxzeH2htcD0zpyS485TWnBnarjBhgO1ywQmRQ/Ryl8Zq\n");
-		cer.append("u7eWKBOfk++hibqJNfeLwEY3uBGoITbTXpBiX2u6U86bRGHES0Cm6mud5xErAgMB\n");
-		cer.append("AAGjggMtMIIDKTB8BgNVHSAEdTBzMHEGCisGAQQBgqg7AQEwYzBhBggrBgEFBQcC\n");
-		cer.append("ARZVaHR0cDovL3d3dy5lY2kuYmNlLmVjL2F1dG9yaWRhZC1jZXJ0aWZpY2FjaW9u\n");
-		cer.append("L2RlY2xhcmFjaW9uLXByYWN0aWNhcy1jZXJ0aWZpY2FjaW9uLnBkZjARBglghkgB\n");
-		cer.append("hvhCAQEEBAMCAAcwggHtBgNVHR8EggHkMIIB4DCCAdygggHYoIIB1KSB1DCB0TEL\n");
-		cer.append("MAkGA1UEBhMCRUMxIjAgBgNVBAoTGUJBTkNPIENFTlRSQUwgREVMIEVDVUFET1Ix\n");
-		cer.append("NzA1BgNVBAsTLkVOVElEQUQgREUgQ0VSVElGSUNBQ0lPTiBERSBJTkZPUk1BQ0lP\n");
-		cer.append("Ti1FQ0lCQ0UxDjAMBgNVBAcTBVFVSVRPMUYwRAYDVQQDEz1BVVRPUklEQUQgREUg\n");
-		cer.append("Q0VSVElGSUNBQ0lPTiBSQUlaIERFTCBCQU5DTyBDRU5UUkFMIERFTCBFQ1VBRE9S\n");
-		cer.append("MQ0wCwYDVQQDEwRDUkwxhoH6bGRhcDovL2JjZXFsZGFwcmFpenAuYmNlLmVjL2Nu\n");
-		cer.append("PUNSTDEsY249QVVUT1JJREFEJTIwREUlMjBDRVJUSUZJQ0FDSU9OJTIwUkFJWiUy\n");
-		cer.append("MERFTCUyMEJBTkNPJTIwQ0VOVFJBTCUyMERFTCUyMEVDVUFET1IsbD1RVUlUTyxv\n");
-		cer.append("dT1FTlRJREFEJTIwREUlMjBDRVJUSUZJQ0FDSU9OJTIwREUlMjBJTkZPUk1BQ0lP\n");
-		cer.append("Ti1FQ0lCQ0Usbz1CQU5DTyUyMENFTlRSQUwlMjBERUwlMjBFQ1VBRE9SLGM9RUM/\n");
-		cer.append("YXV0aG9yaXR5UmV2b2NhdGlvbkxpc3Q/YmFzZTArBgNVHRAEJDAigA8yMDExMDgw\n");
-		cer.append("ODE0MzIwNVqBDzIwMzEwODA4MTUwMjA1WjALBgNVHQ8EBAMCAQYwHwYDVR0jBBgw\n");
-		cer.append("FoAUqBAVqN+gmczo6M/ubUbv6hbSCswwHQYDVR0OBBYEFKgQFajfoJnM6OjP7m1G\n");
-		cer.append("7+oW0grMMAwGA1UdEwQFMAMBAf8wHQYJKoZIhvZ9B0EABBAwDhsIVjguMDo0LjAD\n");
-		cer.append("AgSQMA0GCSqGSIb3DQEBCwUAA4ICAQCt5F5DaFGcZqrQ5uKKrk2D1KD2DlNbniaK\n");
-		cer.append("IwJfZ36tLYUuyu7VmLZZdrVKqjC+FYAZIQJn/q2w/0JN5I5YK+Yj1UEa9nlmshRH\n");
-		cer.append("aCEJXZokLXFjD4ZayiZgJh7OcMEV7G9VFFP2WF4iDflSG0drhn152Fllh+y1ZHov\n");
-		cer.append("hX6TlCT0y5iAq+zzq2Utu6Gs1SU5U7fCC7gNYOeztPehqlnSTaD1xAbqnTVOBS1Z\n");
-		cer.append("hoCQio5vF98TS36ItfjDA0bO12FiJKOLx9WNiimDxy0KIFSfifD1FfmUO5MYgcke\n");
-		cer.append("CTLnkGHtCadhpEsy6HwHeeuLNPkp5DMGJeBX1XAjVC50ulw36lXuryJ9/FRBpbdg\n");
-		cer.append("uLJIssFndQlr6klA5LdK44yFVr3+1d+59fNuiFQnKQV7bFQfApv5FqvqyfNEEI1K\n");
-		cer.append("1prM82aq24xDT5OwsyRnf+F7p6OwQTYmGYkrGH5RlqFI+XC8ckMip3XecFb6Qyur\n");
-		cer.append("kaA/286eYUOZiJpPgn/qlisNreF0GTLi9tBzExGCD+BdsYGqMu/gx8lgMbF3b+HK\n");
-		cer.append("eQe8+kExkb7LVYhbTlOBZzB0da/cDmvg1V+pgrXu0qUX/YnQyybnA9nyQdLj60/3\n");
-		cer.append("sUlWyxURbu33kTNnrPJmcHjRa561Co84NYKifLrDSgAChLQry/eItvhzFYu33Td9\n");
-		cer.append("TkHa++TQjg==\n");
-		cer.append("-----END CERTIFICATE-----");
+        StringBuilder cer = new StringBuilder();
+        cer.append("-----BEGIN CERTIFICATE-----\n");
+        cer.append("MIIGpjCCBI6gAwIBAgIIclcPl1CWUaYwDQYJKoZIhvcNAQELBQAwgboxCzAJBgNV\n");
+        cer.append("BAYTAkVDMREwDwYDVQQHDAhETSBRVUlUTzEhMB8GA1UECgwYQ09OU0VKTyBERSBM\n");
+        cer.append("QSBKVURJQ0FUVVJBMUQwQgYDVQQLDDtTVUJESVJFQ0NJT04gTkFDSU9OQUwgREUg\n");
+        cer.append("U0VHVVJJREFEIERFIExBIElORk9STUFDSU9OIEROVElDUzEvMC0GA1UEAwwmSUNF\n");
+        cer.append("UlQtRUMgRU5USURBRCBERSBDRVJUSUZJQ0FDSU9OIFJBSVowHhcNMTQxMDE2MTc0\n");
+        cer.append("MDEzWhcNMzQxMDE2MTc0MDEzWjCBujELMAkGA1UEBhMCRUMxETAPBgNVBAcMCERN\n");
+        cer.append("IFFVSVRPMSEwHwYDVQQKDBhDT05TRUpPIERFIExBIEpVRElDQVRVUkExRDBCBgNV\n");
+        cer.append("BAsMO1NVQkRJUkVDQ0lPTiBOQUNJT05BTCBERSBTRUdVUklEQUQgREUgTEEgSU5G\n");
+        cer.append("T1JNQUNJT04gRE5USUNTMS8wLQYDVQQDDCZJQ0VSVC1FQyBFTlRJREFEIERFIENF\n");
+        cer.append("UlRJRklDQUNJT04gUkFJWjCCAiIwDQYJKoZIhvcNAQEBBQADggIPADCCAgoCggIB\n");
+        cer.append("AMKpj1qmAlDFg+c2e1tCMij8c5+SAv6DIbDX7664wssD1baWNz7tjMLsHekxr5CR\n");
+        cer.append("RgUq82leyxqFRpBaURxaRMwrys9sSPO5qfln5HM/4I8lRzR+RTD67JGqEI8U1YVf\n");
+        cer.append("LwGYPqC5NTMaK/PKQ0ZoOfk6sgEx5o7XErB6CjSbr2d/ahlt8JL+KShvTkYqtHoM\n");
+        cer.append("kg9a/1jPGKLHiLIxFstf+4L6ss/c4X6HwsjxEVTATuU3ByNVrVItPfxU2fxUsA7D\n");
+        cer.append("JHPS2/mRFmHRuWMOzMoK2H0idavF0vqce1wWyaUbIeKE4NnLvE/Y0ONhVcNwRStl\n");
+        cer.append("1lYix6Llf/5FW+AIJlwI3f8AvpS3sNGLGs27RxM0kklJS6iJx/q1GhoYIsglNJDO\n");
+        cer.append("LDnRfEPwHx9oVa39xV0qvfwQsF4I+alUW2wafTcJtfv0NZHEmj2KcfgosCF0Zeji\n");
+        cer.append("aA3lyA9gQaIARGzF74ui4vj4dkfdf7hOSEp8LSEz7zZH52O8X4rKEKzHQeoTxbzP\n");
+        cer.append("vqLFAhORxpMSkx+n7xUJpGSDLwy3rsTX865j4fokH/IxJylcOeChPcKoMa+P02Zf\n");
+        cer.append("FWi9TrUlyiGe0x2V/8n47IhPRQPiFFN90U3Ct96zAYYSw0jmHy6ktGHRJcGTlw1P\n");
+        cer.append("PYqbcghot0/pB126IFgFx5oiN3VReTXo86yadAxkRm17AgMBAAGjga0wgaowHQYD\n");
+        cer.append("VR0OBBYEFHPIw70P+VVA8WWYelijZ0gfcJ0bMA8GA1UdEwEB/wQFMAMBAf8waAYD\n");
+        cer.append("VR0gBGEwXzBdBgRVHSAAMFUwUwYIKwYBBQUHAgEWR2h0dHA6Ly93d3cuaWNlcnQu\n");
+        cer.append("ZmplLmdvYi5lYy9kcGMvZGVjbGFyYWNpb25fcHJhY3RpY2FzX2NlcnRpZmljYWNp\n");
+        cer.append("b24ucGRmMA4GA1UdDwEB/wQEAwIBBjANBgkqhkiG9w0BAQsFAAOCAgEAkUMleJaH\n");
+        cer.append("8gPVbe3fmLUvOGI5rWMaa3La2LRWkSCzh0TtyBnjMYsSSwEmnsHA71KXwC6rNVwK\n");
+        cer.append("yA4Q9cCytLHb3ewMpuFRAIprrDoCeUxmX4/SlHUOlwJ9oE22dYa6+BiW7OYFMjcc\n");
+        cer.append("EfwYKce9dXc73+TeyJKKZBYoHWDUSQ2+RbTAjLLxyd+pM5GPZe6/WdgjEhYHxWYu\n");
+        cer.append("F7tDMmsk1KqHQWbzA50mPJ9KdrApYt/hf9zZ7Z6+iAdY8yUHzuuSuY2YxyUorPHl\n");
+        cer.append("yOCT2snOqYMq5pyxECnzNyPmtghmVKSa6NE/mCL+VVWalejZsnwq4Bk5U3s/Lpau\n");
+        cer.append("G7n6vpoo4chqNWzHMz+AGukE7Umvb+2UtAyTzZTYCDdwYQCuy0CnG5eM6qxJJbg5\n");
+        cer.append("k+pqUexMvUDFTIuF+HZUVEZcNAhhXi+Fhg3MqJZoCRJHRFt+0D1QG6bNJ4Lq3oH7\n");
+        cer.append("wuOf+wRY7JAaK1FT8lYqD2kLr2if8f0GlAYBUtEqeRdGRh0PYQgcHHM+Sf4QOUNP\n");
+        cer.append("3JN8sVJQZLMWD5D6PHznd19im3T1+SJqWvUQespDi6IYnmlXyjoUtIIpuQGgrlfc\n");
+        cer.append("OcZ17gRrAIbpPfZNTuakG2Q8q1MmSt1CCArLFpTvLoDigNRsMYSwdaeEjJQvIzSK\n");
+        cer.append("yUlekcadxaa0YzaiQOdpExKqoTrZZtN9d9U=\n");
+        cer.append("-----END CERTIFICATE-----");
 
-		try {
-			InputStream is = new ByteArrayInputStream(cer.toString().getBytes("UTF-8"));
-			CertificateFactory cf = CertificateFactory.getInstance("X.509");
-			this.certificate = (X509Certificate) cf.generateCertificate(is);
-		} catch (UnsupportedEncodingException e) {
-			throw new IllegalArgumentException(e);
-		} catch (GeneralSecurityException e) {
-			throw new IllegalArgumentException(e);
-		}
-	}
+        try {
+            InputStream is = new ByteArrayInputStream(cer.toString().getBytes("UTF-8"));
+            CertificateFactory cf = CertificateFactory.getInstance("X.509");
+            this.certificate = (X509Certificate) cf.generateCertificate(is);
+        } catch (UnsupportedEncodingException | GeneralSecurityException e) {
+            throw new IllegalArgumentException(e);
+        }
+    }
 
-	@Override
-	public void checkValidity() throws CertificateExpiredException, CertificateNotYetValidException {
-		certificate.checkValidity();
-	}
+    @Override
+    public void checkValidity() throws CertificateExpiredException, CertificateNotYetValidException {
+        certificate.checkValidity();
+    }
 
-	@Override
-	public void checkValidity(Date date) throws CertificateExpiredException, CertificateNotYetValidException {
-		certificate.checkValidity(date);
-	}
+    @Override
+    public void checkValidity(Date date) throws CertificateExpiredException, CertificateNotYetValidException {
+        certificate.checkValidity(date);
+    }
 
-	@Override
-	public int getBasicConstraints() {
-		return certificate.getBasicConstraints();
-	}
+    @Override
+    public int getBasicConstraints() {
+        return certificate.getBasicConstraints();
+    }
 
-	@Override
-	public Principal getIssuerDN() {
-		return certificate.getIssuerDN();
-	}
+    @Override
+    public Principal getIssuerDN() {
+        return certificate.getIssuerDN();
+    }
 
-	@Override
-	public boolean[] getIssuerUniqueID() {
-		return certificate.getIssuerUniqueID();
-	}
+    @Override
+    public boolean[] getIssuerUniqueID() {
+        return certificate.getIssuerUniqueID();
+    }
 
-	@Override
-	public boolean[] getKeyUsage() {
-		return certificate.getKeyUsage();
-	}
+    @Override
+    public boolean[] getKeyUsage() {
+        return certificate.getKeyUsage();
+    }
 
-	@Override
-	public Date getNotAfter() {
-		return certificate.getNotAfter();
-	}
+    @Override
+    public Date getNotAfter() {
+        return certificate.getNotAfter();
+    }
 
-	@Override
-	public Date getNotBefore() {
-		return certificate.getNotBefore();
-	}
+    @Override
+    public Date getNotBefore() {
+        return certificate.getNotBefore();
+    }
 
-	@Override
-	public BigInteger getSerialNumber() {
-		return certificate.getSerialNumber();
-	}
+    @Override
+    public BigInteger getSerialNumber() {
+        return certificate.getSerialNumber();
+    }
 
-	@Override
-	public String getSigAlgName() {
-		return certificate.getSigAlgName();
-	}
+    @Override
+    public String getSigAlgName() {
+        return certificate.getSigAlgName();
+    }
 
-	@Override
-	public String getSigAlgOID() {
-		return certificate.getSigAlgOID();
-	}
+    @Override
+    public String getSigAlgOID() {
+        return certificate.getSigAlgOID();
+    }
 
-	@Override
-	public byte[] getSigAlgParams() {
-		return certificate.getSigAlgParams();
-	}
+    @Override
+    public byte[] getSigAlgParams() {
+        return certificate.getSigAlgParams();
+    }
 
-	@Override
-	public byte[] getSignature() {
-		return certificate.getSignature();
-	}
+    @Override
+    public byte[] getSignature() {
+        return certificate.getSignature();
+    }
 
-	@Override
-	public Principal getSubjectDN() {
-		return certificate.getSubjectDN();
-	}
+    @Override
+    public Principal getSubjectDN() {
+        return certificate.getSubjectDN();
+    }
 
-	@Override
-	public boolean[] getSubjectUniqueID() {
-		return certificate.getSubjectUniqueID();
-	}
+    @Override
+    public boolean[] getSubjectUniqueID() {
+        return certificate.getSubjectUniqueID();
+    }
 
-	@Override
-	public byte[] getTBSCertificate() throws CertificateEncodingException {
-		return certificate.getTBSCertificate();
-	}
+    @Override
+    public byte[] getTBSCertificate() throws CertificateEncodingException {
+        return certificate.getTBSCertificate();
+    }
 
-	@Override
-	public int getVersion() {
-		return certificate.getVersion();
-	}
+    @Override
+    public int getVersion() {
+        return certificate.getVersion();
+    }
 
-	@Override
-	public byte[] getEncoded() throws CertificateEncodingException {
-		return certificate.getEncoded();
-	}
+    @Override
+    public byte[] getEncoded() throws CertificateEncodingException {
+        return certificate.getEncoded();
+    }
 
-	@Override
-	public PublicKey getPublicKey() {
-		return certificate.getPublicKey();
-	}
+    @Override
+    public PublicKey getPublicKey() {
+        return certificate.getPublicKey();
+    }
 
-	@Override
-	public String toString() {
-		return certificate.toString();
-	}
+    @Override
+    public String toString() {
+        return certificate.toString();
+    }
 
-	@Override
-	public void verify(PublicKey key) throws CertificateException, NoSuchAlgorithmException, InvalidKeyException,
-			NoSuchProviderException, SignatureException {
-		certificate.verify(key);
-	}
+    @Override
+    public void verify(PublicKey key) throws CertificateException, NoSuchAlgorithmException, InvalidKeyException,
+            NoSuchProviderException, SignatureException {
+        certificate.verify(key);
+    }
 
-	@Override
-	public void verify(PublicKey key, String sigProvider) throws CertificateException, NoSuchAlgorithmException,
-			InvalidKeyException, NoSuchProviderException, SignatureException {
-		certificate.verify(key, sigProvider);
-	}
+    @Override
+    public void verify(PublicKey key, String sigProvider) throws CertificateException, NoSuchAlgorithmException,
+            InvalidKeyException, NoSuchProviderException, SignatureException {
+        certificate.verify(key, sigProvider);
+    }
 
-	@Override
-	public Set<String> getCriticalExtensionOIDs() {
-		return certificate.getCriticalExtensionOIDs();
-	}
+    @Override
+    public Set<String> getCriticalExtensionOIDs() {
+        return certificate.getCriticalExtensionOIDs();
+    }
 
-	@Override
-	public byte[] getExtensionValue(String oid) {
-		return certificate.getExtensionValue(oid);
-	}
+    @Override
+    public byte[] getExtensionValue(String oid) {
+        return certificate.getExtensionValue(oid);
+    }
 
-	@Override
-	public Set<String> getNonCriticalExtensionOIDs() {
-		return certificate.getNonCriticalExtensionOIDs();
-	}
+    @Override
+    public Set<String> getNonCriticalExtensionOIDs() {
+        return certificate.getNonCriticalExtensionOIDs();
+    }
 
-	@Override
-	public boolean hasUnsupportedCriticalExtension() {
-		return certificate.hasUnsupportedCriticalExtension();
-	}
+    @Override
+    public boolean hasUnsupportedCriticalExtension() {
+        return certificate.hasUnsupportedCriticalExtension();
+    }
 }

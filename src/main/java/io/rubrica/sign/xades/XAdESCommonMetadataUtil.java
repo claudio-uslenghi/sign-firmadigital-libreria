@@ -31,7 +31,7 @@ import es.uji.crypto.xades.jxades.security.xml.XAdES.SignatureProductionPlaceImp
 import es.uji.crypto.xades.jxades.security.xml.XAdES.SignerRole;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.SignerRoleImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES_EPES;
-import io.rubrica.core.RubricaException;
+import io.rubrica.exceptions.RubricaException;
 
 final class XAdESCommonMetadataUtil {
 

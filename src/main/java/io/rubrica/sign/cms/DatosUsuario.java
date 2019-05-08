@@ -15,7 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.sign.cms;
 
 /**
@@ -25,115 +24,91 @@ package io.rubrica.sign.cms;
  */
 public class DatosUsuario {
 
-	private String nombre;
-	private String apellido;
-	private String institucion = "";
-	private String cargo = "";
-	private String serial;
-	private String fechaFirmaArchivo;
-	private String crl;
-	private String archivo64;
-	private String entidadCertificadora;
-	private String mensaje;
+    private String cedula;
+    private String nombre;
+    private String apellido;
+    private String institucion = "";
+    private String cargo = "";
+    private String serial;
+    private String fechaFirmaArchivo;
+    private String entidadCertificadora;
 
-	public DatosUsuario() {
-	}
+    public DatosUsuario() {
+    }
 
-	private String cedula;
+    public String getCedula() {
+        return cedula;
+    }
 
-	public String getCedula() {
-		return cedula;
-	}
+    public void setCedula(String cedula) {
+        this.cedula = cedula;
+    }
 
-	public void setCedula(String cedula) {
-		this.cedula = cedula;
-	}
+    public String getNombre() {
+        return nombre;
+    }
 
-	public String getNombre() {
-		return nombre;
-	}
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
 
-	public void setNombre(String nombre) {
-		this.nombre = nombre;
-	}
+    public String getApellido() {
+        return apellido;
+    }
 
-	public String getApellido() {
-		return apellido;
-	}
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
+    }
 
-	public void setApellido(String apellido) {
-		this.apellido = apellido;
-	}
+    public String getInstitucion() {
+        return institucion;
+    }
 
-	public String getInstitucion() {
-		return institucion;
-	}
+    public void setInstitucion(String institucion) {
+        this.institucion = institucion;
+    }
 
-	public void setInstitucion(String institucion) {
-		this.institucion = institucion;
-	}
+    public String getCargo() {
+        return cargo;
+    }
 
-	public String getCargo() {
-		return cargo;
-	}
+    public void setCargo(String cargo) {
+        this.cargo = cargo;
+    }
 
-	public void setCargo(String cargo) {
-		this.cargo = cargo;
-	}
+    public String getSerial() {
+        return serial;
+    }
 
-	public String getSerial() {
-		return serial;
-	}
+    public void setSerial(String serial) {
+        this.serial = serial;
+    }
 
-	public void setSerial(String serial) {
-		this.serial = serial;
-	}
+    public String getFechaFirmaArchivo() {
+        return fechaFirmaArchivo;
+    }
 
-	public String getFechaFirmaArchivo() {
-		return fechaFirmaArchivo;
-	}
+    public void setFechaFirmaArchivo(String fechaFirmaArchivo) {
+        this.fechaFirmaArchivo = fechaFirmaArchivo;
+    }
 
-	public void setFechaFirmaArchivo(String fechaFirmaArchivo) {
-		this.fechaFirmaArchivo = fechaFirmaArchivo;
-	}
+    public String getEntidadCertificadora() {
+        return entidadCertificadora;
+    }
 
-	public String getCrl() {
-		return crl;
-	}
+    public void setEntidadCertificadora(String entidadCertificadora) {
+        this.entidadCertificadora = entidadCertificadora;
+    }
 
-	public void setCrl(String crl) {
-		this.crl = crl;
-	}
-
-	public String getArchivo64() {
-		return archivo64;
-	}
-
-	public void setArchivo64(String archivo64) {
-		this.archivo64 = archivo64;
-	}
-
-	public String getEntidadCertificadora() {
-		return entidadCertificadora;
-	}
-
-	public void setEntidadCertificadora(String entidadCertificadora) {
-		this.entidadCertificadora = entidadCertificadora;
-	}
-
-	public String getMensaje() {
-		return mensaje;
-	}
-
-	public void setMensaje(String mensaje) {
-		this.mensaje = mensaje;
-	}
-
-	@Override
-	public String toString() {
-		return "DatosUsuario [nombre=" + nombre + ", apellido=" + apellido + ", institucion=" + institucion + ", cargo="
-				+ cargo + ", serial=" + serial + ", fechaFirmaArchivo=" + fechaFirmaArchivo + ", crl=" + crl
-				+ ", archivo64=" + archivo64 + ", entidadCertificadora=" + entidadCertificadora + ", mensaje=" + mensaje
-				+ ", cedula=" + cedula + "]";
-	}
+    @Override
+    public String toString() {
+        return "\tDatosUsuario\n"
+                + "\t\t[cedula=" + cedula + "\n"
+                + "\t\tnombre=" + nombre + "\n"
+                + "\t\tapellido=" + apellido + "\n"
+                + "\t\tinstitucion=" + institucion + "\n"
+                + "\t\tcargo=" + cargo + "\n"
+                + "\t\tentidadCertificadora=" + entidadCertificadora + "\n"
+                + "\t\t]";
+    }
 }

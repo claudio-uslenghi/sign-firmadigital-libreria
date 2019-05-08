@@ -52,10 +52,10 @@ import es.uji.crypto.xades.jxades.security.xml.XAdES.DataObjectFormatImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.ObjectIdentifierImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES_EPES;
-import io.rubrica.core.RubricaException;
+import io.rubrica.exceptions.RubricaException;
 import io.rubrica.core.Util;
 import io.rubrica.sign.XMLConstants;
-import io.rubrica.util.MimeHelper;
+import io.rubrica.utils.MimeHelper;
 import io.rubrica.xml.Utils;
 
 /**

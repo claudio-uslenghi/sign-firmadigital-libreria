@@ -51,7 +51,7 @@ import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIdImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIndication;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.CommitmentTypeIndicationImpl;
 import es.uji.crypto.xades.jxades.security.xml.XAdES.XAdES_EPES;
-import io.rubrica.core.RubricaException;
+import io.rubrica.exceptions.RubricaException;
 import io.rubrica.sign.SignConstants;
 
 /**

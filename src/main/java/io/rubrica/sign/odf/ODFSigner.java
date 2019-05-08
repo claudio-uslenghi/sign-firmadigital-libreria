@@ -17,6 +17,7 @@
 
 package io.rubrica.sign.odf;
 
+import io.rubrica.exceptions.FormatFileException;
 import java.io.BufferedWriter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -77,13 +78,13 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import io.rubrica.core.RubricaException;
+import io.rubrica.exceptions.RubricaException;
 import io.rubrica.core.Util;
-import io.rubrica.sign.InvalidFormatException;
+import io.rubrica.exceptions.InvalidFormatException;
 import io.rubrica.sign.SignInfo;
 import io.rubrica.sign.Signer;
 import io.rubrica.sign.XMLConstants;
-import io.rubrica.util.Utils;
+import io.rubrica.utils.Utils;
 import nu.xom.canonical.Canonicalizer;
 import nu.xom.converters.DOMConverter;
 

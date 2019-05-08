@@ -33,7 +33,7 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import io.rubrica.util.OsUtils;
+import io.rubrica.utils.OsUtils;
 
 class OOXMLOfficeObjectHelper {
 

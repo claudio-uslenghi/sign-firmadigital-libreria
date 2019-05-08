@@ -55,7 +55,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import io.rubrica.util.Utils;
+import io.rubrica.utils.Utils;
 
 class OOXMLZipHelper {
 

@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.certificate.ec.securitydata;
 
 import static io.rubrica.certificate.ec.securitydata.CertificadoSecurityData.OID_CEDULA_PASAPORTE;
@@ -25,7 +24,7 @@ import static io.rubrica.certificate.ec.securitydata.CertificadoSecurityData.OID
 import static io.rubrica.certificate.ec.securitydata.CertificadoSecurityData.OID_TIPO_PERSONA_NATURAL_PROFESIONAL;
 import static io.rubrica.certificate.ec.securitydata.CertificadoSecurityData.OID_TIPO_PRUEBA;
 import static io.rubrica.certificate.ec.securitydata.CertificadoSecurityData.OID_TIPO_REPRESENTANTE_LEGAL;
-import static io.rubrica.util.BouncyCastleUtils.certificateHasPolicy;
+import static io.rubrica.utils.BouncyCastleUtils.certificateHasPolicy;
 
 import java.security.cert.X509Certificate;
 
@@ -37,28 +36,29 @@ import java.security.cert.X509Certificate;
  */
 public class CertificadoSecurityDataFactory {
 
-	public static boolean esCertificadoDeSecurityData(X509Certificate certificado) {
-		byte[] valor = certificado.getExtensionValue(OID_CEDULA_PASAPORTE);
-		return (valor != null);
-	}
+    public static boolean esCertificadoDeSecurityData(X509Certificate certificado) {
+        byte[] valor = certificado.getExtensionValue(OID_CEDULA_PASAPORTE);
+        return (valor != null);
+    }
 
-	public static CertificadoSecurityData construir(X509Certificate certificado) {
-		if (certificateHasPolicy(certificado, OID_TIPO_PERSONA_NATURAL)) {
-			return new CertificadoPersonaNaturalSecurityData(certificado);
-		} else if (certificateHasPolicy(certificado, OID_TIPO_PERSONA_JURIDICA_EMPRESA)) {
-			return new CertificadoPersonaJuridicaSecurityData(certificado);
-		} else if (certificateHasPolicy(certificado, OID_TIPO_REPRESENTANTE_LEGAL)) {
-			return new CertificadoRepresentanteLegalSecurityData(certificado);
-		} else if (certificateHasPolicy(certificado, OID_TIPO_MIEMBRO_EMPRESA)) {
-			return new CertificadoMiembroEmpresaSecurityData(certificado);
-		} else if (certificateHasPolicy(certificado, OID_TIPO_FUNCIONARIO_PUBLICO)) {
-			return new CertificadoFuncionarioPublicoSecurityData(certificado);
-		} else if (certificateHasPolicy(certificado, OID_TIPO_PERSONA_NATURAL_PROFESIONAL)) {
-			return new CertificadoPersonaNaturalSecurityData(certificado);
-		} else if (certificateHasPolicy(certificado, OID_TIPO_PRUEBA)) {
-			return new CertificadoPruebaSecurityData(certificado);
-		} else {
-			throw new RuntimeException("Tipo Certificado de SecurityData desconocido!");
-		}
-	}
+    public static CertificadoSecurityData construir(X509Certificate certificado) {
+        if (certificateHasPolicy(certificado, OID_TIPO_PERSONA_NATURAL)) {
+            return new CertificadoPersonaNaturalSecurityData(certificado);
+        } else if (certificateHasPolicy(certificado, OID_TIPO_PERSONA_JURIDICA_EMPRESA)) {
+            return new CertificadoPersonaJuridicaSecurityData(certificado);
+        } else if (certificateHasPolicy(certificado, OID_TIPO_REPRESENTANTE_LEGAL)) {
+            return new CertificadoRepresentanteLegalSecurityData(certificado);
+        } else if (certificateHasPolicy(certificado, OID_TIPO_MIEMBRO_EMPRESA)) {
+            return new CertificadoMiembroEmpresaSecurityData(certificado);
+        } else if (certificateHasPolicy(certificado, OID_TIPO_FUNCIONARIO_PUBLICO)) {
+            return new CertificadoFuncionarioPublicoSecurityData(certificado);
+        } else if (certificateHasPolicy(certificado, OID_TIPO_PERSONA_NATURAL_PROFESIONAL)) {
+            return new CertificadoPersonaNaturalSecurityData(certificado);
+        } else if (certificateHasPolicy(certificado, OID_TIPO_PRUEBA)) {
+            return new CertificadoPruebaSecurityData(certificado);
+        } else {
+//            return new CertificadoPersonaNaturalSecurityData(certificado);
+            throw new RuntimeException("Tipo Certificado de SecurityData desconocido!");
+        }
+    }
 }

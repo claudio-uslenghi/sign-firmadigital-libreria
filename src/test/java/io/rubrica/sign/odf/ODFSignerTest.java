@@ -32,7 +32,7 @@ import org.junit.Test;
 import io.rubrica.sign.SignInfo;
 import io.rubrica.sign.Signer;
 import io.rubrica.sign.TestHelper;
-import io.rubrica.util.Utils;
+import io.rubrica.utils.Utils;
 
 public class ODFSignerTest {
 
