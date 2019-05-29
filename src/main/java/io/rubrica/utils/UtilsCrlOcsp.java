@@ -70,53 +70,53 @@ public class UtilsCrlOcsp {
      * @throws io.rubrica.exceptions.EntidadCertificadoraNoValidaException
      * @throws io.rubrica.exceptions.ConexionValidarCRLException
      */
-//    public static String validarCertificado(X509Certificate cert) throws EntidadCertificadoraNoValidaException, IOException, RubricaException, ConexionValidarCRLException, CRLValidationException {
-//        String fechaRevocado = null;
-//        try {
-//            BigInteger serial = cert.getSerialNumber();
-//            fechaRevocado = validarCrlServidorAPI(serial);
-//        } catch (IOException | ConexionApiException ex) {
-//            System.out.println("Fallo la validacion por el servicio del API, Ahora intentamos por OCSP");
-//            //LOGGER.getLogger(UtilsCrlOcsp.class.getName()).log(Level.SEVERE, null, ex);
-//            try {
-//                fechaRevocado = validarOCSP(cert);
-//                if (fechaRevocado.equals("unknownStatus")) {
-//                    System.out.println("Fallo la validacion por OCSP, Ahora intentamos por CRL");
-//                    fechaRevocado = validarCRL(cert);
-//                }
-//            } catch (IOException | RubricaException ex1) {
-//                System.out.println("Fallo la validacion por OCSP, Ahora intentamos por CRL");
-//                //LOGGER.getLogger(UtilsCrlOcsp.class.getName()).log(Level.SEVERE, null, ex1);
-//                fechaRevocado = validarCRL(cert);
-//            }
-//        }
-//        return fechaRevocado;
-//    }
     public static String validarCertificado(X509Certificate cert) throws EntidadCertificadoraNoValidaException, IOException, RubricaException, ConexionValidarCRLException, CRLValidationException {
         String fechaRevocado = null;
         try {
-            fechaRevocado = validarOCSP(cert);
-            if (fechaRevocado.equals("unknownStatus")) {
-                System.out.println("Fallo la validacion por OCSP, Ahora intentamos por servicio del API");
-                BigInteger serial = cert.getSerialNumber();
-                fechaRevocado = validarCrlServidorAPI(serial);
-            }
-        } catch (IOException | RubricaException ex1) {
-            //Logger.getLogger(UtilsCrlOcsp.class.getName()).log(Level.SEVERE, null, ex1);
-            System.out.println("Fallo la validacion por OCSP, Ahora intentamos por servicio del API");
+            BigInteger serial = cert.getSerialNumber();
+            fechaRevocado = validarCrlServidorAPI(serial);
+        } catch (IOException | ConexionApiException ex) {
+            System.out.println("Fallo la validacion por el servicio del API, Ahora intentamos por OCSP");
+            //LOGGER.getLogger(UtilsCrlOcsp.class.getName()).log(Level.SEVERE, null, ex);
             try {
-                BigInteger serial = cert.getSerialNumber();
-                fechaRevocado = validarCrlServidorAPI(serial);
-            } catch (IOException | ConexionApiException ex) {
-                //Logger.getLogger(UtilsCrlOcsp.class.getName()).log(Level.SEVERE, null, ex);
-                System.out.println("Fallo la validacion por el servicio del API, Ahora intentamos por CRL");
+                fechaRevocado = validarOCSP(cert);
+                if (fechaRevocado.equals("unknownStatus")) {
+                    System.out.println("Fallo la validacion por OCSP, Ahora intentamos por CRL");
+                    fechaRevocado = validarCRL(cert);
+                }
+            } catch (IOException | RubricaException ex1) {
+                System.out.println("Fallo la validacion por OCSP, Ahora intentamos por CRL");
+                //LOGGER.getLogger(UtilsCrlOcsp.class.getName()).log(Level.SEVERE, null, ex1);
                 fechaRevocado = validarCRL(cert);
             }
-        } catch (ConexionApiException ex) {
-            Logger.getLogger(UtilsCrlOcsp.class.getName()).log(Level.SEVERE, null, ex);
         }
         return fechaRevocado;
     }
+//    public static String validarCertificado(X509Certificate cert) throws EntidadCertificadoraNoValidaException, IOException, RubricaException, ConexionValidarCRLException, CRLValidationException {
+//        String fechaRevocado = null;
+//        try {
+//            fechaRevocado = validarOCSP(cert);
+//            if (fechaRevocado.equals("unknownStatus")) {
+//                System.out.println("Fallo la validacion por OCSP, Ahora intentamos por servicio del API");
+//                BigInteger serial = cert.getSerialNumber();
+//                fechaRevocado = validarCrlServidorAPI(serial);
+//            }
+//        } catch (IOException | RubricaException ex1) {
+//            //Logger.getLogger(UtilsCrlOcsp.class.getName()).log(Level.SEVERE, null, ex1);
+//            System.out.println("Fallo la validacion por OCSP, Ahora intentamos por servicio del API");
+//            try {
+//                BigInteger serial = cert.getSerialNumber();
+//                fechaRevocado = validarCrlServidorAPI(serial);
+//            } catch (IOException | ConexionApiException ex) {
+//                //Logger.getLogger(UtilsCrlOcsp.class.getName()).log(Level.SEVERE, null, ex);
+//                System.out.println("Fallo la validacion por el servicio del API, Ahora intentamos por CRL");
+//                fechaRevocado = validarCRL(cert);
+//            }
+//        } catch (ConexionApiException ex) {
+//            Logger.getLogger(UtilsCrlOcsp.class.getName()).log(Level.SEVERE, null, ex);
+//        }
+//        return fechaRevocado;
+//    }
 
     public static Date fechaString_Date(String fecha) throws ParseException {
         DateFormat formato = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");

@@ -61,7 +61,7 @@ public class CertEcUtils {
             case "Anf AC":
                 return new AnfAcSubCaCert();
             default:
-                throw new EntidadCertificadoraNoValidaException("Entidad Certificador no reconocida");
+                throw new EntidadCertificadoraNoValidaException("Entidad Certificadora no reconocida");
         }
     }
 
@@ -132,6 +132,7 @@ public class CertEcUtils {
                 datosUsuario.setCargo(certificadoRepresentanteLegal.getCargo());
                 datosUsuario.setSerial(certificado.getSerialNumber().toString());
             }
+            datosUsuario.setEntidadCertificadora("Banco Central del Ecuador");
             return datosUsuario;
         }
 
@@ -192,6 +193,7 @@ public class CertEcUtils {
                         + certificadoPersonaNaturalConsejoJudicatura.getSegundoApellido());
                 datosUsuario.setSerial(certificado.getSerialNumber().toString());
             }
+            datosUsuario.setEntidadCertificadora("Consejo de la Judicatura");
             return datosUsuario;
         }
 
@@ -226,9 +228,10 @@ public class CertEcUtils {
                         + certificadoPersonaNatural.getSegundoApellido());
                 datosUsuario.setSerial(certificado.getSerialNumber().toString());
             }
+            datosUsuario.setEntidadCertificadora("Security Data");
             return datosUsuario;
         }
-        
+
         if (CertificadoAnfAcFactory.esCertificadoDeAnfAc(certificado)) {
             CertificadoAnfAc certificadoAnfAc = CertificadoAnfAcFactory.construir(certificado);
             if (certificadoAnfAc instanceof CertificadoFuncionarioPublico) {
@@ -260,6 +263,7 @@ public class CertEcUtils {
                         + certificadoPersonaNatural.getSegundoApellido());
                 datosUsuario.setSerial(certificado.getSerialNumber().toString());
             }
+            datosUsuario.setEntidadCertificadora("Anf AC");
             return datosUsuario;
         }
         return null;

@@ -17,6 +17,7 @@
 package io.rubrica.utils;
 
 import java.awt.Desktop;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -24,6 +25,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.apache.tika.config.TikaConfig;
+import org.apache.tika.detect.DefaultDetector;
+import org.apache.tika.detect.Detector;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.mime.MediaType;
+import org.apache.tika.mime.MimeType;
+import org.apache.tika.mime.MimeTypeException;
 
 /**
  *
@@ -38,20 +46,6 @@ public class FileUtils {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    public static String getFileExtension(String fileName) {
-        try {
-            return fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    public static String removeP7MExtension(File file) {
-        String name = file.getName();
-        int lastPeriodPos = name.lastIndexOf('.');
-        return null;
     }
 
     public static byte[] fileConvertToByteArray(File file) throws IOException {
@@ -80,29 +74,43 @@ public class FileUtils {
     }
 
     // TODO Crear clase para manejar esto
-    public static String crearNombreFirmado(File documento) {
-        // buscamos el nombre para crear el signed
-        // TODO validar si hay otro archivo de momento lo sobre escribe
-        // USAR solo getAbsolutPath, talvez sin ruta
-        String nombreCompleto = documento.getAbsolutePath();
-        String nombre = nombreCompleto.replaceFirst("[.][^.]+$", "");
-        //String extension = getFileExtension(documento);
-        String extension = FileUtils.getFileExtension(documento);
-        return nombre + "-signed." + extension;
+    public static String crearNombreFirmado(File documento, String extension) throws IOException {
+        String nombre = crearNombre(documento);
+        if (documento.exists()) {
+            nombre += "_1";
+        }
+        return nombre + "-signed" + extension;
     }
 
-    public static String crearNombreArchivoP7M(File documento) throws IOException {
-        // buscamos el nombre para crear el signed
-        // TODO validar si hay otro archivo de momento lo sobre escribe
-        // USAR solo getAbsolutPath, talvez sin ruta
+    public static String crearNombreVerificado(File documento, String extension) throws IOException {
+        String hora = (TiempoUtils.getFechaHoraServidor().replace(":", "").replace(" ", "").replace(".", "").replace("-", "")).substring(0, 20);
+        String nombre = crearNombre(documento);
+        if (extension.isEmpty()) {
+            extension = getExtension(nombre);
+        }
+        return nombre + "-verified-" + hora + extension;
+    }
+
+    private static String crearNombre(File documento) {
         String nombreCompleto = documento.getAbsolutePath();
-        String nombreSinP7m = nombreCompleto.replaceFirst("[.][^.]+$", "");
-        String extension = getFileExtension(nombreSinP7m);
-        String hora = TiempoUtils.getFechaHoraServidor();
-        hora = hora.replace(":", "").replace(" ", "").replace(".", "").replace("-", "");
-        hora = hora.substring(0, 20);
-        extension = extension.length() > 5 ? "pdf" : extension;
-        return nombreSinP7m + "-verified-" + hora + "." + extension;
+        String nombre = nombreCompleto.replaceFirst("[.][^.]+$", "");
+        return nombre;
+    }
+
+    public static String getExtension(byte[] documento) throws IOException, MimeTypeException {
+        TikaConfig tikaConfig = TikaConfig.getDefaultConfig();
+        Detector detector = new DefaultDetector();
+        MediaType mediaType = detector.detect(new ByteArrayInputStream(documento), new Metadata());
+        MimeType mimeType = tikaConfig.getMimeRepository().forName(mediaType.toString());
+        return mimeType.getExtension();
+    }
+
+    public static String getExtension(String fileName) {
+        String extension = "";
+        if (fileName.contains(".")) {
+            extension = "." + fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
+        }
+        return extension;
     }
 
     public static void abrirDocumento(String documento) throws IOException {

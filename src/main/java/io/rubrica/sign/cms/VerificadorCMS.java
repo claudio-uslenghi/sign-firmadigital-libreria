@@ -45,6 +45,7 @@ import org.bouncycastle.util.Store;
 
 import io.rubrica.exceptions.SignatureVerificationException;
 import io.rubrica.utils.BouncyCastleUtils;
+import java.util.Date;
 
 /**
  * Verifica datos CMS.
@@ -54,6 +55,8 @@ import io.rubrica.utils.BouncyCastleUtils;
 public class VerificadorCMS {
 
     public List<DatosUsuario> listaDatosUsuario = new ArrayList<>();
+    public List<X509Certificate> certificados;
+    public List<Date> fechasFirmados;
 
     static {
         BouncyCastleUtils.initializeBouncyCastle();
@@ -71,6 +74,9 @@ public class VerificadorCMS {
             Collection<SignerInformation> collection = signerInformationStore.getSigners();
             String fechaFirma = "";
 
+            certificados = new ArrayList<>();
+            fechasFirmados = new ArrayList<>();
+
             for (SignerInformation signer : collection) {
                 @SuppressWarnings("unchecked")
                 Collection<X509CertificateHolder> certCollection = certStore.getMatches(signer.getSID());
@@ -82,6 +88,8 @@ public class VerificadorCMS {
                 X509Certificate x509Certificate = jcaX509CertificateConverter.setProvider("BC")
                         .getCertificate(certificateHolder);
 
+                certificados.add(x509Certificate);
+
                 AttributeTable attributes = signer.getSignedAttributes();
 
                 if (attributes != null) {
@@ -91,6 +99,7 @@ public class VerificadorCMS {
                     try {
                         SimpleDateFormat f_DateTime = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
                         String dateStr = f_DateTime.format(dt.getDate());
+                        fechasFirmados.add(dt.getDate());
                         System.out.println("Fecha Firma:" + dateStr);
                         fechaFirma = dateStr;
                     } catch (ParseException ex) {

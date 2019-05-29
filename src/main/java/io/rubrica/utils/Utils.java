@@ -22,9 +22,11 @@ import io.rubrica.certificate.Certificado;
 import io.rubrica.core.Util;
 import io.rubrica.exceptions.CRLValidationException;
 import io.rubrica.exceptions.CertificadoInvalidoException;
+import io.rubrica.exceptions.ConexionInvalidaOCSPException;
 import io.rubrica.exceptions.ConexionValidarCRLException;
 import io.rubrica.exceptions.EntidadCertificadoraNoValidaException;
 import io.rubrica.exceptions.HoraServidorException;
+import io.rubrica.exceptions.InvalidFormatException;
 import io.rubrica.exceptions.OcspValidationException;
 import io.rubrica.exceptions.RubricaException;
 import io.rubrica.exceptions.SignatureVerificationException;
@@ -32,6 +34,7 @@ import io.rubrica.sign.Main;
 import io.rubrica.sign.SignInfo;
 import io.rubrica.sign.Signer;
 import io.rubrica.sign.cms.DatosUsuario;
+import io.rubrica.sign.cms.VerificadorCMS;
 import io.rubrica.sign.odf.ODFSigner;
 import io.rubrica.sign.ooxml.OOXMLSigner;
 import io.rubrica.sign.pdf.PDFSigner;
@@ -45,6 +48,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.nio.file.Files;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PublicKey;
@@ -417,6 +421,7 @@ public class Utils {
             datosUsuario = new DatosUsuario();
             datosUsuario.setCedula(Utils.getUID(signInfo.getCerts()[0]));
             datosUsuario.setNombre(Utils.getCN(signInfo.getCerts()[0]));
+            datosUsuario.setEntidadCertificadora("desconocida");
         }
         Certificado certificado = new Certificado(
                 Util.getCN(signInfo.getCerts()[0]),
@@ -469,6 +474,42 @@ public class Utils {
             default:
                 return null;
         }
+    }
+    
+    public static List<Certificado> verificarDocumento(File documento) throws IOException, KeyStoreException, OcspValidationException, SignatureException, InvalidFormatException, RubricaException, ConexionInvalidaOCSPException, HoraServidorException, CertificadoInvalidoException, EntidadCertificadoraNoValidaException, ConexionValidarCRLException, SignatureVerificationException, DocumentoException, CRLValidationException, Exception {
+        byte[] docByteArray = FileUtils.fileConvertToByteArray(documento);
+        // para P7m, ya que p7m no tiene signer
+        String extDocumento = FileUtils.getExtension(docByteArray);
+        if (extDocumento.toLowerCase().contains(".p7s")) {
+            VerificadorCMS verificador = new VerificadorCMS();
+            byte[] archivoOriginal = verificador.verify(docByteArray);
+            
+            String nombreArchivo = FileUtils.crearNombreVerificado(documento, FileUtils.getExtension(archivoOriginal));
+            System.out.println("nombreDocFirmado: " + nombreArchivo);
+            
+            FileUtils.saveByteArrayToDisc(archivoOriginal, nombreArchivo);
+            FileUtils.abrirDocumento(nombreArchivo);
+            return Utils.datosP7mToCertificado(verificador.certificados, verificador.fechasFirmados);
+        } else {
+            Signer docSigner = Utils.documentSigner(documento);
+            if (extDocumento.toLowerCase().equals(".pdf")) {
+                return Utils.pdfToCertificados(docByteArray);
+            } else {
+                return Utils.signInfosToCertificados(docSigner.getSigners(docByteArray));
+            }
+        }
+    }
+    
+    public static String validarFirma(Calendar fechaDesde, Calendar fechaHasta, Calendar fechaFirmado, Calendar fechaRevocado) {
+        String retorno = "Válida";
+        if (fechaFirmado.compareTo(fechaDesde) >= 0 && fechaFirmado.compareTo(fechaHasta) <= 0) {
+            if (fechaRevocado != null && fechaRevocado.compareTo(fechaFirmado) <= 0) {
+                retorno = "Inválida";
+            }
+        } else {
+            retorno = "Inválida";
+        }
+        return retorno;
     }
 
     /**

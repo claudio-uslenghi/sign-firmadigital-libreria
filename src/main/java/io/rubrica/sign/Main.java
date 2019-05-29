@@ -22,12 +22,12 @@ import io.rubrica.exceptions.SignatureVerificationException;
 import io.rubrica.keystore.FileKeyStoreProvider;
 import io.rubrica.keystore.KeyStoreProvider;
 import io.rubrica.keystore.KeyStoreProviderFactory;
-import io.rubrica.sign.cms.VerificadorCMS;
 import io.rubrica.sign.pdf.PDFSigner;
 import io.rubrica.sign.pdf.PdfUtil;
 import io.rubrica.utils.Utils;
 import io.rubrica.utils.UtilsCrlOcsp;
 import io.rubrica.validaciones.Documento;
+import java.io.File;
 import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
@@ -45,16 +45,17 @@ public class Main {
     private static final String FECHA_HORA = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
     // ARCHIVO
-    private static final String ARCHIVO = "/home/mfernandez/Firmas/SecurityData/certificados prueba 2018/pruebac/PRUEBAC MISAEL VLADIMIR.p12";
+    private static final String ARCHIVO = "/home/mfernandez/Firmas/pruebas_misael_revocado.p12";
     private static final String PASSWORD = "1234";
 
-    private static final String FILE_PDF = "/home/mfernandez/Descargas/CIUDADANO-CIU-2018-11-TEMP-signed_1_1_1_EDITADA-signed.pdf";
+    private static final String FILE_PDF = "/home/mfernandez/test.pdf.pdf-signed-signed.pdf";
+    private static final String FILE_P7M = "/home/mfernandez/quipux_xls.p7m";
 
     public static void main(String args[]) throws KeyStoreException, Exception {
 //        firmarArchivo();
 //        verificarPDF();
-        validarCertificado();
-//        verificarP7M();
+//        validarCertificado();
+        verificarP7M();
     }
 
     private static void firmarArchivo() throws IOException, KeyStoreException, Exception {
@@ -125,7 +126,7 @@ public class Main {
         signedPdf = signer.sign(pdf, "SHA1withRSA", key, certChain, params);
         System.out.println("final firma\n-------");
         ////// Permite guardar el archivo en el equipo
-        java.io.FileOutputStream fos = new java.io.FileOutputStream(io.rubrica.validaciones.Fichero.ruta());
+        java.io.FileOutputStream fos = new java.io.FileOutputStream(io.rubrica.validaciones.Fichero.rutaPdf());
         fos.write(signedPdf);
         fos.close();
     }
@@ -152,7 +153,7 @@ public class Main {
         //Validad certificado revocado
         Date fechaRevocado = UtilsCrlOcsp.validarFechaRevocado(x509Certificate);
         if (fechaRevocado != null && fechaRevocado.compareTo(fechaHoraISO) <= 0) {
-            System.out.println("Certificado revocado: "+fechaRevocado);
+            System.out.println("Certificado revocado: " + fechaRevocado);
         }
         if (fechaHoraISO.compareTo(x509Certificate.getNotBefore()) <= 0 || fechaHoraISO.compareTo(x509Certificate.getNotAfter()) >= 0) {
             System.out.println("Certificado caducado");
@@ -170,14 +171,7 @@ public class Main {
     }
 
     private static void verificarP7M() throws IOException, SignatureVerificationException, Exception {
-        String fileP7m = "/home/mfernandez/Decretos firmados/1.pdf.p7m";
-        byte[] p7m = Documento.loadFile(fileP7m);
-
-        VerificadorCMS verificadorCMS = new VerificadorCMS();
-        byte[] signedP7m = verificadorCMS.verify(p7m);
-
-        java.io.FileOutputStream fosP7m = new java.io.FileOutputStream(io.rubrica.validaciones.Fichero.ruta());
-        fosP7m.write(signedP7m);
-        fosP7m.close();
+        File documento = new File(FILE_P7M);
+        Utils.verificarDocumento(documento);
     }
 }
