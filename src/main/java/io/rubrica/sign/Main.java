@@ -24,6 +24,7 @@ import io.rubrica.keystore.KeyStoreProvider;
 import io.rubrica.keystore.KeyStoreProviderFactory;
 import io.rubrica.sign.pdf.PDFSigner;
 import io.rubrica.sign.pdf.PdfUtil;
+import io.rubrica.utils.FileUtils;
 import io.rubrica.utils.Utils;
 import io.rubrica.utils.UtilsCrlOcsp;
 import io.rubrica.validaciones.Documento;
@@ -45,20 +46,20 @@ public class Main {
     private static final String FECHA_HORA = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
 
     // ARCHIVO
-    private static final String ARCHIVO = "/home/mfernandez/Firmas/pruebas_misael_revocado.p12";
+    private static final String ARCHIVO = "/home/mfernandez/Firmas/SecurityData/certificados prueba 2018/pruebac/PRUEBAC MISAEL VLADIMIR.p12";
     private static final String PASSWORD = "1234";
 
-    private static final String FILE_PDF = "/home/mfernandez/test.pdf.pdf-signed-signed.pdf";
+    private static final String FILE_PDF = "/home/mfernandez/1.pdf";
     private static final String FILE_P7M = "/home/mfernandez/quipux_xls.p7m";
 
     public static void main(String args[]) throws KeyStoreException, Exception {
-//        firmarArchivo();
+        firmarArchivoPDF();
 //        verificarPDF();
 //        validarCertificado();
-        verificarP7M();
+//        verificarP7M();
     }
 
-    private static void firmarArchivo() throws IOException, KeyStoreException, Exception {
+    private static void firmarArchivoPDF() throws IOException, KeyStoreException, Exception {
         //QR
         //SUPERIOR IZQUIERDA
         String llx = "10";
@@ -126,7 +127,20 @@ public class Main {
         signedPdf = signer.sign(pdf, "SHA1withRSA", key, certChain, params);
         System.out.println("final firma\n-------");
         ////// Permite guardar el archivo en el equipo
-        java.io.FileOutputStream fos = new java.io.FileOutputStream(io.rubrica.validaciones.Fichero.rutaPdf());
+        //java.io.FileOutputStream fos = new java.io.FileOutputStream(io.rubrica.validaciones.Fichero.rutaPdf());
+        java.io.FileOutputStream fos = new java.io.FileOutputStream(FILE_PDF + ".pdf");
+
+        new java.util.Timer().schedule(new java.util.TimerTask() {
+            @Override
+            public void run() {
+                try {
+                    FileUtils.abrirDocumento(FILE_PDF + ".pdf");
+                    System.exit(0);
+                } catch (IOException ex) {
+                }
+            }
+        }, 3000); //espera 3 segundos
+
         fos.write(signedPdf);
         fos.close();
     }
