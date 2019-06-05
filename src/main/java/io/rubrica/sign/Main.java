@@ -128,19 +128,19 @@ public class Main {
         System.out.println("final firma\n-------");
         ////// Permite guardar el archivo en el equipo
         //java.io.FileOutputStream fos = new java.io.FileOutputStream(io.rubrica.validaciones.Fichero.rutaPdf());
-        java.io.FileOutputStream fos = new java.io.FileOutputStream(FILE_PDF + ".pdf");
+        String nombreDocumento = FileUtils.crearNombreFirmado(new File(FILE_PDF), FileUtils.getExtension(signedPdf));
+        java.io.FileOutputStream fos = new java.io.FileOutputStream(nombreDocumento);
 
         new java.util.Timer().schedule(new java.util.TimerTask() {
             @Override
             public void run() {
                 try {
-                    FileUtils.abrirDocumento(FILE_PDF + ".pdf");
+                    FileUtils.abrirDocumento(nombreDocumento);
                     System.exit(0);
                 } catch (IOException ex) {
                 }
             }
         }, 3000); //espera 3 segundos
-
         fos.write(signedPdf);
         fos.close();
     }

@@ -218,6 +218,8 @@ public class PDFSigner implements Signer {
                         // Nombre Firmante
                         // nombreFirmante = nombreFirmante+" "+nombreFirmante;
                         // nombreFirmante="PRUEBA QUIPUX MISAEL FERNANDEZ";
+                        //nombreFirmante = "RAUL JAVIER JARA INIGUEZ";
+                        // nombreFirmante = "PRUEBA MV PRUEBA F PRUEBA C";
                         // nombreFirmante="JOSE DAVID GAMBOA VERA";
                         PdfTemplate pdfTemplate1 = sap.getLayer(2);
                         Font font = new Font(Font.COURIER, fontSize + (fontSize / 2), Font.BOLD, Color.BLACK);
