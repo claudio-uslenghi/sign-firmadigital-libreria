@@ -24,6 +24,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.Instant;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
@@ -37,7 +38,6 @@ import java.util.logging.Logger;
 public class TiempoUtils {
 
     private static final Logger LOGGER = Logger.getLogger(TiempoUtils.class.getName());
-    private static final String FECHA_HORA_URL = "https://api.firmadigital.gob.ec/api/fecha-hora";
     private static final int TIME_OUT = 2000; //set timeout to 2 seconds
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
@@ -64,31 +64,38 @@ public class TiempoUtils {
     }
 
     public static String getFechaHoraServidor() throws IOException {
-        URL url = new URL(FECHA_HORA_URL);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-        con.setRequestMethod("GET");
-        con.setConnectTimeout(TIME_OUT);
-        int responseCode = con.getResponseCode();
-        LOGGER.fine("GET Response Code: " + responseCode);
-        System.out.println("GET Response Code: " + responseCode);
-
-        if (responseCode == HttpURLConnection.HTTP_OK) {
-            try (InputStream is = con.getInputStream();) {
-                InputStreamReader reader = new InputStreamReader(is);
-                BufferedReader in = new BufferedReader(reader);
-
-                String inputLine;
-                StringBuilder response = new StringBuilder();
-
-                while ((inputLine = in.readLine()) != null) {
-                    response.append(inputLine);
-                }
-
-                return response.toString();
-            }
+        String  fecha_hora_url = PropertiesUtils.getConfig().getProperty("fecha_hora_url");
+        System.out.println("fecha_hora_url: "+fecha_hora_url);
+        if (fecha_hora_url.isEmpty()) {
+            // La fecha actual en formato ISO-8601 (2017-08-27T17:54:43.562-05:00)
+            return ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
         } else {
-            throw new RuntimeException(
-                    "Error al obtener fecha y hora del servidor");
+            URL url = new URL(fecha_hora_url);
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            con.setRequestMethod("GET");
+            con.setConnectTimeout(TIME_OUT);
+            int responseCode = con.getResponseCode();
+            LOGGER.fine("GET Response Code: " + responseCode);
+            System.out.println("GET Response Code: " + responseCode);
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                try (InputStream is = con.getInputStream();) {
+                    InputStreamReader reader = new InputStreamReader(is);
+                    BufferedReader in = new BufferedReader(reader);
+
+                    String inputLine;
+                    StringBuilder response = new StringBuilder();
+
+                    while ((inputLine = in.readLine()) != null) {
+                        response.append(inputLine);
+                    }
+
+                    return response.toString();
+                }
+            } else {
+                throw new RuntimeException(
+                        "Error al obtener fecha y hora del servidor");
+            }
         }
     }
 }

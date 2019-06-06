@@ -117,7 +117,7 @@ public class ValidadorOCSP {
             return (String) new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(revokedStatus.getRevocationTime());
         } else {
             UnknownStatus unknownStatus = (UnknownStatus) certStatus;
-            System.out.println("unknownStatus.: " + unknownStatus);
+            System.out.println("unknownStatus: " + unknownStatus);
             return "unknownStatus";
         }
     }

@@ -14,7 +14,6 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
-import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Properties;
 
@@ -25,6 +24,7 @@ import io.rubrica.keystore.KeyStoreProviderFactory;
 import io.rubrica.sign.pdf.PDFSigner;
 import io.rubrica.sign.pdf.PdfUtil;
 import io.rubrica.utils.FileUtils;
+import io.rubrica.utils.TiempoUtils;
 import io.rubrica.utils.Utils;
 import io.rubrica.utils.UtilsCrlOcsp;
 import io.rubrica.validaciones.Documento;
@@ -41,14 +41,9 @@ import java.util.List;
  * @author mfernandez
  */
 public class Main {
-
-    // La fecha actual en formato ISO-8601 (2017-08-27T17:54:43.562-05:00)
-    private static final String FECHA_HORA = ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
-
     // ARCHIVO
     private static final String ARCHIVO = "/home/mfernandez/Firmas/SecurityData/certificados prueba 2018/pruebac/PRUEBAC MISAEL VLADIMIR.p12";
     private static final String PASSWORD = "1234";
-
     private static final String FILE_PDF = "/home/mfernandez/1.pdf";
     private static final String FILE_P7M = "/home/mfernandez/quipux_xls.p7m";
 
@@ -98,7 +93,7 @@ public class Main {
         Properties params = new Properties();
         params.setProperty(PDFSigner.SIGNING_LOCATION, "");
         params.setProperty(PDFSigner.SIGNING_REASON, "Firmado digitalmente con RUBRICA");
-        params.setProperty(PDFSigner.SIGN_TIME, FECHA_HORA);
+        params.setProperty(PDFSigner.SIGN_TIME, TiempoUtils.getFechaHoraServidor());
         params.setProperty(PDFSigner.LAST_PAGE, "1");
         params.setProperty(PDFSigner.TYPE_SIG, "QR");
         params.setProperty(PDFSigner.INFO_QR, "Firmado digitalmente con RUBRICA\nhttps://minka.gob.ec/rubrica/rubrica");
@@ -161,7 +156,7 @@ public class Main {
         System.out.println("fecha expiración: " + x509Certificate.getNotAfter());
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-        TemporalAccessor accessor = dateTimeFormatter.parse(FECHA_HORA);
+        TemporalAccessor accessor = dateTimeFormatter.parse(TiempoUtils.getFechaHoraServidor());
         Date fechaHoraISO = Date.from(Instant.from(accessor));
 
         //Validad certificado revocado

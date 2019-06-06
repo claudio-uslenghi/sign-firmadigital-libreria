@@ -52,7 +52,6 @@ import java.util.logging.Logger;
 public class UtilsCrlOcsp {
 
     private static final int TIME_OUT = 2000; //set timeout to 2 seconds
-    private static final String CERTIFICADO_REVOCADO_URL = "https://api.firmadigital.gob.ec/api/certificado/fechaRevocado";
     private static final Logger LOGGER = Logger.getLogger(UtilsCrlOcsp.class.getName());
 
     public UtilsCrlOcsp() {
@@ -75,9 +74,16 @@ public class UtilsCrlOcsp {
         try {
             BigInteger serial = cert.getSerialNumber();
             fechaRevocado = validarCrlServidorAPI(serial);
+            if (fechaRevocado != null) {
+                System.out.println("Fallo la validacion por el servicio del API, Ahora intentamos por OCSP");
+                fechaRevocado = validarOCSP(cert);
+                if (fechaRevocado.equals("unknownStatus")) {
+                    System.out.println("Fallo la validacion por OCSP, Ahora intentamos por CRL");
+                    fechaRevocado = validarCRL(cert);
+                }
+            }
         } catch (IOException | ConexionApiException ex) {
             System.out.println("Fallo la validacion por el servicio del API, Ahora intentamos por OCSP");
-            //LOGGER.getLogger(UtilsCrlOcsp.class.getName()).log(Level.SEVERE, null, ex);
             try {
                 fechaRevocado = validarOCSP(cert);
                 if (fechaRevocado.equals("unknownStatus")) {
@@ -86,37 +92,11 @@ public class UtilsCrlOcsp {
                 }
             } catch (IOException | RubricaException ex1) {
                 System.out.println("Fallo la validacion por OCSP, Ahora intentamos por CRL");
-                //LOGGER.getLogger(UtilsCrlOcsp.class.getName()).log(Level.SEVERE, null, ex1);
                 fechaRevocado = validarCRL(cert);
             }
         }
         return fechaRevocado;
     }
-//    public static String validarCertificado(X509Certificate cert) throws EntidadCertificadoraNoValidaException, IOException, RubricaException, ConexionValidarCRLException, CRLValidationException {
-//        String fechaRevocado = null;
-//        try {
-//            fechaRevocado = validarOCSP(cert);
-//            if (fechaRevocado.equals("unknownStatus")) {
-//                System.out.println("Fallo la validacion por OCSP, Ahora intentamos por servicio del API");
-//                BigInteger serial = cert.getSerialNumber();
-//                fechaRevocado = validarCrlServidorAPI(serial);
-//            }
-//        } catch (IOException | RubricaException ex1) {
-//            //Logger.getLogger(UtilsCrlOcsp.class.getName()).log(Level.SEVERE, null, ex1);
-//            System.out.println("Fallo la validacion por OCSP, Ahora intentamos por servicio del API");
-//            try {
-//                BigInteger serial = cert.getSerialNumber();
-//                fechaRevocado = validarCrlServidorAPI(serial);
-//            } catch (IOException | ConexionApiException ex) {
-//                //Logger.getLogger(UtilsCrlOcsp.class.getName()).log(Level.SEVERE, null, ex);
-//                System.out.println("Fallo la validacion por el servicio del API, Ahora intentamos por CRL");
-//                fechaRevocado = validarCRL(cert);
-//            }
-//        } catch (ConexionApiException ex) {
-//            Logger.getLogger(UtilsCrlOcsp.class.getName()).log(Level.SEVERE, null, ex);
-//        }
-//        return fechaRevocado;
-//    }
 
     public static Date fechaString_Date(String fecha) throws ParseException {
         DateFormat formato = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -184,24 +164,30 @@ public class UtilsCrlOcsp {
     }
 
     private static String validarCrlServidorAPI(BigInteger serial) throws IOException, ConexionApiException {
-        URL url = new URL(CERTIFICADO_REVOCADO_URL + "/" + serial);
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-        int responseCode = urlConnection.getResponseCode();
+        String certificado_revocado_url = PropertiesUtils.getConfig().getProperty("certificado_revocado_url");
+        System.out.println("certificado_revocado_url: " + certificado_revocado_url);
+        if (!certificado_revocado_url.isEmpty()) {
+            URL url = new URL(certificado_revocado_url + "/" + serial);
+            HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+            int responseCode = urlConnection.getResponseCode();
 
-        if (responseCode >= 300 && responseCode < 400) {
-            urlConnection = (HttpURLConnection) new URL(urlConnection.getHeaderField("Location")).openConnection();
-            urlConnection.setConnectTimeout(TIME_OUT);
-            responseCode = urlConnection.getResponseCode();
-        }
-        if (responseCode >= 400) {
-            LOGGER.severe(CERTIFICADO_REVOCADO_URL + "/" + serial + ": Response Code: " + responseCode);
-            throw new ConexionApiException("No se pudo conectar API. " + CERTIFICADO_REVOCADO_URL + " Response Code: " + responseCode);
-        }
+            if (responseCode >= 300 && responseCode < 400) {
+                urlConnection = (HttpURLConnection) new URL(urlConnection.getHeaderField("Location")).openConnection();
+                urlConnection.setConnectTimeout(TIME_OUT);
+                responseCode = urlConnection.getResponseCode();
+            }
+            if (responseCode >= 400) {
+                LOGGER.severe(certificado_revocado_url + "/" + serial + ": Response Code: " + responseCode);
+                throw new ConexionApiException("No se pudo conectar API. " + certificado_revocado_url + " Response Code: " + responseCode);
+            }
 
-        try (InputStream is = urlConnection.getInputStream()) {
-            InputStreamReader reader = new InputStreamReader(is);
-            BufferedReader in = new BufferedReader(reader);
-            return in.readLine();
+            try (InputStream is = urlConnection.getInputStream()) {
+                InputStreamReader reader = new InputStreamReader(is);
+                BufferedReader in = new BufferedReader(reader);
+                return in.readLine();
+            }
+        } else {
+            return null;
         }
     }
 
