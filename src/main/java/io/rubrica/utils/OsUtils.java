@@ -14,7 +14,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.utils;
 
 import java.util.logging.Logger;
@@ -26,27 +25,33 @@ import java.util.logging.Logger;
  */
 public class OsUtils {
 
-	private static final Logger logger = Logger.getLogger(OsUtils.class.getName());
+    private static final Logger logger = Logger.getLogger(OsUtils.class.getName());
 
-	public static boolean isWindows() {
-		String osName = System.getProperty("os.name");
-		logger.finer("Operating System:" + osName);
-		return (osName.toUpperCase().indexOf("WINDOWS") == 0);
-	}
+    public static boolean isWindows() {
+        String osName = System.getProperty("os.name");
+        logger.finer("Operating System:" + osName);
+        return (osName.toUpperCase().indexOf("WINDOWS") == 0);
+    }
 
-	public static String getOs() {
-		String osName = System.getProperty("os.name");
-		logger.finer("Operating System:" + osName);
-		return osName.toUpperCase();
-	}
+    public static boolean isMac() {
+        String osName = System.getProperty("os.name");
+        logger.finer("Operating System:" + osName);
+        return osName.toUpperCase().contains("MAC");
+    }
 
-	public static String getJavaVersion() {
-		String javaVersion = System.getProperty("java.version");
-		logger.finer("Java Version:" + javaVersion);
-		return javaVersion.toUpperCase();
-	}
+    public static String getOs() {
+        String osName = System.getProperty("os.name");
+        logger.finer("Operating System:" + osName);
+        return osName.toUpperCase();
+    }
 
-	public static boolean is64Bits() {
-		return System.getProperty("os.arch").equals("xmd64");
-	}
+    public static String getJavaVersion() {
+        String javaVersion = System.getProperty("java.version");
+        logger.finer("Java Version:" + javaVersion);
+        return javaVersion.toUpperCase();
+    }
+
+    public static boolean is64Bits() {
+        return System.getProperty("os.arch").equals("xmd64");
+    }
 }
