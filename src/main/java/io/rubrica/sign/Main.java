@@ -44,7 +44,7 @@ public class Main {
     // ARCHIVO
     private static final String ARCHIVO = "/home/mfernandez/Firmas/SecurityData/certificados prueba 2018/pruebac/PRUEBAC MISAEL VLADIMIR.p12";
     private static final String PASSWORD = "1234";
-    private static final String FILE_PDF = "/home/mfernandez/1.pdf";
+    private static final String FILE_PDF = "/Users/sge/Downloads/test.pdf";
     private static final String FILE_P7M = "/home/mfernandez/quipux_xls.p7m";
 
     public static void main(String args[]) throws KeyStoreException, Exception {
@@ -112,14 +112,14 @@ public class Main {
         KeyStoreProvider ksp = new FileKeyStoreProvider(ARCHIVO);
         KeyStore keyStore = ksp.getKeystore(PASSWORD.toCharArray());
         // TOKEN
-        //KeyStore keyStore = KeyStoreProviderFactory.getKeyStore(password);
+        //KeyStore keyStore = KeyStoreProviderFactory.getKeyStore(PASSWORD);
 
         byte[] signedPdf = null;
         PDFSigner signer = new PDFSigner();
         String alias = seleccionarAlias(keyStore);
         PrivateKey key = (PrivateKey) keyStore.getKey(alias, PASSWORD.toCharArray());
         Certificate[] certChain = keyStore.getCertificateChain(alias);
-        signedPdf = signer.sign(pdf, "SHA1withRSA", key, certChain, params);
+        signedPdf = signer.sign(pdf, SignConstants.SIGN_ALGORITHM_SHA1WITHRSA, key, certChain, params);
         System.out.println("final firma\n-------");
         ////// Permite guardar el archivo en el equipo
         //java.io.FileOutputStream fos = new java.io.FileOutputStream(io.rubrica.validaciones.Fichero.rutaPdf());
@@ -145,7 +145,7 @@ public class Main {
         KeyStoreProvider ksp = new FileKeyStoreProvider(ARCHIVO);
         KeyStore keyStore = ksp.getKeystore(PASSWORD.toCharArray());
         // TOKEN
-        //KeyStore keyStore = KeyStoreProviderFactory.getKeyStore(password);
+        //KeyStore keyStore = KeyStoreProviderFactory.getKeyStore(PASSWORD);
 
         String alias = seleccionarAlias(keyStore);
         X509Certificate x509Certificate = (X509Certificate) keyStore.getCertificate(alias);

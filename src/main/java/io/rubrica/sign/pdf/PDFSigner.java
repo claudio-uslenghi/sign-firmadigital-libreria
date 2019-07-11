@@ -99,6 +99,8 @@ public class PDFSigner implements Signer {
             throws RubricaException, IOException, BadPasswordException {
 
         Properties extraParams = xParams != null ? xParams : new Properties();
+        
+        X509Certificate x509Certificate = (X509Certificate) certChain[0];
 
         // Motivo de la firma
         String reason = extraParams.getProperty(SIGNING_REASON);
@@ -198,8 +200,6 @@ public class PDFSigner implements Signer {
 
         if (signaturePositionOnPage != null) {
             sap.setVisibleSignature(signaturePositionOnPage, page, null);
-
-            X509Certificate x509Certificate = (X509Certificate) certChain[0];
             String informacionCertificado = x509Certificate.getSubjectDN().getName();
             String nombreFirmante = (Utils.getCN(x509Certificate)).toUpperCase();
             try {
@@ -320,10 +320,12 @@ public class PDFSigner implements Signer {
             }
         }
 
-        sap.setCrypto(key, (X509Certificate) certChain[0], null, PdfSignatureAppearance.WINCER_SIGNED);
+        sap.setCrypto(key, x509Certificate, null, PdfSignatureAppearance.WINCER_SIGNED);
 
         try {
             stp.close();
+        } catch (com.lowagie.text.ExceptionConverter ec) {
+            ec.printStackTrace();
         } catch (DocumentException e) {
             logger.severe("Error al estampar la firma: " + e);
             throw new RubricaException("Error al estampar la firma", e);
