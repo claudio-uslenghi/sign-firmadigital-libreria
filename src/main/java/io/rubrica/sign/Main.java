@@ -154,6 +154,7 @@ public class Main {
         System.out.println("emisión: " + CertEcUtils.getNombreCA(x509Certificate));
         System.out.println("fecha emisión: " + x509Certificate.getNotBefore());
         System.out.println("fecha expiración: " + x509Certificate.getNotAfter());
+        System.out.println("ISSUER: " + x509Certificate.getIssuerX500Principal().getName());
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
         TemporalAccessor accessor = dateTimeFormatter.parse(TiempoUtils.getFechaHoraServidor());

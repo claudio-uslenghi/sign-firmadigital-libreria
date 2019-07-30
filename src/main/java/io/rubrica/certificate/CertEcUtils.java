@@ -25,7 +25,8 @@ import io.rubrica.certificate.ec.CertificadoRepresentanteLegal;
 import io.rubrica.certificate.ec.anfac.AnfAcSubCaCert;
 import io.rubrica.certificate.ec.anfac.CertificadoAnfAc;
 import io.rubrica.certificate.ec.anfac.CertificadoAnfAcFactory;
-import io.rubrica.certificate.ec.bce.BceSubCaCert;
+import io.rubrica.certificate.ec.bce.BceSubCaCert20112021;
+import io.rubrica.certificate.ec.bce.BceSubCaCert20192029;
 import io.rubrica.certificate.ec.bce.CertificadoBancoCentral;
 import io.rubrica.certificate.ec.bce.CertificadoBancoCentralFactory;
 import io.rubrica.certificate.ec.cj.CertificadoConsejoJudicatura;
@@ -49,11 +50,23 @@ import java.security.cert.X509Certificate;
  */
 public class CertEcUtils {
 
-    public static X509Certificate getRootCertificate(X509Certificate cert) throws EntidadCertificadoraNoValidaException {
-        String entidadCertStr = getNombreCA(cert);
+    public static X509Certificate getRootCertificate(X509Certificate certificado) throws EntidadCertificadoraNoValidaException {
+        String entidadCertStr = getNombreCA(certificado);
         switch (entidadCertStr) {
-            case "Banco Central del Ecuador":
-                return new BceSubCaCert();
+            case "Banco Central del Ecuador": {
+                try {
+                    if (io.rubrica.utils.Utils.verifySignature(certificado, new BceSubCaCert20112021())) {
+                        System.out.println("BceSubCaCert 2011-2021");
+                        return new BceSubCaCert20112021();
+                    }
+                    if (io.rubrica.utils.Utils.verifySignature(certificado, new BceSubCaCert20192029())) {
+                        System.out.println("BceSubCaCert 2019-2029");
+                        return new BceSubCaCert20192029();
+                    }
+                } catch (java.security.InvalidKeyException ex) {
+                    //TODO
+                }
+            }
             case "Consejo de la Judicatura":
                 return new ConsejoJudicaturaSubCaCert();
             case "Security Data":

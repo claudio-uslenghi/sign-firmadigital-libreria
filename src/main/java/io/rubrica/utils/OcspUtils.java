@@ -18,6 +18,7 @@ package io.rubrica.utils;
 
 import io.rubrica.certificate.CertEcUtils;
 import io.rubrica.certificate.ec.anfac.AnfAcCaCert;
+import io.rubrica.certificate.ec.bce.BceCaCert20192029;
 import io.rubrica.certificate.ec.bce.BceCaCert;
 import io.rubrica.certificate.ec.cj.ConsejoJudicaturaCaCert;
 import io.rubrica.certificate.ec.securitydata.SecurityDataCaCert;
@@ -75,18 +76,21 @@ public class OcspUtils {
         X509Certificate rootCACert2 = new BceCaCert();
         X509Certificate rootCACert3 = new ConsejoJudicaturaCaCert();
         X509Certificate rootCACert4 = new AnfAcCaCert();
+        X509Certificate rootCACert5 = new BceCaCert20192029();
 
         // init root trusted certs
         TrustAnchor ta1 = new TrustAnchor(rootCACert1, null);
         TrustAnchor ta2 = new TrustAnchor(rootCACert2, null);
         TrustAnchor ta3 = new TrustAnchor(rootCACert3, null);
         TrustAnchor ta4 = new TrustAnchor(rootCACert4, null);
+        TrustAnchor ta5 = new TrustAnchor(rootCACert5, null);
 
         Set<TrustAnchor> trustedCertsSet = new HashSet<TrustAnchor>();
         trustedCertsSet.add(ta1);
         trustedCertsSet.add(ta2);
         trustedCertsSet.add(ta3);
         trustedCertsSet.add(ta4);
+        trustedCertsSet.add(ta5);
 
         // init PKIX parameters
         PKIXParameters params;

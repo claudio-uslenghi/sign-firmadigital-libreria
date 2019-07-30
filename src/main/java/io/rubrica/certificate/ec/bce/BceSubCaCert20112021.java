@@ -42,11 +42,11 @@ import java.util.Set;
  *
  * @author Ricardo Arguello <ricardo.arguello@soportelibre.com>
  */
-public class BceSubCaCert extends X509Certificate {
+public class BceSubCaCert20112021 extends X509Certificate {
 
     private X509Certificate certificate;
 
-    public BceSubCaCert() {
+    public BceSubCaCert20112021() {
         super();
 
         StringBuilder cer = new StringBuilder();

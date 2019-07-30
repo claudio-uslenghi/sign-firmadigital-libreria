@@ -69,7 +69,6 @@ import java.util.Locale;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.management.openmbean.InvalidKeyException;
-import javax.security.auth.x500.X500Principal;
 
 import org.w3c.dom.Node;
 
@@ -522,11 +521,11 @@ public class Utils {
      * @throws io.rubrica.exceptions.EntidadCertificadoraNoValidaException
      */
     public static boolean verifySignature(X509Certificate certificate) throws java.security.InvalidKeyException, EntidadCertificadoraNoValidaException {
-        X509Certificate issuingCertificate = CertEcUtils.getRootCertificate(certificate);
-        X500Principal subject = certificate.getSubjectX500Principal();
-        X500Principal expectedIssuerSubject = certificate.getIssuerX500Principal();
-        X500Principal issuerSubject = issuingCertificate.getSubjectX500Principal();
-        PublicKey publicKeyForSignature = issuingCertificate.getPublicKey();
+        return verifySignature(certificate, CertEcUtils.getRootCertificate(certificate));
+    }
+    
+    public static boolean verifySignature(X509Certificate certificate, X509Certificate rootCertificate) throws java.security.InvalidKeyException, EntidadCertificadoraNoValidaException {
+        PublicKey publicKeyForSignature = rootCertificate.getPublicKey();
 
         try {
             certificate.verify(publicKeyForSignature);
@@ -535,11 +534,11 @@ public class Utils {
                 | NoSuchProviderException | SignatureException e) {
             System.out.println("\n"
                     + "\tSignature verification of certificate having distinguished name \n"
-                    + "\t'" + subject.getName() + "'\n"
+                    + "\t'" + certificate.getSubjectX500Principal() + "'\n"
                     + "\twith certificate having distinguished name (the issuer) \n"
-                    + "\t'" + issuerSubject.getName() + "'\n"
+                    + "\t'" + rootCertificate.getSubjectX500Principal() + "'\n"
                     + "\tfailed. Expected issuer has distinguished name \n"
-                    + "\t'" + expectedIssuerSubject.getName() + "' (" + e.getClass().getSimpleName() + ")");
+                    + "\t'" + certificate.getIssuerX500Principal() + "' (" + e.getClass().getSimpleName() + ")");
         }
         return false;
     }
