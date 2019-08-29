@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +12,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.sign.xades;
 
 import java.io.ByteArrayInputStream;
@@ -287,476 +284,472 @@ import io.rubrica.xml.Utils;
  */
 public final class XAdESSigner implements Signer {
 
-	private static final Logger logger = Logger.getLogger(XAdESSigner.class.getName());
+    private static final Logger logger = Logger.getLogger(XAdESSigner.class.getName());
 
-	private static final String ID_IDENTIFIER = "Id";
+    private static final String ID_IDENTIFIER = "Id";
 
-	/** Etiqueta de los nodos firma de los XML firmados. */
-	public static final String SIGNATURE_TAG = "Signature";
+    /**
+     * Etiqueta de los nodos firma de los XML firmados.
+     */
+    public static final String SIGNATURE_TAG = "Signature";
 
-	/** URI que define la versi&oacute;n por defecto de XAdES. */
-	static final String XADESNS = "http://uri.etsi.org/01903/v1.3.2#";
+    /**
+     * URI que define la versi&oacute;n por defecto de XAdES.
+     */
+    static final String XADESNS = "http://uri.etsi.org/01903/v1.3.2#";
 
-	/** URI que define el tipo de propiedades firmadas de XAdES (1.4.x). */
-	static final String XADES_SIGNED_PROPERTIES_TYPE = "http://uri.etsi.org/01903#SignedProperties";
+    /**
+     * URI que define el tipo de propiedades firmadas de XAdES (1.4.x).
+     */
+    static final String XADES_SIGNED_PROPERTIES_TYPE = "http://uri.etsi.org/01903#SignedProperties";
 
-	/** URI que define una referencia de tipo MANIFEST. */
-	static final String MANIFESTURI = "http://www.w3.org/2000/09/xmldsig#Manifest";
+    /**
+     * URI que define una referencia de tipo MANIFEST.
+     */
+    static final String MANIFESTURI = "http://www.w3.org/2000/09/xmldsig#Manifest";
 
-	static final String AFIRMA = "AFIRMA";
-	static final String XML_SIGNATURE_PREFIX = "ds";
-	static final String XADES_SIGNATURE_PREFIX = "xades";
-	static final String SIGNATURE_NODE_NAME = XML_SIGNATURE_PREFIX + ":Signature";
-	static final String DETACHED_CONTENT_ELEMENT_NAME = "CONTENT";
-	static final String DETACHED_STYLE_ELEMENT_NAME = "STYLE";
+    static final String AFIRMA = "AFIRMA";
+    static final String XML_SIGNATURE_PREFIX = "ds";
+    static final String XADES_SIGNATURE_PREFIX = "xades";
+    static final String SIGNATURE_NODE_NAME = XML_SIGNATURE_PREFIX + ":Signature";
+    static final String DETACHED_CONTENT_ELEMENT_NAME = "CONTENT";
+    static final String DETACHED_STYLE_ELEMENT_NAME = "STYLE";
 
-	/** Algoritmo de huella digital por defecto para las referencias XML. */
-	static final String DIGEST_METHOD = DigestMethod.SHA512;
+    /**
+     * Algoritmo de huella digital por defecto para las referencias XML.
+     */
+    static final String DIGEST_METHOD = DigestMethod.SHA512;
 
-	static final String STYLE_REFERENCE_PREFIX = "StyleReference-";
+    static final String STYLE_REFERENCE_PREFIX = "StyleReference-";
 
-	static final String XMLDSIG_ATTR_MIMETYPE_STR = "MimeType";
-	static final String XMLDSIG_ATTR_ENCODING_STR = "Encoding";
+    static final String XMLDSIG_ATTR_MIMETYPE_STR = "MimeType";
+    static final String XMLDSIG_ATTR_ENCODING_STR = "Encoding";
 
-	static {
-		Utils.installXmlDSigProvider();
-	}
+    static {
+        Utils.installXmlDSigProvider();
+    }
 
-	/**
-	 * Firma datos en formato XAdES.
-	 * <p>
-	 * Este m&eacute;todo, al firmar un XML, firmas tambi&eacute;n sus hojas de
-	 * estilo XSL asociadas, siguiendo el siguiente criterio:
-	 * <ul>
-	 * <li>Firmas XML <i>Enveloped</i>
-	 * <ul>
-	 * <li>Hoja de estilo con ruta relativa
-	 * <ul>
-	 * <li>No se firma.</li>
-	 * </ul>
-	 * </li>
-	 * <li>Hola de estilo remota con ruta absoluta
-	 * <ul>
-	 * <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en
-	 * el XML original</li>
-	 * <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
-	 * </ul>
-	 * </li>
-	 * <li>Hoja de estilo empotrada
-	 * <ul>
-	 * <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba en
-	 * el XML original</li>
-	 * </ul>
-	 * </li>
-	 * </ul>
-	 * </li>
-	 * <li>Firmas XML <i>Externally Detached</i>
-	 * <ul>
-	 * <li>Hoja de estilo con ruta relativa
-	 * <ul>
-	 * <li>No se firma.</li>
-	 * </ul>
-	 * </li>
-	 * <li>Hola de estilo remota con ruta absoluta
-	 * <ul>
-	 * <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
-	 * </ul>
-	 * </li>
-	 * <li>Hoja de estilo empotrada
-	 * <ul>
-	 * <li>No es necesaria ninguna acci&oacute;n</li>
-	 * </ul>
-	 * </li>
-	 * </ul>
-	 * </li>
-	 * <li>Firmas XML <i>Enveloping</i>
-	 * <ul>
-	 * <li>Hoja de estilo con ruta relativa
-	 * <ul>
-	 * <li>No se firma.</li>
-	 * </ul>
-	 * </li>
-	 * <li>Hola de estilo remota con ruta absoluta
-	 * <ul>
-	 * <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
-	 * </ul>
-	 * </li>
-	 * <li>Hoja de estilo empotrada
-	 * <ul>
-	 * <li>No es necesaria ninguna acci&oacute;n</li>
-	 * </ul>
-	 * </li>
-	 * </ul>
-	 * </li>
-	 * <li>Firmas XML <i>Internally Detached</i>
-	 * <ul>
-	 * <li>Hoja de estilo con ruta relativa
-	 * <ul>
-	 * <li>No se firma.</li>
-	 * </ul>
-	 * </li>
-	 * <li>Hola de estilo remota con ruta absoluta
-	 * <ul>
-	 * <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja remota</li>
-	 * </ul>
-	 * </li>
-	 * <li>Hoja de estilo empotrada
-	 * <ul>
-	 * <li>No es necesaria ninguna acci&oacute;n</li>
-	 * </ul>
-	 * </li>
-	 * </ul>
-	 * </li>
-	 * </ul>
-	 * 
-	 * @param data
-	 *            Datos que deseamos firmar.
-	 * @param algorithm
-	 *            Algoritmo a usar para la firma.
-	 *            <p>
-	 *            Se aceptan los siguientes algoritmos en el par&aacute;metro
-	 *            <code>algorithm</code>:
-	 *            </p>
-	 *            <ul>
-	 *            <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
-	 *            <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
-	 *            <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
-	 *            <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
-	 *            </ul>
-	 * @param key
-	 *            Clave privada a usar para firmar.
-	 * @param certChain
-	 *            Cadena de certificados del cliente
-	 * @param xParams
-	 *            Par&aacute;metros adicionales para la firma
-	 *            (<a href="doc-files/extraparams.html">detalle</a>)
-	 * @return Firma en formato XAdES
-	 * @throws AOException
-	 *             Cuando ocurre cualquier problema durante el proceso
-	 */
-	@Override
-	public byte[] sign(final byte[] data, final String algorithm, final PrivateKey key, final Certificate[] certChain,
-			final Properties xParams) throws RubricaException {
+    /**
+     * Firma datos en formato XAdES.
+     * <p>
+     * Este m&eacute;todo, al firmar un XML, firmas tambi&eacute;n sus hojas de
+     * estilo XSL asociadas, siguiendo el siguiente criterio:
+     * <ul>
+     * <li>Firmas XML <i>Enveloped</i>
+     * <ul>
+     * <li>Hoja de estilo con ruta relativa
+     * <ul>
+     * <li>No se firma.</li>
+     * </ul>
+     * </li>
+     * <li>Hola de estilo remota con ruta absoluta
+     * <ul>
+     * <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba
+     * en el XML original</li>
+     * <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja
+     * remota</li>
+     * </ul>
+     * </li>
+     * <li>Hoja de estilo empotrada
+     * <ul>
+     * <li>Se restaura la declaraci&oacute;n de hoja de estilo tal y como estaba
+     * en el XML original</li>
+     * </ul>
+     * </li>
+     * </ul>
+     * </li>
+     * <li>Firmas XML <i>Externally Detached</i>
+     * <ul>
+     * <li>Hoja de estilo con ruta relativa
+     * <ul>
+     * <li>No se firma.</li>
+     * </ul>
+     * </li>
+     * <li>Hola de estilo remota con ruta absoluta
+     * <ul>
+     * <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja
+     * remota</li>
+     * </ul>
+     * </li>
+     * <li>Hoja de estilo empotrada
+     * <ul>
+     * <li>No es necesaria ninguna acci&oacute;n</li>
+     * </ul>
+     * </li>
+     * </ul>
+     * </li>
+     * <li>Firmas XML <i>Enveloping</i>
+     * <ul>
+     * <li>Hoja de estilo con ruta relativa
+     * <ul>
+     * <li>No se firma.</li>
+     * </ul>
+     * </li>
+     * <li>Hola de estilo remota con ruta absoluta
+     * <ul>
+     * <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja
+     * remota</li>
+     * </ul>
+     * </li>
+     * <li>Hoja de estilo empotrada
+     * <ul>
+     * <li>No es necesaria ninguna acci&oacute;n</li>
+     * </ul>
+     * </li>
+     * </ul>
+     * </li>
+     * <li>Firmas XML <i>Internally Detached</i>
+     * <ul>
+     * <li>Hoja de estilo con ruta relativa
+     * <ul>
+     * <li>No se firma.</li>
+     * </ul>
+     * </li>
+     * <li>Hola de estilo remota con ruta absoluta
+     * <ul>
+     * <li>Se firma una referencia (<i>canonicalizada</i>) a esta hoja
+     * remota</li>
+     * </ul>
+     * </li>
+     * <li>Hoja de estilo empotrada
+     * <ul>
+     * <li>No es necesaria ninguna acci&oacute;n</li>
+     * </ul>
+     * </li>
+     * </ul>
+     * </li>
+     * </ul>
+     *
+     * @param data Datos que deseamos firmar.
+     * @param algorithm Algoritmo a usar para la firma.
+     * <p>
+     * Se aceptan los siguientes algoritmos en el par&aacute;metro
+     * <code>algorithm</code>:
+     * </p>
+     * <ul>
+     * <li>&nbsp;&nbsp;&nbsp;<i>SHA1withRSA</i></li>
+     * <li>&nbsp;&nbsp;&nbsp;<i>SHA256withRSA</i></li>
+     * <li>&nbsp;&nbsp;&nbsp;<i>SHA384withRSA</i></li>
+     * <li>&nbsp;&nbsp;&nbsp;<i>SHA512withRSA</i></li>
+     * </ul>
+     * @param key Clave privada a usar para firmar.
+     * @param certChain Cadena de certificados del cliente
+     * @param xParams Par&aacute;metros adicionales para la firma
+     * (<a href="doc-files/extraparams.html">detalle</a>)
+     * @return Firma en formato XAdES
+     * @throws AOException Cuando ocurre cualquier problema durante el proceso
+     */
+    @Override
+    public byte[] sign(final byte[] data, final String algorithm, final PrivateKey key, final Certificate[] certChain,
+            final Properties xParams) throws RubricaException {
 
-		return FirmadorXAdES.sign(data, algorithm, key, certChain, xParams);
-	}
+        return FirmadorXAdES.sign(data, algorithm, key, certChain, xParams);
+    }
 
-	/**
-	 * Comprueba si la firma es <i>detached</i>. Previamente debe haberse comprobado
-	 * que el XML se corresponde con una firma XAdES.
-	 * 
-	 * @param element
-	 *            Elemento que contiene el nodo ra&iacute;z del documento que se
-	 *            quiere comprobar
-	 * @return <code>true</code> si la firma es <i>detached</i>, <code>false</code>
-	 *         en caso contrario.
-	 */
-	public static boolean isDetached(final Element element) {
-		if (element == null) {
-			return false;
-		}
+    /**
+     * Comprueba si la firma es <i>detached</i>. Previamente debe haberse
+     * comprobado que el XML se corresponde con una firma XAdES.
+     *
+     * @param element Elemento que contiene el nodo ra&iacute;z del documento
+     * que se quiere comprobar
+     * @return <code>true</code> si la firma es <i>detached</i>,
+     * <code>false</code> en caso contrario.
+     */
+    public static boolean isDetached(final Element element) {
+        if (element == null) {
+            return false;
+        }
 
-		try {
-			String dataNodeId = null;
-			final NodeList mainChildNodes = element.getChildNodes();
-			for (int i = 0; i < mainChildNodes.getLength(); i++) {
-				if (!mainChildNodes.item(i).getNodeName().equals(SIGNATURE_TAG)) {
-					dataNodeId = ((Element) mainChildNodes.item(i)).getAttribute(ID_IDENTIFIER);
-					break;
-				}
-			}
-			if (dataNodeId == null || dataNodeId.length() == 0) {
-				return false;
-			}
+        try {
+            String dataNodeId = null;
+            final NodeList mainChildNodes = element.getChildNodes();
+            for (int i = 0; i < mainChildNodes.getLength(); i++) {
+                if (!mainChildNodes.item(i).getNodeName().equals(SIGNATURE_TAG)) {
+                    dataNodeId = ((Element) mainChildNodes.item(i)).getAttribute(ID_IDENTIFIER);
+                    break;
+                }
+            }
+            if (dataNodeId == null || dataNodeId.length() == 0) {
+                return false;
+            }
 
-			final NodeList transformList = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference");
-			for (int i = 0; i < transformList.getLength(); i++) {
-				if (((Element) transformList.item(i)).getAttribute("URI").equals('#' + dataNodeId)) {
-					return true;
-				}
-			}
-		} catch (final Exception e) {
-			return false;
-		}
+            final NodeList transformList = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference");
+            for (int i = 0; i < transformList.getLength(); i++) {
+                if (((Element) transformList.item(i)).getAttribute("URI").equals('#' + dataNodeId)) {
+                    return true;
+                }
+            }
+        } catch (final Exception e) {
+            return false;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	/**
-	 * Comprueba si la firma es <i>enveloped</i>. Previamente debe haberse
-	 * comprabado que el XML se corresponde con una firma XAdES.
-	 * 
-	 * @param element
-	 *            Elemento que contiene el nodo ra&iacute;z del documento que se
-	 *            quiere comprobar
-	 * @return <code>true</code> cuando la firma es <i>enveloped</i>,
-	 *         <code>false</code> en caso contrario.
-	 */
-	public static boolean isEnveloped(final Element element) {
-		final NodeList transformList = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Transform");
-		for (int i = 0; i < transformList.getLength(); i++) {
-			if (((Element) transformList.item(i)).getAttribute("Algorithm").equals(Transform.ENVELOPED)) {
-				return true;
-			}
-		}
-		return false;
-	}
+    /**
+     * Comprueba si la firma es <i>enveloped</i>. Previamente debe haberse
+     * comprabado que el XML se corresponde con una firma XAdES.
+     *
+     * @param element Elemento que contiene el nodo ra&iacute;z del documento
+     * que se quiere comprobar
+     * @return <code>true</code> cuando la firma es <i>enveloped</i>,
+     * <code>false</code> en caso contrario.
+     */
+    public static boolean isEnveloped(final Element element) {
+        final NodeList transformList = element.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Transform");
+        for (int i = 0; i < transformList.getLength(); i++) {
+            if (((Element) transformList.item(i)).getAttribute("Algorithm").equals(Transform.ENVELOPED)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
-	/**
-	 * Comprueba si la firma es <i>enveloping</i>. Previamente debe haberse
-	 * comprabado que el XML se corresponde con una firma XAdES.
-	 * 
-	 * @param element
-	 *            Elemento que contiene el nodo ra&iacute;z del documento que se
-	 *            quiere comprobar.
-	 * @return <code>true</code> cuando la firma es <i>enveloping</i>,
-	 *         <code>false</code> en caso contrario.
-	 */
-	public static boolean isEnveloping(final Element element) {
-		if (element.getLocalName().equals(SIGNATURE_TAG) || element.getLocalName().equals(AFIRMA)
-				&& element.getFirstChild().getLocalName().equals(SIGNATURE_TAG)) {
-			return true;
-		}
-		return false;
-	}
+    /**
+     * Comprueba si la firma es <i>enveloping</i>. Previamente debe haberse
+     * comprabado que el XML se corresponde con una firma XAdES.
+     *
+     * @param element Elemento que contiene el nodo ra&iacute;z del documento
+     * que se quiere comprobar.
+     * @return <code>true</code> cuando la firma es <i>enveloping</i>,
+     * <code>false</code> en caso contrario.
+     */
+    public static boolean isEnveloping(final Element element) {
+        if (element.getLocalName().equals(SIGNATURE_TAG) || element.getLocalName().equals(AFIRMA)
+                && element.getFirstChild().getLocalName().equals(SIGNATURE_TAG)) {
+            return true;
+        }
+        return false;
+    }
 
-	public byte[] getData(final byte[] sign) throws InvalidFormatException {
-		// nueva instancia de DocumentBuilderFactory que permita espacio de
-		// nombres (necesario para XML)
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
+    public byte[] getData(final byte[] sign) throws InvalidFormatException {
+        // nueva instancia de DocumentBuilderFactory que permita espacio de
+        // nombres (necesario para XML)
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
 
-		Element rootSig;
-		Element elementRes = null;
+        Element rootSig;
+        Element elementRes = null;
 
-		try {
-			// comprueba que sea una documento de firma valido
-			if (!isSign(sign)) {
-				throw new InvalidFormatException("El documento no es un documento de firmas valido.");
-			}
+        try {
+            // comprueba que sea una documento de firma valido
+            if (!isSign(sign)) {
+                throw new InvalidFormatException("El documento no es un documento de firmas valido.");
+            }
 
-			// obtiene la raiz del documento de firmas
-			rootSig = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
+            // obtiene la raiz del documento de firmas
+            rootSig = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
 
-			// si es detached
-			if (XAdESSigner.isDetached(rootSig)) {
-				Element firstChild = (Element) rootSig.getFirstChild();
-				// si el documento es un xml se extrae como tal
-				if (firstChild.getAttribute(XMLDSIG_ATTR_MIMETYPE_STR).equals("text/xml")) {
-					elementRes = (Element) firstChild.getFirstChild();
-				}
-				// si el documento es binario se deshace la codificacion en
-				// Base64 si y solo si esta declarada esta transformacion
-				else {
-					// TODO: Deshacer solo el Base64 si existe la transformacion
-					// Base64 (COMPROBAR)
-					return isBase64TransformationDeclared(rootSig, firstChild.getAttribute(ID_IDENTIFIER))
-							? Base64.decode(firstChild.getTextContent())
-							: firstChild.getTextContent().getBytes();
-				}
-			}
+            // si es detached
+            if (XAdESSigner.isDetached(rootSig)) {
+                Element firstChild = (Element) rootSig.getFirstChild();
+                // si el documento es un xml se extrae como tal
+                if (firstChild.getAttribute(XMLDSIG_ATTR_MIMETYPE_STR).equals("text/xml")) {
+                    elementRes = (Element) firstChild.getFirstChild();
+                } // si el documento es binario se deshace la codificacion en
+                // Base64 si y solo si esta declarada esta transformacion
+                else {
+                    // TODO: Deshacer solo el Base64 si existe la transformacion
+                    // Base64 (COMPROBAR)
+                    return isBase64TransformationDeclared(rootSig, firstChild.getAttribute(ID_IDENTIFIER))
+                            ? Base64.decode(firstChild.getTextContent())
+                            : firstChild.getTextContent().getBytes();
+                }
+            } // Si es enveloped
+            else if (XAdESSigner.isEnveloped(rootSig)) {
+                removeEnvelopedSignatures(rootSig);
+                elementRes = rootSig;
+            } // Si es enveloping
+            else if (XAdESSigner.isEnveloping(rootSig)) {
+                // Obtiene el nodo Object de la primera firma
+                Element object = (Element) rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Object").item(0);
+                // Si el documento es un xml se extrae como tal
+                if (object.getAttribute(XMLDSIG_ATTR_MIMETYPE_STR).equals("text/xml")) {
+                    elementRes = (Element) object.getFirstChild();
+                } // Si el documento es binario se deshace la codificacion en
+                // Base64 si y solo si esta declarada esta transformacion
+                else {
+                    // TODO: Deshacer solo el Base64 si existe la transformacion
+                    // Base64 (COMPROBAR)
+                    return isBase64TransformationDeclared(rootSig, object.getAttribute(ID_IDENTIFIER))
+                            ? Base64.decode(object.getTextContent())
+                            : object.getTextContent().getBytes();
+                }
+            }
+        } catch (Exception ex) {
+            throw new InvalidFormatException("Error al leer el fichero de firmas: " + ex, ex);
+        }
 
-			// Si es enveloped
-			else if (XAdESSigner.isEnveloped(rootSig)) {
-				removeEnvelopedSignatures(rootSig);
-				elementRes = rootSig;
-			}
+        // si no se ha recuperado ningun dato se devuelve null
+        if (elementRes == null) {
+            return null;
+        }
 
-			// Si es enveloping
-			else if (XAdESSigner.isEnveloping(rootSig)) {
-				// Obtiene el nodo Object de la primera firma
-				Element object = (Element) rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Object").item(0);
-				// Si el documento es un xml se extrae como tal
-				if (object.getAttribute(XMLDSIG_ATTR_MIMETYPE_STR).equals("text/xml")) {
-					elementRes = (Element) object.getFirstChild();
-				}
-				// Si el documento es binario se deshace la codificacion en
-				// Base64 si y solo si esta declarada esta transformacion
-				else {
-					// TODO: Deshacer solo el Base64 si existe la transformacion
-					// Base64 (COMPROBAR)
-					return isBase64TransformationDeclared(rootSig, object.getAttribute(ID_IDENTIFIER))
-							? Base64.decode(object.getTextContent())
-							: object.getTextContent().getBytes();
-				}
-			}
-		} catch (Exception ex) {
-			throw new InvalidFormatException("Error al leer el fichero de firmas: " + ex, ex);
-		}
+        // convierte el documento obtenido en un array de bytes
+        ByteArrayOutputStream baosSig = new ByteArrayOutputStream();
+        XMLUtils.writeXML(baosSig, elementRes, false);
 
-		// si no se ha recuperado ningun dato se devuelve null
-		if (elementRes == null) {
-			return null;
-		}
+        return baosSig.toByteArray();
+    }
 
-		// convierte el documento obtenido en un array de bytes
-		ByteArrayOutputStream baosSig = new ByteArrayOutputStream();
-		XMLUtils.writeXML(baosSig, elementRes, false);
+    private void removeEnvelopedSignatures(Element rootSig) {
+        // obtiene las firmas y las elimina
+        NodeList mainChildNodes = rootSig.getChildNodes();
+        for (int i = 0; i < mainChildNodes.getLength(); i++) {
+            if (mainChildNodes.item(i).getNodeType() == Node.ELEMENT_NODE
+                    && mainChildNodes.item(i).getNodeName().endsWith(":" + SIGNATURE_TAG)) {
+                rootSig.removeChild(mainChildNodes.item(i));
+                removeEnvelopedSignatures(rootSig);
+                return;
+            }
+        }
+    }
 
-		return baosSig.toByteArray();
-	}
+    /**
+     * Comprueba si unos datos firmados tienen declarados una
+     * transformaci&oacute;n de tipo Base64.
+     *
+     * @param rootSig Nodo raiz de la firma.
+     * @param objectId Identificador de los datos.
+     * @return {@code true} si la transformaci&oacute;n est&aacute; definida,
+     * {@code false} en caso contrario.
+     */
+    private static boolean isBase64TransformationDeclared(final Element rootSig, final String objectId) {
+        if (objectId == null || objectId.trim().equals("")) {
+            return false;
+        }
 
-	private void removeEnvelopedSignatures(Element rootSig) {
-		// obtiene las firmas y las elimina
-		NodeList mainChildNodes = rootSig.getChildNodes();
-		for (int i = 0; i < mainChildNodes.getLength(); i++) {
-			if (mainChildNodes.item(i).getNodeType() == Node.ELEMENT_NODE
-					&& mainChildNodes.item(i).getNodeName().endsWith(":" + SIGNATURE_TAG)) {
-				rootSig.removeChild(mainChildNodes.item(i));
-				removeEnvelopedSignatures(rootSig);
-				return;
-			}
-		}
-	}
+        Element reference = null;
+        final NodeList references = rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference");
+        for (int i = 0; i < references.getLength(); i++) {
+            reference = (Element) references.item(i);
+            if (reference.hasAttribute("URI") && ("#" + objectId).equals(reference.getAttribute("URI"))) { //$NON-NLS-3$
+                break;
+            }
+            reference = null;
+        }
+        if (reference != null) {
+            final NodeList transforms = reference.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Transform");
+            for (int i = 0; i < transforms.getLength(); i++) {
+                if (((Element) transforms.item(i)).hasAttribute("Algorithm") && XMLConstants.BASE64_ENCODING
+                        .equals(((Element) transforms.item(i)).getAttribute("Algorithm"))) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
-	/**
-	 * Comprueba si unos datos firmados tienen declarados una transformaci&oacute;n
-	 * de tipo Base64.
-	 * 
-	 * @param rootSig
-	 *            Nodo raiz de la firma.
-	 * @param objectId
-	 *            Identificador de los datos.
-	 * @return {@code true} si la transformaci&oacute;n est&aacute; definida,
-	 *         {@code false} en caso contrario.
-	 */
-	private static boolean isBase64TransformationDeclared(final Element rootSig, final String objectId) {
-		if (objectId == null || objectId.trim().equals("")) {
-			return false;
-		}
+    public boolean isSign(final byte[] sign) {
+        if (sign == null) {
+            logger.warning("Se han introducido datos nulos para su comprobacion");
+            return false;
+        }
 
-		Element reference = null;
-		final NodeList references = rootSig.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Reference");
-		for (int i = 0; i < references.getLength(); i++) {
-			reference = (Element) references.item(i);
-			if (reference.hasAttribute("URI") && ("#" + objectId).equals(reference.getAttribute("URI"))) { //$NON-NLS-3$
-				break;
-			}
-			reference = null;
-		}
-		if (reference != null) {
-			final NodeList transforms = reference.getElementsByTagNameNS(XMLConstants.DSIGNNS, "Transform");
-			for (int i = 0; i < transforms.getLength(); i++) {
-				if (((Element) transforms.item(i)).hasAttribute("Algorithm") && XMLConstants.BASE64_ENCODING
-						.equals(((Element) transforms.item(i)).getAttribute("Algorithm"))) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
+        try {
+            // Carga el documento a validar
+            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
 
-	public boolean isSign(final byte[] sign) {
-		if (sign == null) {
-			logger.warning("Se han introducido datos nulos para su comprobacion");
-			return false;
-		}
+            // JXades no captura un nodo de firma si se pasa este como raiz del
+            // arbol de firmas, asi
+            // que nos vemos obligados a crear un nodo padre, del que colgara
+            // todo el arbol de firmas,
+            // para que lo detecte correctamente
+            Element rootNode = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
 
-		try {
-			// Carga el documento a validar
-			final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-			dbf.setNamespaceAware(true);
+            List<Node> signNodes = new ArrayList<>();
+            if (rootNode.getNodeName().equals(SIGNATURE_NODE_NAME)) {
+                signNodes.add(rootNode);
+            }
 
-			// JXades no captura un nodo de firma si se pasa este como raiz del
-			// arbol de firmas, asi
-			// que nos vemos obligados a crear un nodo padre, del que colgara
-			// todo el arbol de firmas,
-			// para que lo detecte correctamente
-			Element rootNode = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign)).getDocumentElement();
+            NodeList signatures = rootNode.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
+            for (int i = 0; i < signatures.getLength(); i++) {
+                signNodes.add(signatures.item(i));
+            }
 
-			List<Node> signNodes = new ArrayList<>();
-			if (rootNode.getNodeName().equals(SIGNATURE_NODE_NAME)) {
-				signNodes.add(rootNode);
-			}
+            // Si no se encuentran firmas, no es un documento de firma
+            if (signNodes.size() == 0 || !XAdESUtil.checkSignNodes(signNodes)) {
+                return false;
+            }
+        } catch (final Exception e) {
+            return false;
+        }
+        return true;
+    }
 
-			NodeList signatures = rootNode.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
-			for (int i = 0; i < signatures.getLength(); i++) {
-				signNodes.add(signatures.item(i));
-			}
+    public boolean isValidDataFile(final byte[] data) {
+        if (data == null) {
+            logger.warning("Se han introducido datos nulos para su comprobacion");
+            return false;
+        }
+        return true;
+    }
 
-			// Si no se encuentran firmas, no es un documento de firma
-			if (signNodes.size() == 0 || !XAdESUtil.checkSignNodes(signNodes)) {
-				return false;
-			}
-		} catch (final Exception e) {
-			return false;
-		}
-		return true;
-	}
+    public String getSignedName(final String originalName, final String inText) {
+        return originalName + (inText != null ? inText : "") + ".xsig";
+    }
 
-	public boolean isValidDataFile(final byte[] data) {
-		if (data == null) {
-			logger.warning("Se han introducido datos nulos para su comprobacion");
-			return false;
-		}
-		return true;
-	}
+    /**
+     * Devuelve un nuevo documento con ra&iacute;z "AFIRMA" del que cuelga el
+     * documento especificado.
+     *
+     * @param docu Documento que estar&aacute; contenido en el nuevo documento.
+     * @return Documento con ra&iacute;z "AFIRMA".
+     * @throws ParserConfigurationException Cuando se produce un error al
+     * analizar el XML.
+     */
+    static Document insertarNodoAfirma(final Document docu) throws ParserConfigurationException {
 
-	public String getSignedName(final String originalName, final String inText) {
-		return originalName + (inText != null ? inText : "") + ".xsig";
-	}
+        // Nueva instancia de DocumentBuilderFactory que permita espacio de
+        // nombres (necesario para XML)
+        final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
 
-	/**
-	 * Devuelve un nuevo documento con ra&iacute;z "AFIRMA" del que cuelga el
-	 * documento especificado.
-	 * 
-	 * @param docu
-	 *            Documento que estar&aacute; contenido en el nuevo documento.
-	 * @return Documento con ra&iacute;z "AFIRMA".
-	 * @throws ParserConfigurationException
-	 *             Cuando se produce un error al analizar el XML.
-	 */
-	static Document insertarNodoAfirma(final Document docu) throws ParserConfigurationException {
+        // Crea un nuevo documento con la raiz "AFIRMA"
+        final Document docAfirma = dbf.newDocumentBuilder().newDocument();
+        final Element rootAfirma = docAfirma.createElement(AFIRMA);
+        rootAfirma.setAttributeNS(null, ID_IDENTIFIER, "AfirmaRoot-" + UUID.randomUUID().toString());
 
-		// Nueva instancia de DocumentBuilderFactory que permita espacio de
-		// nombres (necesario para XML)
-		final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
+        // Inserta el documento pasado por parametro en el nuevo documento
+        rootAfirma.appendChild(docAfirma.adoptNode(docu.getDocumentElement()));
+        docAfirma.appendChild(rootAfirma);
 
-		// Crea un nuevo documento con la raiz "AFIRMA"
-		final Document docAfirma = dbf.newDocumentBuilder().newDocument();
-		final Element rootAfirma = docAfirma.createElement(AFIRMA);
-		rootAfirma.setAttributeNS(null, ID_IDENTIFIER, "AfirmaRoot-" + UUID.randomUUID().toString());
+        return docAfirma;
+    }
 
-		// Inserta el documento pasado por parametro en el nuevo documento
-		rootAfirma.appendChild(docAfirma.adoptNode(docu.getDocumentElement()));
-		docAfirma.appendChild(rootAfirma);
+    @Override
+    public List<SignInfo> getSigners(byte[] sign) throws InvalidFormatException, IOException {
+        if (!isSign(sign)) {
+            throw new InvalidFormatException("Los datos indicados no son una firma XAdES compatible");
+        }
 
-		return docAfirma;
-	}
+        // Obtenemos el arbol del documento
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        dbf.setNamespaceAware(true);
 
-	@Override
-	public List<SignInfo> getSigners(byte[] sign) throws InvalidFormatException, IOException {
-		if (!isSign(sign)) {
-			throw new InvalidFormatException("Los datos indicados no son una firma XAdES compatible");
-		}
+        Document signDoc;
 
-		// Obtenemos el arbol del documento
-		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-		dbf.setNamespaceAware(true);
+        try {
+            signDoc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
+        } catch (Exception e) {
+            logger.warning("Se ha producido un error al obtener la estructura de firmas: " + e);
+            return null;
+        }
 
-		Document signDoc;
+        // Obtenemos todas las firmas del documento y el SignatureValue de cada
+        // una de ellas
+        NodeList signatures = signDoc.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
+        List<SignInfo> signInfos = new ArrayList<>();
 
-		try {
-			signDoc = dbf.newDocumentBuilder().parse(new ByteArrayInputStream(sign));
-		} catch (Exception e) {
-			logger.warning("Se ha producido un error al obtener la estructura de firmas: " + e);
-			return null;
-		}
+        // Rellenamos la lista con los datos de las firmas del documento
+        for (int i = 0; i < signatures.getLength(); i++) {
+            Element signature = (Element) signatures.item(i);
+            SignInfo signInfo = Utils.getSimpleSignInfoNode(Utils.guessXAdESNamespaceURL(signDoc.getDocumentElement()),
+                    signature);
+            signInfos.add(signInfo);
+        }
 
-		// Obtenemos todas las firmas del documento y el SignatureValue de cada
-		// una de ellas
-		NodeList signatures = signDoc.getElementsByTagNameNS(XMLConstants.DSIGNNS, SIGNATURE_TAG);
-		List<SignInfo> signInfos = new ArrayList<>();
-
-		// Rellenamos la lista con los datos de las firmas del documento
-		for (int i = 0; i < signatures.getLength(); i++) {
-			Element signature = (Element) signatures.item(i);
-			SignInfo signInfo = Utils.getSimpleSignInfoNode(Utils.guessXAdESNamespaceURL(signDoc.getDocumentElement()),
-					signature);
-			signInfos.add(signInfo);
-		}
-
-		return signInfos;
-	}
+        return signInfos;
+    }
 }

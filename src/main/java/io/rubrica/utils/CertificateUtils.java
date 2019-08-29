@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -47,8 +45,9 @@ public class CertificateUtils {
 
     /**
      * Return an X509Certificate from a certificate encoded in byte[]
+     *
      * @param bytes
-     * @return 
+     * @return
      */
     public static X509Certificate certificateFromByteArray(byte[] bytes) {
         try {
@@ -61,8 +60,9 @@ public class CertificateUtils {
 
     /**
      * Return the crlDistributionPoints extension from a certificate
+     *
      * @param cert
-     * @return 
+     * @return
      * @throws java.io.IOException
      */
     public static List<String> getCrlDistributionPoints(X509Certificate cert) throws IOException {
@@ -89,8 +89,9 @@ public class CertificateUtils {
     /**
      * Return the OCSP Responder address contained in the certificate More
      * precisely the it is contained in the authorityInfoAccess extension
+     *
      * @param cert
-     * @return 
+     * @return
      * @throws java.io.IOException
      */
     public static List<String> getAuthorityInformationAccess(X509Certificate cert) throws IOException {

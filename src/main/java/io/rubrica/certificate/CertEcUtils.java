@@ -1,6 +1,4 @@
 /*
- * Copyright (C) 2017 FirmaEC
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -41,10 +39,12 @@ import io.rubrica.certificate.ec.cj.ConsejoJudicaturaSubCaCert;
 import io.rubrica.certificate.ec.securitydata.CertificadoSecurityData;
 import io.rubrica.certificate.ec.securitydata.CertificadoSecurityDataFactory;
 import io.rubrica.certificate.ec.securitydata.SecurityDataSubCaCert;
+import io.rubrica.certificate.ec.securitydata.SecurityDataSubCaCert20192031;
 import io.rubrica.sign.cms.DatosUsuario;
 import java.security.cert.X509Certificate;
 
 /**
+ * Validar diferentes certificados digitales
  *
  * @author mfernandez
  */
@@ -52,6 +52,7 @@ public class CertEcUtils {
 
     public static X509Certificate getRootCertificate(X509Certificate certificado) throws EntidadCertificadoraNoValidaException {
         String entidadCertStr = getNombreCA(certificado);
+
         switch (entidadCertStr) {
             case "Banco Central del Ecuador": {
                 try {
@@ -63,14 +64,28 @@ public class CertEcUtils {
                         System.out.println("BceSubCaCert 2019-2029");
                         return new BceSubCaCert20192029();
                     }
+                    return null;
+                } catch (java.security.InvalidKeyException ex) {
+                    //TODO
+                }
+            }
+            case "Security Data": {
+                try {
+                    if (io.rubrica.utils.Utils.verifySignature(certificado, new SecurityDataSubCaCert())) {
+                        System.out.println("SecurityDataSubCaCert");
+                        return new SecurityDataSubCaCert();
+                    }
+                    if (io.rubrica.utils.Utils.verifySignature(certificado, new SecurityDataSubCaCert20192031())) {
+                        System.out.println("SecurityDataSubCaCert 2019-2031");
+                        return new SecurityDataSubCaCert20192031();
+                    }
+                    return null;
                 } catch (java.security.InvalidKeyException ex) {
                     //TODO
                 }
             }
             case "Consejo de la Judicatura":
                 return new ConsejoJudicaturaSubCaCert();
-            case "Security Data":
-                return new SecurityDataSubCaCert();
             case "Anf AC":
                 return new AnfAcSubCaCert();
             default:

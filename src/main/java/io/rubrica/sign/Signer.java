@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +12,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.sign;
 
 import io.rubrica.exceptions.InvalidFormatException;
@@ -33,27 +30,22 @@ import io.rubrica.exceptions.RubricaException;
  */
 public interface Signer {
 
-	/**
-	 * Firma digitalmente un archivo.
-	 * 
-	 * @param data
-	 *            Archivo a firmar
-	 * @param algorithm
-	 *            Algoritmo a usar para la firma
-	 * @param key
-	 *            Clave privada a usar para firmar
-	 * @param certChain
-	 *            Cadena de certificados del firmante
-	 * @param extraParams
-	 *            Parámetros adicionales para la firma
-	 * @return Contenido firmado
-	 * @throws RubricaException
-	 *             Cuando ocurre cualquier problema durante el proceso
-	 * @throws IOException
-	 *             Cuando ocurren problemas relacionados con la lectura de los datos
-	 */
-	byte[] sign(byte[] data, String algorithm, PrivateKey key, Certificate[] certChain, Properties extraParams)
-			throws RubricaException, IOException;
+    /**
+     * Firma digitalmente un archivo.
+     *
+     * @param data Archivo a firmar
+     * @param algorithm Algoritmo a usar para la firma
+     * @param key Clave privada a usar para firmar
+     * @param certChain Cadena de certificados del firmante
+     * @param extraParams Parámetros adicionales para la firma
+     * @return Contenido firmado
+     * @throws RubricaException Cuando ocurre cualquier problema durante el
+     * proceso
+     * @throws IOException Cuando ocurren problemas relacionados con la lectura
+     * de los datos
+     */
+    byte[] sign(byte[] data, String algorithm, PrivateKey key, Certificate[] certChain, Properties extraParams)
+            throws RubricaException, IOException;
 
-	List<SignInfo> getSigners(byte[] sign) throws InvalidFormatException, IOException;
+    List<SignInfo> getSigners(byte[] sign) throws InvalidFormatException, IOException;
 }

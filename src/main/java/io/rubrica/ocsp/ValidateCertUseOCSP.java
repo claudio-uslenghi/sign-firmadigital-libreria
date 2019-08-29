@@ -31,6 +31,10 @@ public class ValidateCertUseOCSP {
      * Example: java \ -Dhttp.proxyHost=proxy.example.net \
      * -Dhttp.proxyPort=8080 \ ValidateCert \ mycert.pem \
      * http://ocsp.openvalidation.org:80
+     *
+     * @param ocspCert
+     * @param rootCACert
+     * @param url
      */
     public static void validadorOCSP(X509Certificate ocspCert, X509Certificate rootCACert, String url) {
         try {

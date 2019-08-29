@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +12,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.certificate.ec.securitydata;
 
 import java.security.cert.X509Certificate;
@@ -27,57 +24,69 @@ import io.rubrica.certificate.ec.CertificadoFuncionarioPublico;
  * @author Ricardo Arguello <ricardo.arguello@soportelibre.com>
  */
 public class CertificadoFuncionarioPublicoSecurityData extends CertificadoSecurityData
-		implements CertificadoFuncionarioPublico {
+        implements CertificadoFuncionarioPublico {
 
-	public CertificadoFuncionarioPublicoSecurityData(X509Certificate certificado) {
-		super(certificado);
-	}
+    public CertificadoFuncionarioPublicoSecurityData(X509Certificate certificado) {
+        super(certificado);
+    }
 
-	public String getCedulaPasaporte() {
-		return obtenerExtension(OID_CEDULA_PASAPORTE);
-	}
+    @Override
+    public String getCedulaPasaporte() {
+        return obtenerExtension(OID_CEDULA_PASAPORTE);
+    }
 
-	public String getNombres() {
-		return obtenerExtension(OID_NOMBRES);
-	}
+    @Override
+    public String getNombres() {
+        return obtenerExtension(OID_NOMBRES);
+    }
 
-	public String getPrimerApellido() {
-		return obtenerExtension(OID_PRIMER_APELLIDO);
-	}
+    @Override
+    public String getPrimerApellido() {
+        return obtenerExtension(OID_PRIMER_APELLIDO);
+    }
 
-	public String getSegundoApellido() {
-		return obtenerExtension(OID_SEGUNDO_APELLIDO);
-	}
+    @Override
+    public String getSegundoApellido() {
+        return obtenerExtension(OID_SEGUNDO_APELLIDO);
+    }
 
-	public String getCargo() {
-		return obtenerExtension(OID_CARGO);
-	}
+    @Override
+    public String getCargo() {
+        return obtenerExtension(OID_CARGO);
+    }
 
-	public String getInstitucion() {
-		return obtenerExtension(OID_INSTITUCION);
-	}
+    @Override
+    public String getInstitucion() {
+        return obtenerExtension(OID_INSTITUCION);
+    }
 
-	public String getDireccion() {
-		return obtenerExtension(OID_DIRECCION);
-	}
+    @Override
+    public String getDireccion() {
+        return obtenerExtension(OID_DIRECCION);
+    }
 
-	public String getTelefono() {
-		return obtenerExtension(OID_TELEFONO);
-	}
+    @Override
+    public String getTelefono() {
+        return obtenerExtension(OID_TELEFONO);
+    }
 
-	public String getCiudad() {
-		return obtenerExtension(OID_CIUDAD);
-	}
+    @Override
+    public String getCiudad() {
+        return obtenerExtension(OID_CIUDAD);
+    }
 
-	public String getPais() {
-		return obtenerExtension(OID_PAIS);
-	}
+    @Override
+    public String getPais() {
+        return obtenerExtension(OID_PAIS);
+    }
 
-	public String getRuc() {
-		return obtenerExtension(OID_RUC);
-	}
+    @Override
+    public String getRuc() {
+        return obtenerExtension(OID_RUC);
+    }
 
-	public String getRazonSocial() {
-		return obtenerExtension(OID_RAZON_SOCIAL);
-	}
+    @Override
+    public String getRazonSocial() {
+        return obtenerExtension(OID_RAZON_SOCIAL);
+    }
 }

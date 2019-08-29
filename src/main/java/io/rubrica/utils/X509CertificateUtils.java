@@ -1,7 +1,5 @@
 /*
  * Firma Digital: Cliente
- * Copyright 2017 Secretaría Nacional de la Administración Pública
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,18 +28,14 @@ import io.rubrica.sign.cms.DatosUsuario;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.util.Date;
-import java.util.Locale;
-import java.util.ResourceBundle;
 import javax.swing.JOptionPane;
 
 /**
  * Validacion de cedula.
  *
- * @author Ricardo Arguello <ricardo.arguello@soportelibre.com>
+ * @author mfernandez
  */
 public class X509CertificateUtils {
-
-    private final ResourceBundle MESSAGES = ResourceBundle.getBundle("Messages", Locale.getDefault());
 
     private String revocado = null;
     private boolean caducado = false;
@@ -89,8 +83,8 @@ public class X509CertificateUtils {
                 desconocido = true;
             }
 
-            if ((revocado!=null) || caducado || desconocido) {
-                JOptionPane.showMessageDialog(null, MESSAGES.getString("mensaje.error.certificado_invalido"), "Advertencia", JOptionPane.WARNING_MESSAGE);
+            if ((revocado != null) || caducado || desconocido) {
+                JOptionPane.showMessageDialog(null, PropertiesUtils.getMessages().getProperty("mensaje.error.certificado_invalido"), "Advertencia", JOptionPane.WARNING_MESSAGE);
             } else {
                 retorno = true;
             }

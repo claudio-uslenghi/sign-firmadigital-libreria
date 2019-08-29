@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -27,6 +25,8 @@ import java.security.cert.X509Certificate;
 /**
  * Permite construir certificados tipo Certificado ANF AC a partir de
  * certificados X509Certificate.
+ * 
+ * @author mfernandez
  */
 public class CertificadoAnfAcFactory {
 
@@ -47,7 +47,6 @@ public class CertificadoAnfAcFactory {
         } else if (certificateHasPolicy(certificado, OID_CERTIFICADO_FUNCIONARIO_PUBLICO)) {
             return new CertificadoFuncionarioPublicoAnfAc(certificado);
         } else {
-//            return new CertificadoPersonaNaturalAnfAc(certificado);
             throw new RuntimeException("Certificado ANF AC Ecuador de tipo desconocido!");
         }
     }

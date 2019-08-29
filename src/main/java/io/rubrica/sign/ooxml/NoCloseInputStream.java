@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +12,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.sign.ooxml;
 
 import java.io.FilterInputStream;
@@ -22,12 +19,12 @@ import java.io.InputStream;
 
 final class NoCloseInputStream extends FilterInputStream {
 
-	NoCloseInputStream(final InputStream proxy) {
-		super(proxy);
-	}
+    NoCloseInputStream(final InputStream proxy) {
+        super(proxy);
+    }
 
-	@Override
-	public void close() {
-		// Se ignoran los errores al cerrar
-	}
+    @Override
+    public void close() {
+        // Se ignoran los errores al cerrar
+    }
 }

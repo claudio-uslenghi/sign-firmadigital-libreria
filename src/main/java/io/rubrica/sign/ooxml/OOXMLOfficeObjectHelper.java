@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +12,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.sign.ooxml;
 
 import java.awt.Dimension;
@@ -37,153 +34,144 @@ import io.rubrica.utils.OsUtils;
 
 class OOXMLOfficeObjectHelper {
 
-	private static final String MS_DIGITAL_SIGNATURE_SCHEMA = "http://schemas.microsoft.com/office/2006/digsig";
-	private static final String NAMESPACE_SPEC_NS = "http://www.w3.org/2000/xmlns/";
+    private static final String MS_DIGITAL_SIGNATURE_SCHEMA = "http://schemas.microsoft.com/office/2006/digsig";
+    private static final String NAMESPACE_SPEC_NS = "http://www.w3.org/2000/xmlns/";
 
-	private OOXMLOfficeObjectHelper() {
-		// No permitimos la instanciacion
-	}
+    private OOXMLOfficeObjectHelper() {
+        // No permitimos la instanciacion
+    }
 
-	static XMLObject getOfficeObject(String nodeId, XMLSignatureFactory fac, Document document, String signatureId,
-			String signatureComments, String address1, String address2, String sigType) {
+    static XMLObject getOfficeObject(String nodeId, XMLSignatureFactory fac, Document document, String signatureId,
+            String signatureComments, String address1, String address2, String sigType) {
 
-		List<XMLStructure> objectContent = new LinkedList<>();
+        List<XMLStructure> objectContent = new LinkedList<>();
 
-		// ************************************************************************************
-		// ************************************************************************************
-		// ********************** SIGNATURE INFO V1
-		// *******************************************
+        // ************************************************************************************
+        // ************************************************************************************
+        // ********************** SIGNATURE INFO V1
+        // *******************************************
+        Element signatureInfoV1Element = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "SignatureInfoV1");
+        signatureInfoV1Element.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns", MS_DIGITAL_SIGNATURE_SCHEMA);
 
-		Element signatureInfoV1Element = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "SignatureInfoV1");
-		signatureInfoV1Element.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns", MS_DIGITAL_SIGNATURE_SCHEMA);
+        // ******************************************************************************
+        // *********************** Metadatos vacios
+        // *************************************
+        signatureInfoV1Element.appendChild(document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "SetupID"));
+        signatureInfoV1Element.appendChild(document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "SignatureText"));
+        signatureInfoV1Element.appendChild(document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "SignatureImage"));
 
-		// ******************************************************************************
-		// *********************** Metadatos vacios
-		// *************************************
-		signatureInfoV1Element.appendChild(document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "SetupID"));
-		signatureInfoV1Element.appendChild(document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "SignatureText"));
-		signatureInfoV1Element.appendChild(document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "SignatureImage"));
+        // ********************** Fin Metadatos vacios
+        // **********************************
+        // ******************************************************************************
+        // ******************************************************************************
+        // **************** Metadatos adicionales V1
+        // ************************************
+        if (signatureComments != null) {
+            Element signatureCommentsElement = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA,
+                    "SignatureComments");
+            signatureCommentsElement.setTextContent(signatureComments);
+            signatureInfoV1Element.appendChild(signatureCommentsElement);
+        }
 
-		// ********************** Fin Metadatos vacios
-		// **********************************
-		// ******************************************************************************
+        if (OsUtils.isWindows()) {
+            Element windowsVersionElement = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "WindowsVersion");
+            windowsVersionElement.setTextContent(System.getProperty("os.version"));
+            signatureInfoV1Element.appendChild(windowsVersionElement);
+        }
 
-		// ******************************************************************************
-		// **************** Metadatos adicionales V1
-		// ************************************
+        // Indicamos firma generada con Office 16
+        Element officeVersionElement = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "OfficeVersion");
+        officeVersionElement.setTextContent("16.0");
+        signatureInfoV1Element.appendChild(officeVersionElement);
+        Element applicationVersionElement = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "ApplicationVersion");
+        applicationVersionElement.setTextContent("16.0");
+        signatureInfoV1Element.appendChild(applicationVersionElement);
 
-		if (signatureComments != null) {
-			Element signatureCommentsElement = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA,
-					"SignatureComments");
-			signatureCommentsElement.setTextContent(signatureComments);
-			signatureInfoV1Element.appendChild(signatureCommentsElement);
-		}
+        GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
 
-		if (OsUtils.isWindows()) {
-			Element windowsVersionElement = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "WindowsVersion");
-			windowsVersionElement.setTextContent(System.getProperty("os.version"));
-			signatureInfoV1Element.appendChild(windowsVersionElement);
-		}
+        Element monitorsElement = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "Monitors");
+        monitorsElement.setTextContent(Integer.toString(ge.getScreenDevices().length));
+        signatureInfoV1Element.appendChild(monitorsElement);
 
-		// Indicamos firma generada con Office 16
-		Element officeVersionElement = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "OfficeVersion");
-		officeVersionElement.setTextContent("16.0");
-		signatureInfoV1Element.appendChild(officeVersionElement);
-		Element applicationVersionElement = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "ApplicationVersion");
-		applicationVersionElement.setTextContent("16.0");
-		signatureInfoV1Element.appendChild(applicationVersionElement);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 
-		GraphicsEnvironment ge = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        Element horizontalResolutionElement = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA,
+                "HorizontalResolutionElement");
+        horizontalResolutionElement.setTextContent(Integer.toString(screenSize.width));
+        signatureInfoV1Element.appendChild(horizontalResolutionElement);
 
-		Element monitorsElement = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "Monitors");
-		monitorsElement.setTextContent(Integer.toString(ge.getScreenDevices().length));
-		signatureInfoV1Element.appendChild(monitorsElement);
+        Element verticalResolutionElement = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA,
+                "VerticalResolutionElement");
+        verticalResolutionElement.setTextContent(Integer.toString(screenSize.height));
+        signatureInfoV1Element.appendChild(verticalResolutionElement);
 
-		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Element colorDepthElement = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "ColorDepth");
+        colorDepthElement.setTextContent(Integer.toString(ge.getScreenDevices()[0].getDisplayMode().getBitDepth()));
+        signatureInfoV1Element.appendChild(colorDepthElement);
 
-		Element horizontalResolutionElement = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA,
-				"HorizontalResolutionElement");
-		horizontalResolutionElement.setTextContent(Integer.toString(screenSize.width));
-		signatureInfoV1Element.appendChild(horizontalResolutionElement);
+        // Proveedor de firma por defecto
+        Element signatureProviderId = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "SignatureProviderId");
+        signatureProviderId.setTextContent("{00000000-0000-0000-0000-000000000000}");
+        signatureInfoV1Element.appendChild(signatureProviderId);
 
-		Element verticalResolutionElement = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA,
-				"VerticalResolutionElement");
-		verticalResolutionElement.setTextContent(Integer.toString(screenSize.height));
-		signatureInfoV1Element.appendChild(verticalResolutionElement);
+        signatureInfoV1Element
+                .appendChild(document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "SignatureProviderUrl"));
 
-		Element colorDepthElement = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "ColorDepth");
-		colorDepthElement.setTextContent(Integer.toString(ge.getScreenDevices()[0].getDisplayMode().getBitDepth()));
-		signatureInfoV1Element.appendChild(colorDepthElement);
+        Element signatureProviderDetails = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA,
+                "SignatureProviderDetails");
+        signatureProviderDetails.setTextContent("9");
+        signatureInfoV1Element.appendChild(signatureProviderDetails);
 
-		// Proveedor de firma por defecto
+        if (sigType != null && !sigType.isEmpty()) {
+            Element signatureType = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "SignatureType");
+            signatureType.setTextContent(sigType);
+            signatureInfoV1Element.appendChild(signatureType);
+        }
 
-		Element signatureProviderId = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "SignatureProviderId");
-		signatureProviderId.setTextContent("{00000000-0000-0000-0000-000000000000}");
-		signatureInfoV1Element.appendChild(signatureProviderId);
+        // **************** Fin Metadatos adicionales V1
+        // ********************************
+        // ******************************************************************************
+        // ************** FIN SIGNATURE INFO V1
+        // ***********************************************
+        // ************************************************************************************
+        // ************************************************************************************
+        // ************************************************************************************
+        // ************************************************************************************
+        // ************** SIGNATURE INFO V2
+        // ***************************************************
+        Element signatureInfoV2Element = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "SignatureInfoV2");
+        signatureInfoV2Element.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns", MS_DIGITAL_SIGNATURE_SCHEMA);
 
-		signatureInfoV1Element
-				.appendChild(document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "SignatureProviderUrl"));
+        if (address1 != null) {
+            Element address1Element = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "Address1");
+            address1Element.setTextContent(address1);
+            signatureInfoV2Element.appendChild(address1Element);
+        }
 
-		Element signatureProviderDetails = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA,
-				"SignatureProviderDetails");
-		signatureProviderDetails.setTextContent("9");
-		signatureInfoV1Element.appendChild(signatureProviderDetails);
+        if (address2 != null) {
+            Element address2Element = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "Address2");
+            address2Element.setTextContent(address2);
+            signatureInfoV2Element.appendChild(address2Element);
+        }
 
-		if (sigType != null && !sigType.isEmpty()) {
-			Element signatureType = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "SignatureType");
-			signatureType.setTextContent(sigType);
-			signatureInfoV1Element.appendChild(signatureType);
-		}
+        // ************** FIN SIGNATURE INFO V2
+        // ***********************************************
+        // ************************************************************************************
+        // ************************************************************************************
+        // El nodo idOfficeV1Details agrupa tanto a SignatureInfoV1 como a
+        // SignatureInfoV2
+        List<XMLStructure> signatureInfoContent = new LinkedList<>();
+        signatureInfoContent.add(new DOMStructure(signatureInfoV1Element));
+        signatureInfoContent.add(new DOMStructure(signatureInfoV2Element));
 
-		// **************** Fin Metadatos adicionales V1
-		// ********************************
-		// ******************************************************************************
+        SignatureProperty signatureInfoSignatureProperty = fac.newSignatureProperty(signatureInfoContent,
+                "#" + signatureId, "idOfficeV1Details");
 
-		// ************** FIN SIGNATURE INFO V1
-		// ***********************************************
-		// ************************************************************************************
-		// ************************************************************************************
+        List<SignatureProperty> signaturePropertyContent = new LinkedList<>();
+        signaturePropertyContent.add(signatureInfoSignatureProperty);
+        SignatureProperties signatureProperties = fac.newSignatureProperties(signaturePropertyContent, null);
+        objectContent.add(signatureProperties);
 
-		// ************************************************************************************
-		// ************************************************************************************
-		// ************** SIGNATURE INFO V2
-		// ***************************************************
-
-		Element signatureInfoV2Element = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "SignatureInfoV2");
-		signatureInfoV2Element.setAttributeNS(NAMESPACE_SPEC_NS, "xmlns", MS_DIGITAL_SIGNATURE_SCHEMA);
-
-		if (address1 != null) {
-			Element address1Element = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "Address1");
-			address1Element.setTextContent(address1);
-			signatureInfoV2Element.appendChild(address1Element);
-		}
-
-		if (address2 != null) {
-			Element address2Element = document.createElementNS(MS_DIGITAL_SIGNATURE_SCHEMA, "Address2");
-			address2Element.setTextContent(address2);
-			signatureInfoV2Element.appendChild(address2Element);
-		}
-
-		// ************** FIN SIGNATURE INFO V2
-		// ***********************************************
-		// ************************************************************************************
-		// ************************************************************************************
-
-		// El nodo idOfficeV1Details agrupa tanto a SignatureInfoV1 como a
-		// SignatureInfoV2
-
-		List<XMLStructure> signatureInfoContent = new LinkedList<>();
-		signatureInfoContent.add(new DOMStructure(signatureInfoV1Element));
-		signatureInfoContent.add(new DOMStructure(signatureInfoV2Element));
-
-		SignatureProperty signatureInfoSignatureProperty = fac.newSignatureProperty(signatureInfoContent,
-				"#" + signatureId, "idOfficeV1Details");
-
-		List<SignatureProperty> signaturePropertyContent = new LinkedList<>();
-		signaturePropertyContent.add(signatureInfoSignatureProperty);
-		SignatureProperties signatureProperties = fac.newSignatureProperties(signaturePropertyContent, null);
-		objectContent.add(signatureProperties);
-
-		return fac.newXMLObject(objectContent, nodeId, null, null);
-	}
+        return fac.newXMLObject(objectContent, nodeId, null, null);
+    }
 }

@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -37,9 +35,10 @@ import java.util.Date;
 import java.util.Set;
 
 /**
- * Certificado intermedio ANF AC Ecuador, representado como un
- * objeto <code>X509Certificate</code>.
-
+ * Certificado intermedio ANF AC Ecuador, representado como un objeto
+ * <code>X509Certificate</code>.
+ *
+ * @author mfernandez
  */
 public class AnfAcSubCaCert extends X509Certificate {
 

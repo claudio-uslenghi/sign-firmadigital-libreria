@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +12,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.core;
 
 import java.security.PrivateKey;
@@ -28,29 +25,29 @@ import java.security.cert.Certificate;
  */
 public class PrivateKeyAndCertificateChain {
 
-	private String alias;
-	private PrivateKey privateKey;
-	private Certificate[] certificateChain;
+    private final String alias;
+    private final PrivateKey privateKey;
+    private final Certificate[] certificateChain;
 
-	public PrivateKeyAndCertificateChain(String alias, PrivateKey privateKey, Certificate[] certificateChain) {
-		this.alias = alias;
-		this.privateKey = privateKey;
-		this.certificateChain = certificateChain;
-	}
+    public PrivateKeyAndCertificateChain(String alias, PrivateKey privateKey, Certificate[] certificateChain) {
+        this.alias = alias;
+        this.privateKey = privateKey;
+        this.certificateChain = certificateChain;
+    }
 
-	public String getAlias() {
-		return alias;
-	}
+    public String getAlias() {
+        return alias;
+    }
 
-	public PrivateKey getPrivateKey() {
-		return privateKey;
-	}
+    public PrivateKey getPrivateKey() {
+        return privateKey;
+    }
 
-	public Certificate[] getCertificateChain() {
-		return certificateChain;
-	}
+    public Certificate[] getCertificateChain() {
+        return certificateChain;
+    }
 
-	public String toString() {
-		return alias;
-	}
+    public String toString() {
+        return alias;
+    }
 }

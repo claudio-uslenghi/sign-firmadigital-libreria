@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +12,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.exceptions;
 
 /**
@@ -25,18 +22,18 @@ package io.rubrica.exceptions;
  */
 public class AliasesNotFoundException extends Exception {
 
-	public AliasesNotFoundException() {
-	}
+    public AliasesNotFoundException() {
+    }
 
-	public AliasesNotFoundException(String message) {
-		super(message);
-	}
+    public AliasesNotFoundException(String message) {
+        super(message);
+    }
 
-	public AliasesNotFoundException(Throwable cause) {
-		super(cause);
-	}
+    public AliasesNotFoundException(Throwable cause) {
+        super(cause);
+    }
 
-	public AliasesNotFoundException(String message, Throwable cause) {
-		super(message, cause);
-	}
+    public AliasesNotFoundException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

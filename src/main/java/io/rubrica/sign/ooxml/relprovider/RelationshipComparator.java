@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +12,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.sign.ooxml.relprovider;
 
 import java.util.Comparator;
@@ -26,10 +23,10 @@ import org.w3c.dom.Element;
  */
 class RelationshipComparator implements Comparator<Element> {
 
-	@Override
-	public int compare(final Element element1, final Element element2) {
-		final String id1 = element1.getAttribute("Id");
-		final String id2 = element2.getAttribute("Id");
-		return id1.compareTo(id2);
-	}
+    @Override
+    public int compare(final Element element1, final Element element2) {
+        final String id1 = element1.getAttribute("Id");
+        final String id2 = element2.getAttribute("Id");
+        return id1.compareTo(id2);
+    }
 }

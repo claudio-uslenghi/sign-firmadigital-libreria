@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +12,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.exceptions;
 
 import java.net.URL;
@@ -26,16 +23,16 @@ import java.net.URL;
  */
 public class OcspTimeoutException extends Exception {
 
-	private static final long serialVersionUID = 8593563176075864415L;
+    private static final long serialVersionUID = 8593563176075864415L;
 
-	private String url;
+    private String url;
 
-	public OcspTimeoutException(Exception e, URL url) {
-		super(e);
-		this.url = url.toString();
-	}
+    public OcspTimeoutException(Exception e, URL url) {
+        super(e);
+        this.url = url.toString();
+    }
 
-	public String getUrl() {
-		return this.url;
-	}
+    public String getUrl() {
+        return this.url;
+    }
 }

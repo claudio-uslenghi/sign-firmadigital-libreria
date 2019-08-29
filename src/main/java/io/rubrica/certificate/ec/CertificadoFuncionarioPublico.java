@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +12,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.certificate.ec;
 
 /**
@@ -27,63 +24,64 @@ package io.rubrica.certificate.ec;
  */
 public interface CertificadoFuncionarioPublico {
 
-	/**
-	 * Cedula o Pasaporte del funcionario publico
-	 */
-	String getCedulaPasaporte();
+    /**
+     * @return Cedula o Pasaporte del funcionario publico
+     */
+    String getCedulaPasaporte();
 
-	/**
-	 * Nombre(s) del funcionario publico
-	 */
-	String getNombres();
+    /**
+     * @return Nombre(s) del funcionario publico
+     */
+    String getNombres();
 
-	/**
-	 * Primer apellido del funcionario publico
-	 */
-	String getPrimerApellido();
+    /**
+     * @return Primer apellido del funcionario publico
+     */
+    String getPrimerApellido();
 
-	/**
-	 * Segundo apellido del funcionario publico (si no tiene queda en blanco)
-	 */
-	String getSegundoApellido();
+    /**
+     * @return Segundo apellido del funcionario publico (si no tiene queda en
+     * blanco)
+     */
+    String getSegundoApellido();
 
-	/**
-	 * Cargo
-	 */
-	String getCargo();
+    /**
+     * @return Cargo
+     */
+    String getCargo();
 
-	/**
-	 * Institucion
-	 */
-	String getInstitucion();
+    /**
+     * @return Institucion
+     */
+    String getInstitucion();
 
-	/**
-	 * Direccion
-	 */
-	String getDireccion();
+    /**
+     * @return Direccion
+     */
+    String getDireccion();
 
-	/**
-	 * Telefono
-	 */
-	String getTelefono();
+    /**
+     * @return Telefono
+     */
+    String getTelefono();
 
-	/**
-	 * Telefono
-	 */
-	String getCiudad();
+    /**
+     * @return Ciudad
+     */
+    String getCiudad();
 
-	/**
-	 * Pais
-	 */
-	String getPais();
+    /**
+     * @return Pais
+     */
+    String getPais();
 
-	/**
-	 * RUC de la Institucion
-	 */
-	String getRuc();
+    /**
+     * @return RUC de la Institucion
+     */
+    String getRuc();
 
-	/**
-	 * Razon Social
-	 */
-	String getRazonSocial();
+    /**
+     * @return Razon Social
+     */
+    String getRazonSocial();
 }

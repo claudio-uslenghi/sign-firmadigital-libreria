@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +12,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.sign.ooxml;
 
 import java.security.GeneralSecurityException;
@@ -47,71 +44,71 @@ import io.rubrica.xml.Utils;
 
 final class OOXMLAdvancedSignature extends XMLAdvancedSignature {
 
-	private byte[] ooXmlDocument;
+    private byte[] ooXmlDocument;
 
-	private OOXMLAdvancedSignature(XAdES_EPES xades, byte[] ooXmlPackage) {
-		super(xades);
-		this.ooXmlDocument = ooXmlPackage.clone();
-	}
+    private OOXMLAdvancedSignature(XAdES_EPES xades, byte[] ooXmlPackage) {
+        super(xades);
+        this.ooXmlDocument = ooXmlPackage.clone();
+    }
 
-	static OOXMLAdvancedSignature newInstance(XAdES_EPES xades, byte[] ooXmlPackage) throws GeneralSecurityException {
-		xades.setSignaturePolicyIdentifier(new SignaturePolicyIdentifierImpl(true));
-		OOXMLAdvancedSignature result = new OOXMLAdvancedSignature(xades, ooXmlPackage);
-		result.setDigestMethod(xades.getDigestMethod());
-		result.setXadesNamespace(xades.getXadesNamespace());
-		return result;
-	}
+    static OOXMLAdvancedSignature newInstance(XAdES_EPES xades, byte[] ooXmlPackage) throws GeneralSecurityException {
+        xades.setSignaturePolicyIdentifier(new SignaturePolicyIdentifierImpl(true));
+        OOXMLAdvancedSignature result = new OOXMLAdvancedSignature(xades, ooXmlPackage);
+        result.setDigestMethod(xades.getDigestMethod());
+        result.setXadesNamespace(xades.getXadesNamespace());
+        return result;
+    }
 
-	void sign(X509Certificate[] certChain, PrivateKey privateKey, String signatureMethod, List<?> refsIdList,
-			String signatureIdPrefix) throws MarshalException, GeneralSecurityException, XMLSignatureException {
+    void sign(X509Certificate[] certChain, PrivateKey privateKey, String signatureMethod, List<?> refsIdList,
+            String signatureIdPrefix) throws MarshalException, GeneralSecurityException, XMLSignatureException {
 
-		List<?> referencesIdList = new ArrayList<>(refsIdList);
+        List<?> referencesIdList = new ArrayList<>(refsIdList);
 
-		if (WrappedKeyStorePlace.SIGNING_CERTIFICATE_PROPERTY.equals(getWrappedKeyStorePlace()) && certChain != null
-				&& certChain.length > 0) {
-			this.xades.setSigningCertificate(certChain[0]);
-		}
+        if (WrappedKeyStorePlace.SIGNING_CERTIFICATE_PROPERTY.equals(getWrappedKeyStorePlace()) && certChain != null
+                && certChain.length > 0) {
+            this.xades.setSigningCertificate(certChain[0]);
+        }
 
-		addXMLObject(marshalXMLSignature(this.xadesNamespace, this.signedPropertiesTypeUrl, signatureIdPrefix,
-				referencesIdList, Arrays.asList( // En OOXML las SignedProperties se canonicalizan
-						Utils.getDOMFactory().newTransform("http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
-								(TransformParameterSpec) null))));
+        addXMLObject(marshalXMLSignature(this.xadesNamespace, this.signedPropertiesTypeUrl, signatureIdPrefix,
+                referencesIdList, Arrays.asList( // En OOXML las SignedProperties se canonicalizan
+                        Utils.getDOMFactory().newTransform("http://www.w3.org/TR/2001/REC-xml-c14n-20010315",
+                                (TransformParameterSpec) null))));
 
-		XMLSignatureFactory fac = getXMLSignatureFactory();
+        XMLSignatureFactory fac = getXMLSignatureFactory();
 
-		List<Reference> documentReferences = getReferences(referencesIdList);
-		String keyInfoId = getKeyInfoId(signatureIdPrefix);
-		documentReferences.add(fac.newReference("#" + keyInfoId, getDigestMethod()));
+        List<Reference> documentReferences = getReferences(referencesIdList);
+        String keyInfoId = getKeyInfoId(signatureIdPrefix);
+        documentReferences.add(fac.newReference("#" + keyInfoId, getDigestMethod()));
 
-		this.signature = fac
-				.newXMLSignature(
-						fac.newSignedInfo(
-								fac.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE,
-										(C14NMethodParameterSpec) null),
-								fac.newSignatureMethod(signatureMethod, null), documentReferences),
-						newKeyInfo(certChain, keyInfoId), getXMLObjects(), getSignatureId(signatureIdPrefix),
-						getSignatureValueId(signatureIdPrefix));
+        this.signature = fac
+                .newXMLSignature(
+                        fac.newSignedInfo(
+                                fac.newCanonicalizationMethod(CanonicalizationMethod.INCLUSIVE,
+                                        (C14NMethodParameterSpec) null),
+                                fac.newSignatureMethod(signatureMethod, null), documentReferences),
+                        newKeyInfo(certChain, keyInfoId), getXMLObjects(), getSignatureId(signatureIdPrefix),
+                        getSignatureValueId(signatureIdPrefix));
 
-		this.signContext = new DOMSignContext(privateKey,
-				this.baseElement != null ? this.baseElement : getBaseDocument());
-		this.signContext.putNamespacePrefix(XMLSignature.XMLNS, this.xades.getXmlSignaturePrefix());
-		this.signContext.putNamespacePrefix(this.xadesNamespace, this.xades.getXadesPrefix());
-		this.signContext.setURIDereferencer(new OOXMLURIDereferencer(this.ooXmlDocument));
+        this.signContext = new DOMSignContext(privateKey,
+                this.baseElement != null ? this.baseElement : getBaseDocument());
+        this.signContext.putNamespacePrefix(XMLSignature.XMLNS, this.xades.getXmlSignaturePrefix());
+        this.signContext.putNamespacePrefix(this.xadesNamespace, this.xades.getXadesPrefix());
+        this.signContext.setURIDereferencer(new OOXMLURIDereferencer(this.ooXmlDocument));
 
-		this.signature.sign(this.signContext);
-	}
+        this.signature.sign(this.signContext);
+    }
 
-	private KeyInfo newKeyInfo(X509Certificate[] certChain, String keyInfoId) throws KeyException {
-		KeyInfoFactory keyInfoFactory = getXMLSignatureFactory().getKeyInfoFactory();
-		List<X509Certificate> x509DataList = new ArrayList<>();
-		if (!XmlWrappedKeyInfo.PUBLIC_KEY.equals(getXmlWrappedKeyInfo())) {
-			for (final X509Certificate cert : certChain) {
-				x509DataList.add(cert);
-			}
-		}
-		List<XMLStructure> newList = new ArrayList<>();
-		newList.add(keyInfoFactory.newKeyValue(certChain[0].getPublicKey()));
-		newList.add(keyInfoFactory.newX509Data(x509DataList));
-		return keyInfoFactory.newKeyInfo(newList, keyInfoId);
-	}
+    private KeyInfo newKeyInfo(X509Certificate[] certChain, String keyInfoId) throws KeyException {
+        KeyInfoFactory keyInfoFactory = getXMLSignatureFactory().getKeyInfoFactory();
+        List<X509Certificate> x509DataList = new ArrayList<>();
+        if (!XmlWrappedKeyInfo.PUBLIC_KEY.equals(getXmlWrappedKeyInfo())) {
+            for (final X509Certificate cert : certChain) {
+                x509DataList.add(cert);
+            }
+        }
+        List<XMLStructure> newList = new ArrayList<>();
+        newList.add(keyInfoFactory.newKeyValue(certChain[0].getPublicKey()));
+        newList.add(keyInfoFactory.newX509Data(x509DataList));
+        return keyInfoFactory.newKeyInfo(newList, keyInfoId);
+    }
 }

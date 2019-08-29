@@ -1,6 +1,4 @@
 /*
- * Copyright (C) 2017 FirmaEC
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -33,7 +31,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author FirmaEC
+ * @author mfernandez
  */
 public class TiempoUtils {
 
@@ -64,8 +62,8 @@ public class TiempoUtils {
     }
 
     public static String getFechaHoraServidor() throws IOException {
-        String  fecha_hora_url = PropertiesUtils.getConfig().getProperty("fecha_hora_url");
-        System.out.println("fecha_hora_url: "+fecha_hora_url);
+        String fecha_hora_url = PropertiesUtils.getConfig().getProperty("fecha_hora_url");
+        System.out.println("fecha_hora_url: " + fecha_hora_url);
         if (fecha_hora_url.isEmpty()) {
             // La fecha actual en formato ISO-8601 (2017-08-27T17:54:43.562-05:00)
             return ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);

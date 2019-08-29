@@ -27,6 +27,7 @@ import io.rubrica.utils.FileUtils;
 import io.rubrica.utils.TiempoUtils;
 import io.rubrica.utils.Utils;
 import io.rubrica.utils.UtilsCrlOcsp;
+import io.rubrica.utils.X509CertificateUtils;
 import io.rubrica.validaciones.Documento;
 import java.io.File;
 import java.security.SignatureException;
@@ -41,20 +42,25 @@ import java.util.List;
  * @author mfernandez
  */
 public class Main {
+
     // ARCHIVO
-    private static final String ARCHIVO = "/home/mfernandez/Firmas/SecurityData/certificados prueba 2018/pruebac/PRUEBAC MISAEL VLADIMIR.p12";
-    private static final String PASSWORD = "1234";
-    private static final String FILE_PDF = "/Users/sge/Downloads/test.pdf";
-    private static final String FILE_P7M = "/home/mfernandez/quipux_xls.p7m";
+//    private static final String ARCHIVO = "/home/mfernandez/Firmas/SecurityData/2019/MISAEL VLADIMIR FERNANDEZ CORREA 190819105700.p12";
+//    private static final String PASSWORD = "Security2019";
+    private static final String ARCHIVO = "/home/mfernandez/Firmas/BCE/2019/cn=misael_vladimir_fernandez_correa.p12";
+    private static final String PASSWORD = "Password#1";
+    private static final String FILE_XML = "/home/mfernandez/Test/facturaMovistar.xml";
+    private static final String FILE_PDF = "/home/mfernandez/Test/documento_blanco.pdf";
+    private static final String FILE_P7M = "/home/mfernandez/Test/quipux_xls.p7m";
 
     public static void main(String args[]) throws KeyStoreException, Exception {
-        firmarArchivoPDF();
+//        firmarArchivoPDF();
 //        verificarPDF();
+        verificarXML();
 //        validarCertificado();
 //        verificarP7M();
     }
 
-    private static void firmarArchivoPDF() throws IOException, KeyStoreException, Exception {
+    private static Properties parametros() throws IOException {
         //QR
         //SUPERIOR IZQUIERDA
         String llx = "10";
@@ -100,11 +106,14 @@ public class Main {
         //params.setProperty(PDFSigner.TYPE_SIG, "information2");
         //params.setProperty(PDFSigner.FONT_SIZE, "4.5");
         // Posicion firma
-        params.setProperty(PdfUtil.positionOnPageLowerLeftX, llx);
-        params.setProperty(PdfUtil.positionOnPageLowerLeftY, lly);
-        //params.setProperty(PdfUtil.positionOnPageUpperRightX, urx);
-        //params.setProperty(PdfUtil.positionOnPageUpperRightY, ury);
+        params.setProperty(PdfUtil.POSITION_ON_PAGE_LOWER_LEFT_X, llx);
+        params.setProperty(PdfUtil.POSITION_ON_PAGE_LOWER_LEFT_Y, lly);
+        //params.setProperty(PdfUtil.POSITION_ON_PAGE_UPPER_RIGHT_X, urx);
+        //params.setProperty(PdfUtil.POSITION_ON_PAGE_UPPER_RIGHT_Y, ury);
+        return params;
+    }
 
+    private static void firmarArchivoPDF() throws KeyStoreException, Exception {
         ////// LEER PDF:
         byte[] pdf = Documento.loadFile(FILE_PDF);
 
@@ -118,26 +127,33 @@ public class Main {
         PDFSigner signer = new PDFSigner();
         String alias = seleccionarAlias(keyStore);
         PrivateKey key = (PrivateKey) keyStore.getKey(alias, PASSWORD.toCharArray());
-        Certificate[] certChain = keyStore.getCertificateChain(alias);
-        signedPdf = signer.sign(pdf, SignConstants.SIGN_ALGORITHM_SHA1WITHRSA, key, certChain, params);
-        System.out.println("final firma\n-------");
-        ////// Permite guardar el archivo en el equipo
-        //java.io.FileOutputStream fos = new java.io.FileOutputStream(io.rubrica.validaciones.Fichero.rutaPdf());
-        String nombreDocumento = FileUtils.crearNombreFirmado(new File(FILE_PDF), FileUtils.getExtension(signedPdf));
-        java.io.FileOutputStream fos = new java.io.FileOutputStream(nombreDocumento);
 
-        new java.util.Timer().schedule(new java.util.TimerTask() {
-            @Override
-            public void run() {
-                try {
-                    FileUtils.abrirDocumento(nombreDocumento);
-                    System.exit(0);
-                } catch (IOException ex) {
+        X509CertificateUtils x509CertificateUtils = new X509CertificateUtils();
+        if (x509CertificateUtils.validarX509Certificate((X509Certificate) keyStore.getCertificate(alias))) {//validación de firmaEC
+            Certificate[] certChain = keyStore.getCertificateChain(alias);
+            signedPdf = signer.sign(pdf, SignConstants.SIGN_ALGORITHM_SHA1WITHRSA, key, certChain, parametros());
+            System.out.println("final firma\n-------");
+            ////// Permite guardar el archivo en el equipo sin abrir
+            //java.io.FileOutputStream fos = new java.io.FileOutputStream(io.rubrica.validaciones.Fichero.rutaPdf());
+            ////// Permite guardar el archivo en el equipo y luego lo abre
+            String nombreDocumento = FileUtils.crearNombreFirmado(new File(FILE_PDF), FileUtils.getExtension(signedPdf));
+            java.io.FileOutputStream fos = new java.io.FileOutputStream(nombreDocumento);
+
+            new java.util.Timer().schedule(new java.util.TimerTask() {
+                @Override
+                public void run() {
+                    try {
+                        FileUtils.abrirDocumento(nombreDocumento);
+                        System.exit(0);
+                    } catch (IOException ex) {
+                    }
                 }
-            }
-        }, 3000); //espera 3 segundos
-        fos.write(signedPdf);
-        fos.close();
+            }, 3000); //espera 3 segundos
+            fos.write(signedPdf);
+            fos.close();
+        } else {
+            System.out.println("Entidad Certificadora no reconocida");
+        }
     }
 
     private static void validarCertificado() throws IOException, KeyStoreException, Exception {
@@ -172,7 +188,6 @@ public class Main {
     }
 
     private static void verificarPDF() throws IOException, InvalidFormatException, SignatureException, Exception {
-        ////// LEER PDF:
         byte[] pdf = Documento.loadFile(FILE_PDF);
         List<Certificado> certificados = Utils.pdfToCertificados(pdf);
         certificados.forEach((certificado) -> {
@@ -182,6 +197,17 @@ public class Main {
 
     private static void verificarP7M() throws IOException, SignatureVerificationException, Exception {
         File documento = new File(FILE_P7M);
-        Utils.verificarDocumento(documento);
+        List<Certificado> certificados = Utils.verificarDocumento(documento);
+        certificados.forEach((certificado) -> {
+            System.out.println(certificado.toString());
+        });
+    }
+
+    private static void verificarXML() throws IOException, SignatureVerificationException, Exception {
+        File documento = new File(FILE_XML);
+        List<Certificado> certificados = Utils.verificarDocumento(documento);
+        certificados.forEach((certificado) -> {
+            System.out.println(certificado.toString());
+        });
     }
 }

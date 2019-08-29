@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -121,7 +119,7 @@ public class ValidadorOCSP {
             return "unknownStatus";
         }
     }
-    
+
     private static OCSPReq generateOCSPRequest(X509Certificate issuerCert, BigInteger serialNumber)
             throws OperatorCreationException, CertificateEncodingException, OCSPException, IOException {
         // Add provider BC

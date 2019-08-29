@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -47,6 +45,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -66,6 +65,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.management.openmbean.InvalidKeyException;
@@ -474,7 +474,7 @@ public class Utils {
                 return null;
         }
     }
-    
+
     public static List<Certificado> verificarDocumento(File documento) throws IOException, KeyStoreException, OcspValidationException, SignatureException, InvalidFormatException, RubricaException, ConexionInvalidaOCSPException, HoraServidorException, CertificadoInvalidoException, EntidadCertificadoraNoValidaException, ConexionValidarCRLException, SignatureVerificationException, DocumentoException, CRLValidationException, Exception {
         byte[] docByteArray = FileUtils.fileConvertToByteArray(documento);
         // para P7m, ya que p7m no tiene signer
@@ -482,23 +482,58 @@ public class Utils {
         if (extDocumento.toLowerCase().contains(".p7s")) {
             VerificadorCMS verificador = new VerificadorCMS();
             byte[] archivoOriginal = verificador.verify(docByteArray);
-            
+
             String nombreArchivo = FileUtils.crearNombreVerificado(documento, FileUtils.getExtension(archivoOriginal));
             System.out.println("nombreDocFirmado: " + nombreArchivo);
-            
+
             FileUtils.saveByteArrayToDisc(archivoOriginal, nombreArchivo);
             FileUtils.abrirDocumento(nombreArchivo);
             return Utils.datosP7mToCertificado(verificador.certificados, verificador.fechasFirmados);
         } else {
-            Signer docSigner = Utils.documentSigner(documento);
             if (extDocumento.toLowerCase().equals(".pdf")) {
                 return Utils.pdfToCertificados(docByteArray);
             } else {
-                return Utils.signInfosToCertificados(docSigner.getSigners(docByteArray));
+                String xml = leerXmlSRI(documento);
+                Signer docSigner = Utils.documentSigner(documento);
+                return Utils.signInfosToCertificados(docSigner.getSigners(xml.getBytes(StandardCharsets.UTF_8)));
             }
         }
     }
-    
+
+    public static String leerXmlSRI(File documento) {
+        Scanner entrada = null;
+        //String xml
+        String xml = "";
+        try {
+            //creamos un Scanner para leer el fichero
+            entrada = new Scanner(documento);
+            while (entrada.hasNext()) { //mientras no se llegue al final del fichero
+                xml += entrada.nextLine();  //se lee una línea
+            }
+            xml = xml.replaceAll("&lt;", "<");
+            xml = xml.replaceAll("&gt;", ">");
+            //Texto a buscar
+            String inicioTexto1 = "<comprobante><![CDATA[";
+            String finTexto1 = "]]></comprobante>";
+            String inicioTexto2 = "<comprobante>";
+            String finTexto2 = "</comprobante>";
+            if (xml.contains(inicioTexto1)) {   //si la línea contiene el texto buscado
+                xml = xml.substring(xml.lastIndexOf(inicioTexto1) + inicioTexto1.length(),
+                        xml.indexOf(finTexto1));
+            } else {   //si la línea contiene el texto buscado
+                xml = xml.substring(xml.lastIndexOf(inicioTexto2) + inicioTexto2.length(),
+                        xml.indexOf(finTexto2));
+            }
+        } catch (Exception e) {
+            System.out.println(e.toString());
+        } finally {
+            if (entrada != null) {
+                entrada.close();
+            }
+        }
+        return xml;
+    }
+
     public static String validarFirma(Calendar fechaDesde, Calendar fechaHasta, Calendar fechaFirmado, Calendar fechaRevocado) {
         String retorno = "Válida";
         if (fechaFirmado.compareTo(fechaDesde) >= 0 && fechaFirmado.compareTo(fechaHasta) <= 0) {
@@ -523,22 +558,24 @@ public class Utils {
     public static boolean verifySignature(X509Certificate certificate) throws java.security.InvalidKeyException, EntidadCertificadoraNoValidaException {
         return verifySignature(certificate, CertEcUtils.getRootCertificate(certificate));
     }
-    
-    public static boolean verifySignature(X509Certificate certificate, X509Certificate rootCertificate) throws java.security.InvalidKeyException, EntidadCertificadoraNoValidaException {
-        PublicKey publicKeyForSignature = rootCertificate.getPublicKey();
 
-        try {
-            certificate.verify(publicKeyForSignature);
-            return true;
-        } catch (InvalidKeyException | CertificateException | NoSuchAlgorithmException
-                | NoSuchProviderException | SignatureException e) {
-            System.out.println("\n"
-                    + "\tSignature verification of certificate having distinguished name \n"
-                    + "\t'" + certificate.getSubjectX500Principal() + "'\n"
-                    + "\twith certificate having distinguished name (the issuer) \n"
-                    + "\t'" + rootCertificate.getSubjectX500Principal() + "'\n"
-                    + "\tfailed. Expected issuer has distinguished name \n"
-                    + "\t'" + certificate.getIssuerX500Principal() + "' (" + e.getClass().getSimpleName() + ")");
+    public static boolean verifySignature(X509Certificate certificate, X509Certificate rootCertificate) throws java.security.InvalidKeyException, EntidadCertificadoraNoValidaException {
+        if (rootCertificate != null) {
+            PublicKey publicKeyForSignature = rootCertificate.getPublicKey();
+
+            try {
+                certificate.verify(publicKeyForSignature);
+                return true;
+            } catch (InvalidKeyException | CertificateException | NoSuchAlgorithmException
+                    | NoSuchProviderException | SignatureException e) {
+                System.out.println("\n"
+                        + "\tSignature verification of certificate having distinguished name \n"
+                        + "\t'" + certificate.getSubjectX500Principal() + "'\n"
+                        + "\twith certificate having distinguished name (the issuer) \n"
+                        + "\t'" + rootCertificate.getSubjectX500Principal() + "'\n"
+                        + "\tfailed. Expected issuer has distinguished name \n"
+                        + "\t'" + certificate.getIssuerX500Principal() + "' (" + e.getClass().getSimpleName() + ")");
+            }
         }
         return false;
     }

@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -40,7 +38,7 @@ import java.util.Set;
  * Certificado intermedio de Consejo de la Judicatura, representado como un
  * objeto <code>X509Certificate</code>.
  *
- * @author Ricardo Arguello <ricardo.arguello@soportelibre.com>
+ * @author mfernandez
  */
 public class ConsejoJudicaturaSubCaCert extends X509Certificate {
 

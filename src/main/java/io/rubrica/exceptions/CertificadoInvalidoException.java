@@ -1,6 +1,4 @@
 /* 
- * Copyright (C) 2017 FirmaEC
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -20,10 +18,11 @@ package io.rubrica.exceptions;
  *
  * @author jdc
  */
-public class CertificadoInvalidoException extends Exception{
+public class CertificadoInvalidoException extends Exception {
+
     private static final long serialVersionUID = 1L;
 
-	public CertificadoInvalidoException(String msg){
-		super(msg);
-	}
+    public CertificadoInvalidoException(String msg) {
+        super(msg);
+    }
 }

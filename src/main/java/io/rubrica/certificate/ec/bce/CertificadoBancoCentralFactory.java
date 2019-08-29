@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -45,7 +43,6 @@ public class CertificadoBancoCentralFactory {
         } else if (certificateHasPolicy(certificado, OID_CERTIFICADO_FUNCIONARIO_PUBLICO)) {
             return new CertificadoFuncionarioPublicoBancoCentral(certificado);
         } else {
-//            return new CertificadoPersonaNaturalBancoCentral(certificado);
             throw new RuntimeException("Certificado del Banco Central del Ecuador de tipo desconocido!");
         }
     }

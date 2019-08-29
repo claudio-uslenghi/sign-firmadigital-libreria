@@ -1,6 +1,4 @@
 /* 
- * Copyright (C) 2017 FirmaEC
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -25,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import org.apache.tika.config.TikaConfig;
 import org.apache.tika.detect.DefaultDetector;
 import org.apache.tika.detect.Detector;
@@ -138,6 +137,30 @@ public class FileUtils {
                 for (String filtre : filtro.getExtensions()) {
                     if (getFileExtension(file).equals(filtre)) {
                         ruta = file.toString();
+                    }
+                }
+            }
+        }
+        return ruta;
+    }
+
+    public static java.util.List<String> rutaFicheros(javax.swing.filechooser.FileNameExtensionFilter filtro) {
+        java.util.List<String> ruta = new java.util.ArrayList<>();
+        javax.swing.JFileChooser jFileChooser = new javax.swing.JFileChooser(new java.io.File(System.getProperty("user.home")));
+        jFileChooser.setAcceptAllFileFilterUsed(false);
+        jFileChooser.setEnabled(false);
+        jFileChooser.setFileFilter(filtro);
+        jFileChooser.setMultiSelectionEnabled(true);
+
+        int resultado = jFileChooser.showOpenDialog(null);
+        if (resultado == javax.swing.JFileChooser.APPROVE_OPTION) {
+            java.io.File[] files = jFileChooser.getSelectedFiles();
+            for (File file : files) {
+                if (file.exists() && file.isFile()) {
+                    for (String filtre : filtro.getExtensions()) {
+                        if (getFileExtension(file).equals(filtre)) {
+                            ruta.add(file.toString());
+                        }
                     }
                 }
             }

@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +12,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.utils;
 
 import java.io.IOException;
@@ -37,157 +34,153 @@ import javax.net.ssl.X509TrustManager;
 
 public class HttpClient {
 
-	private static final Logger logger = Logger.getLogger(HttpClient.class.getName());
+    private static final Logger logger = Logger.getLogger(HttpClient.class.getName());
 
-	private static final String SSL_CONTEXT = "SSL";
-	private static final String HTTPS = "https";
-	private static final HostnameVerifier DEFAULT_HOSTNAME_VERIFIER = HttpsURLConnection.getDefaultHostnameVerifier();
-	private static final SSLSocketFactory DEFAULT_SSL_SOCKET_FACTORY = HttpsURLConnection.getDefaultSSLSocketFactory();
-	private static final boolean DISABLE_SSL_CHECKS = true;
-	private static final int DEFAULT_CONNECT_TIMEOUT = 5000;
-	private static final int DEFAULT_READ_TIMEOUT = 15000;
+    private static final String SSL_CONTEXT = "SSL";
+    private static final String HTTPS = "https";
+    private static final HostnameVerifier DEFAULT_HOSTNAME_VERIFIER = HttpsURLConnection.getDefaultHostnameVerifier();
+    private static final SSLSocketFactory DEFAULT_SSL_SOCKET_FACTORY = HttpsURLConnection.getDefaultSSLSocketFactory();
+    private static final boolean DISABLE_SSL_CHECKS = true;
+    private static final int DEFAULT_CONNECT_TIMEOUT = 5000;
+    private static final int DEFAULT_READ_TIMEOUT = 15000;
 
-	private static final TrustManager[] DUMMY_TRUST_MANAGER = new TrustManager[] { new X509TrustManager() {
-		@Override
-		public void checkClientTrusted(X509Certificate[] chain, String authType) {
-		}
+    private static final TrustManager[] DUMMY_TRUST_MANAGER = new TrustManager[]{new X509TrustManager() {
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType) {
+        }
 
-		@Override
-		public void checkServerTrusted(X509Certificate[] chain, String authType) {
-		}
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType) {
+        }
 
-		@Override
-		public X509Certificate[] getAcceptedIssuers() {
-			return null;
-		}
-	} };
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+            return null;
+        }
+    }};
 
-	private static final HostnameVerifier ALL_HOSTNAME_VERIFIER = new HostnameVerifier() {
-		@Override
-		public boolean verify(String hostname, SSLSession session) {
-			return true;
-		}
-	};
+    private static final HostnameVerifier ALL_HOSTNAME_VERIFIER = new HostnameVerifier() {
+        @Override
+        public boolean verify(String hostname, SSLSession session) {
+            return true;
+        }
+    };
 
-	public HttpClient() {
-	}
+    public HttpClient() {
+    }
 
-	public byte[] download(String urlString) throws IOException {
-		if (urlString == null) {
-			throw new IllegalArgumentException("La URL a leer no puede ser nula");
-		}
+    public byte[] download(String urlString) throws IOException {
+        if (urlString == null) {
+            throw new IllegalArgumentException("La URL a leer no puede ser nula");
+        }
 
-		URL url = new URL(urlString);
+        URL url = new URL(urlString);
 
-		if (DISABLE_SSL_CHECKS && url.getProtocol().equals(HTTPS)) {
-			try {
-				disableSslChecks();
-			} catch (Exception e) {
-				logger.warning(
-						"No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: "
-								+ e);
-			}
-		}
+        if (DISABLE_SSL_CHECKS && url.getProtocol().equals(HTTPS)) {
+            try {
+                disableSslChecks();
+            } catch (Exception e) {
+                logger.warning(
+                        "No se ha podido ajustar la confianza SSL, es posible que no se pueda completar la conexion: "
+                        + e);
+            }
+        }
 
-		HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-		conn.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
-		conn.setReadTimeout(DEFAULT_READ_TIMEOUT);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT);
+        conn.setReadTimeout(DEFAULT_READ_TIMEOUT);
 
-		conn.connect();
+        conn.connect();
 
-		int resCode = conn.getResponseCode();
-		String statusCode = Integer.toString(resCode);
-		logger.fine("Recibido: " + resCode + ": " + conn.getResponseMessage());
+        int resCode = conn.getResponseCode();
+        String statusCode = Integer.toString(resCode);
+        logger.fine("Recibido: " + resCode + ": " + conn.getResponseMessage());
 
-		if (statusCode.startsWith("4") || statusCode.startsWith("5")) {
-			if (url.getProtocol().equals(HTTPS)) {
-				enableSslChecks();
-			}
-			throw new HttpError(resCode, conn.getResponseMessage(), urlString);
-		}
+        if (statusCode.startsWith("4") || statusCode.startsWith("5")) {
+            if (url.getProtocol().equals(HTTPS)) {
+                enableSslChecks();
+            }
+            throw new HttpError(resCode, conn.getResponseMessage(), urlString);
+        }
 
-		try (InputStream is = conn.getInputStream()) {
-			byte[] data = Utils.getDataFromInputStream(is);
+        try (InputStream is = conn.getInputStream()) {
+            byte[] data = Utils.getDataFromInputStream(is);
 
-			if (DISABLE_SSL_CHECKS && url.getProtocol().equals(HTTPS)) {
-				enableSslChecks();
-			}
+            if (DISABLE_SSL_CHECKS && url.getProtocol().equals(HTTPS)) {
+                enableSslChecks();
+            }
 
-			return data;
-		}
-	}
+            return data;
+        }
+    }
 
-	public static void disableSslChecks() throws NoSuchAlgorithmException, KeyManagementException {
-		SSLContext sc = SSLContext.getInstance(SSL_CONTEXT);
-		sc.init(null, DUMMY_TRUST_MANAGER, new SecureRandom());
-		HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
-		HttpsURLConnection.setDefaultHostnameVerifier(ALL_HOSTNAME_VERIFIER);
+    public static void disableSslChecks() throws NoSuchAlgorithmException, KeyManagementException {
+        SSLContext sc = SSLContext.getInstance(SSL_CONTEXT);
+        sc.init(null, DUMMY_TRUST_MANAGER, new SecureRandom());
+        HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+        HttpsURLConnection.setDefaultHostnameVerifier(ALL_HOSTNAME_VERIFIER);
 
-		// Disable SNI
-		System.setProperty("jsse.enableSNIExtension", "false");
-	}
+        // Disable SNI
+        System.setProperty("jsse.enableSNIExtension", "false");
+    }
 
-	/**
-	 * Habilita las comprobaciones de certificados en conexiones SSL
-	 * dej&aacute;ndolas con su comportamiento por defecto.
-	 */
-	public static void enableSslChecks() {
-		HttpsURLConnection.setDefaultSSLSocketFactory(DEFAULT_SSL_SOCKET_FACTORY);
-		HttpsURLConnection.setDefaultHostnameVerifier(DEFAULT_HOSTNAME_VERIFIER);
-	}
+    /**
+     * Habilita las comprobaciones de certificados en conexiones SSL
+     * dej&aacute;ndolas con su comportamiento por defecto.
+     */
+    public static void enableSslChecks() {
+        HttpsURLConnection.setDefaultSSLSocketFactory(DEFAULT_SSL_SOCKET_FACTORY);
+        HttpsURLConnection.setDefaultHostnameVerifier(DEFAULT_HOSTNAME_VERIFIER);
+    }
 }
 
 class HttpError extends IOException {
 
-	private static final long serialVersionUID = -5234088987681090845L;
+    private static final long serialVersionUID = -5234088987681090845L;
 
-	private int responseCode;
-	private String responseDescription;
+    private int responseCode;
+    private String responseDescription;
 
-	/**
-	 * Crea una excepci&oacute;n de error de conexi&oacute;n HTTP.
-	 * 
-	 * @param resCode
-	 *            C&oacute;digo HTTP de respuesta.
-	 */
-	HttpError(int resCode) {
-		super("Error en conexion HTTP con codigo de respuesta " + resCode);
-		this.responseCode = resCode;
-		this.responseDescription = null;
-	}
+    /**
+     * Crea una excepci&oacute;n de error de conexi&oacute;n HTTP.
+     *
+     * @param resCode C&oacute;digo HTTP de respuesta.
+     */
+    HttpError(int resCode) {
+        super("Error en conexion HTTP con codigo de respuesta " + resCode);
+        this.responseCode = resCode;
+        this.responseDescription = null;
+    }
 
-	/**
-	 * Crea una excepci&oacute;n de error de conexi&oacute;n HTTP.
-	 * 
-	 * @param resCode
-	 *            C&oacute;digo HTTP de respuesta.
-	 * @param resDescription
-	 *            Descripci&oacute;n del error.
-	 * @param url
-	 *            URL a la que se intent&oacute; conectar.
-	 */
-	public HttpError(int resCode, String resDescription, String url) {
-		super("Error en conexion HTTP con codigo de respuesta " + resCode + " y descripcion '" + resDescription
-				+ "' para la direccion: " + url);
-		this.responseCode = resCode;
-		this.responseDescription = resDescription;
-	}
+    /**
+     * Crea una excepci&oacute;n de error de conexi&oacute;n HTTP.
+     *
+     * @param resCode C&oacute;digo HTTP de respuesta.
+     * @param resDescription Descripci&oacute;n del error.
+     * @param url URL a la que se intent&oacute; conectar.
+     */
+    public HttpError(int resCode, String resDescription, String url) {
+        super("Error en conexion HTTP con codigo de respuesta " + resCode + " y descripcion '" + resDescription
+                + "' para la direccion: " + url);
+        this.responseCode = resCode;
+        this.responseDescription = resDescription;
+    }
 
-	/**
-	 * Obtiene el c&oacute;digo HTTP de respuesta.
-	 * 
-	 * @return C&oacute;digo HTTP de respuesta.
-	 */
-	public int getResponseCode() {
-		return this.responseCode;
-	}
+    /**
+     * Obtiene el c&oacute;digo HTTP de respuesta.
+     *
+     * @return C&oacute;digo HTTP de respuesta.
+     */
+    public int getResponseCode() {
+        return this.responseCode;
+    }
 
-	/**
-	 * Obtiene la descripci&oacute;n del error HTTP.
-	 * 
-	 * @return Descripci&oacute;n del error HTTP.
-	 */
-	public String getResponseDescription() {
-		return this.responseDescription;
-	}
+    /**
+     * Obtiene la descripci&oacute;n del error HTTP.
+     *
+     * @return Descripci&oacute;n del error HTTP.
+     */
+    public String getResponseDescription() {
+        return this.responseDescription;
+    }
 }

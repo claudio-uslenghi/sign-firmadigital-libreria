@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +12,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.exceptions;
 
 /**
@@ -24,21 +21,21 @@ package io.rubrica.exceptions;
  */
 public class RubricaException extends Exception {
 
-	static final long serialVersionUID = -7855834122538664923L;
+    static final long serialVersionUID = -7855834122538664923L;
 
-	public RubricaException() {
-		super();
-	}
+    public RubricaException() {
+        super();
+    }
 
-	public RubricaException(String message) {
-		super(message);
-	}
+    public RubricaException(String message) {
+        super(message);
+    }
 
-	public RubricaException(String msg, Throwable cause) {
-		super(msg, cause);
-	}
+    public RubricaException(String msg, Throwable cause) {
+        super(msg, cause);
+    }
 
-	public RubricaException(Throwable cause) {
-		super(cause);
-	}
+    public RubricaException(Throwable cause) {
+        super(cause);
+    }
 }

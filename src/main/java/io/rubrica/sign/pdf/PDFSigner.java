@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -93,13 +91,17 @@ public class PDFSigner implements Signer {
      * <li><i>SHA256withRSA</i></li>
      * <li><i>SHA384withRSA</i></li>
      * <li><i>SHA512withRSA</i></li>
+     * @param xParams
+     * @throws io.rubrica.exceptions.RubricaException
+     * @throws java.io.IOException
+     * @throws com.lowagie.text.exceptions.BadPasswordException
      */
     @Override
     public byte[] sign(byte[] data, String algorithm, PrivateKey key, Certificate[] certChain, Properties xParams)
             throws RubricaException, IOException, BadPasswordException {
 
         Properties extraParams = xParams != null ? xParams : new Properties();
-        
+
         X509Certificate x509Certificate = (X509Certificate) certChain[0];
 
         // Motivo de la firma

@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,10 +12,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.exceptions;
-
-import io.rubrica.exceptions.RubricaException;
 
 /**
  * Excepci&oacute;n para notificar que se ha encontrado un objeto con un formato
@@ -25,27 +20,24 @@ import io.rubrica.exceptions.RubricaException;
  */
 public class InvalidFormatException extends RubricaException {
 
-	private static final long serialVersionUID = 3204897511735178462L;
+    private static final long serialVersionUID = 3204897511735178462L;
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n.
-	 */
-	public InvalidFormatException(String msg) {
-		super(msg);
-	}
+    /**
+     * Crea la excepci&oacute;n con un mensaje determinado.
+     *
+     * @param msg Mensaje descriptivo de la excepci&oacute;n.
+     */
+    public InvalidFormatException(String msg) {
+        super(msg);
+    }
 
-	/**
-	 * Crea la excepci&oacute;n con un mensaje determinado.
-	 * 
-	 * @param msg
-	 *            Mensaje descriptivo de la excepci&oacute;n.
-	 * @param e
-	 *            Excepci&oacute;n que ha causado el lanzamiento de esta.
-	 */
-	public InvalidFormatException(String msg, Exception e) {
-		super(msg, e);
-	}
+    /**
+     * Crea la excepci&oacute;n con un mensaje determinado.
+     *
+     * @param msg Mensaje descriptivo de la excepci&oacute;n.
+     * @param e Excepci&oacute;n que ha causado el lanzamiento de esta.
+     */
+    public InvalidFormatException(String msg, Exception e) {
+        super(msg, e);
+    }
 }

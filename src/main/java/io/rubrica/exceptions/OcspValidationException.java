@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +12,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.exceptions;
 
 import java.util.Date;
@@ -26,26 +23,26 @@ import java.util.Date;
  */
 public class OcspValidationException extends Exception {
 
-	private static final long serialVersionUID = -4371520182817375302L;
+    private static final long serialVersionUID = -4371520182817375302L;
 
-	private int revocationReason;
-	private Date revocationTime;
+    private int revocationReason;
+    private Date revocationTime;
 
-	public OcspValidationException() {
-		super();
-	}
+    public OcspValidationException() {
+        super();
+    }
 
-	public OcspValidationException(int revocationReason, Date revocationTime) {
-		super();
-		this.revocationReason = revocationReason;
-		this.revocationTime = revocationTime;
-	}
+    public OcspValidationException(int revocationReason, Date revocationTime) {
+        super();
+        this.revocationReason = revocationReason;
+        this.revocationTime = revocationTime;
+    }
 
-	public int getRevocationReason() {
-		return revocationReason;
-	}
+    public int getRevocationReason() {
+        return revocationReason;
+    }
 
-	public Date getRevocationTime() {
-		return revocationTime;
-	}
+    public Date getRevocationTime() {
+        return revocationTime;
+    }
 }

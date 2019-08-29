@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +12,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.certificate.ec;
 
 /**
@@ -26,48 +23,48 @@ package io.rubrica.certificate.ec;
  */
 public interface CertificadoPersonaNatural {
 
-	/**
-	 * Cedula o Pasaporte
-	 */
-	String getCedulaPasaporte();
+    /**
+     * @return Cedula o Pasaporte
+     */
+    String getCedulaPasaporte();
 
-	/**
-	 * Nombre(s)
-	 */
-	String getNombres();
+    /**
+     * @return Nombre(s)
+     */
+    String getNombres();
 
-	/**
-	 * Primer apellido
-	 */
-	String getPrimerApellido();
+    /**
+     * @return Primer apellido
+     */
+    String getPrimerApellido();
 
-	/**
-	 * Segundo apellido (si no tiene queda en blanco)
-	 */
-	String getSegundoApellido();
+    /**
+     * @return Segundo apellido (si no tiene queda en blanco)
+     */
+    String getSegundoApellido();
 
-	/**
-	 * Direccion
-	 */
-	String getDireccion();
+    /**
+     * @return Direccion
+     */
+    String getDireccion();
 
-	/**
-	 * Telefono
-	 */
-	String getTelefono();
+    /**
+     * @return Telefono
+     */
+    String getTelefono();
 
-	/**
-	 * Ciudad
-	 */
-	String getCiudad();
+    /**
+     * @return Ciudad
+     */
+    String getCiudad();
 
-	/**
-	 * Pais
-	 */
-	String getPais();
+    /**
+     * @return Pais
+     */
+    String getPais();
 
-	/**
-	 * RUC (si no tiene queda en blanco)
-	 */
-	String getRuc();
+    /**
+     * @return RUC (si no tiene queda en blanco)
+     */
+    String getRuc();
 }

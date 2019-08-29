@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -39,6 +37,8 @@ import java.util.Set;
 /**
  * Certificado raiz de ANF AC Ecuador, representado como un objeto
  * <code>X509Certificate</code>.
+ * 
+ * @author mfernandez
  */
 public class AnfAcCaCert extends X509Certificate {
 
@@ -82,7 +82,6 @@ public class AnfAcCaCert extends X509Certificate {
         cer.append("E973CkA/qtg0kH1MJmBrbqPDZm4cBMfLTGvWl1r0l59pmEjEp538DF6rrLnPo/gK\n");
         cer.append("gZFzZdSx1n7yoUkc6RXshyqxmbX+0JTyy03S\n");
         cer.append("-----END CERTIFICATE-----");
-
 
         try {
             InputStream is = new ByteArrayInputStream(cer.toString().getBytes("UTF-8"));

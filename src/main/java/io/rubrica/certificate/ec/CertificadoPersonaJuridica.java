@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +12,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.certificate.ec;
 
 /**
@@ -29,58 +26,58 @@ package io.rubrica.certificate.ec;
  */
 public interface CertificadoPersonaJuridica {
 
-	/**
-	 * @return
-	 */
-	String getRazonSocial();
+    /**
+     * @return Razon Social
+     */
+    String getRazonSocial();
 
-	/**
-	 * RUC (si no tiene queda en blanco)
-	 */
-	String getRuc();
+    /**
+     * @return RUC (si no tiene queda en blanco)
+     */
+    String getRuc();
 
-	/**
-	 * Cedula o Pasaporte del suscriptor
-	 */
-	String getCedulaPasaporte();
+    /**
+     * @return Cedula o Pasaporte del suscriptor
+     */
+    String getCedulaPasaporte();
 
-	/**
-	 * Nombre(s) del suscriptor
-	 */
-	String getNombres();
+    /**
+     * @return Nombre(s) del suscriptor
+     */
+    String getNombres();
 
-	/**
-	 * Primer apellido del suscriptor
-	 */
-	String getPrimerApellido();
+    /**
+     * @return Primer apellido del suscriptor
+     */
+    String getPrimerApellido();
 
-	/**
-	 * Segundo apellido del suscriptor (si no tiene queda en blanco)
-	 */
-	String getSegundoApellido();
+    /**
+     * @return Segundo apellido del suscriptor (si no tiene queda en blanco)
+     */
+    String getSegundoApellido();
 
-	/**
-	 * Cargo
-	 */
-	String getCargo();
+    /**
+     * @return Cargo
+     */
+    String getCargo();
 
-	/**
-	 * Direccion
-	 */
-	String getDireccion();
+    /**
+     * @return Direccion
+     */
+    String getDireccion();
 
-	/**
-	 * Telefono
-	 */
-	String getTelefono();
+    /**
+     * @return Telefono
+     */
+    String getTelefono();
 
-	/**
-	 * Telefono
-	 */
-	String getCiudad();
+    /**
+     * @return Ciudad
+     */
+    String getCiudad();
 
-	/**
-	 * Pais
-	 */
-	String getPais();
+    /**
+     * @return Pais
+     */
+    String getPais();
 }

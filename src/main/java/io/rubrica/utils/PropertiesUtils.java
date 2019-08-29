@@ -1,6 +1,4 @@
 /* 
- * Copyright (C) 2017 FirmaEC
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -27,8 +25,8 @@ import java.util.logging.Logger;
  */
 public class PropertiesUtils {
 
-    private static final String MESSAGES = "Messages.properties";
-    private static final String CONFIG = "configuration.properties";
+    private static final String MESSAGES = "messages.rubrica.properties";
+    private static final String CONFIG = "config.rubrica.properties";
     private static Properties messages;
     private static Properties config;
 

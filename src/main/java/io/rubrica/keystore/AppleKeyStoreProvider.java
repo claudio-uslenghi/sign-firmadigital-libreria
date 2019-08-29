@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -31,22 +29,22 @@ import java.security.cert.CertificateException;
  */
 public class AppleKeyStoreProvider implements KeyStoreProvider {
 
-	private static final String APPLE_PROVIDER_TYPE = "KeychainStore";
-	private static final String APPLE_PROVIDER_NAME = "Apple";
+    private static final String APPLE_PROVIDER_TYPE = "KeychainStore";
+    private static final String APPLE_PROVIDER_NAME = "Apple";
 
-	@Override
-	public KeyStore getKeystore() throws KeyStoreException {
-		try {
-			KeyStore keyStore = KeyStore.getInstance(APPLE_PROVIDER_TYPE, APPLE_PROVIDER_NAME);
-			keyStore.load(null, null);
-			return keyStore;
-		} catch (NoSuchProviderException | NoSuchAlgorithmException | CertificateException | IOException e) {
-			throw new KeyStoreException(e);
-		}
-	}
+    @Override
+    public KeyStore getKeystore() throws KeyStoreException {
+        try {
+            KeyStore keyStore = KeyStore.getInstance(APPLE_PROVIDER_TYPE, APPLE_PROVIDER_NAME);
+            keyStore.load(null, null);
+            return keyStore;
+        } catch (NoSuchProviderException | NoSuchAlgorithmException | CertificateException | IOException e) {
+            throw new KeyStoreException(e);
+        }
+    }
 
-	@Override
-	public KeyStore getKeystore(char[] password) throws KeyStoreException {
-		return getKeystore();
-	}
+    @Override
+    public KeyStore getKeystore(char[] password) throws KeyStoreException {
+        return getKeystore();
+    }
 }

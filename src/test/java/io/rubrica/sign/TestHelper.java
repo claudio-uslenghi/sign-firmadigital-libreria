@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,7 +12,6 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.sign;
 
 import java.io.ByteArrayInputStream;
@@ -47,52 +44,52 @@ import com.lowagie.text.pdf.PdfWriter;
 
 public class TestHelper {
 
-	public static KeyPair createKeyPair() throws Exception {
-		KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
-		gen.initialize(2048);
-		return gen.generateKeyPair();
-	}
+    public static KeyPair createKeyPair() throws Exception {
+        KeyPairGenerator gen = KeyPairGenerator.getInstance("RSA");
+        gen.initialize(2048);
+        return gen.generateKeyPair();
+    }
 
-	public static Certificate[] createCertificate(KeyPair keypar) throws Exception {
-		try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-			baos.write(generateV1Certificate(keypar).getEncoded());
+    public static Certificate[] createCertificate(KeyPair keypar) throws Exception {
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            baos.write(generateV1Certificate(keypar).getEncoded());
 
-			try (InputStream in = new ByteArrayInputStream(baos.toByteArray())) {
-				CertificateFactory fact = CertificateFactory.getInstance("X.509", "BC");
-				return new Certificate[] { fact.generateCertificate(in) };
-			}
-		}
-	}
+            try (InputStream in = new ByteArrayInputStream(baos.toByteArray())) {
+                CertificateFactory fact = CertificateFactory.getInstance("X.509", "BC");
+                return new Certificate[]{fact.generateCertificate(in)};
+            }
+        }
+    }
 
-	public static byte[] crearPdf() throws Exception {
-		File tempFile = File.createTempFile("temp-", ".pdf");
+    public static byte[] crearPdf() throws Exception {
+        File tempFile = File.createTempFile("temp-", ".pdf");
 
-		Document document = new Document();
-		PdfWriter.getInstance(document, new FileOutputStream(tempFile));
-		document.open();
+        Document document = new Document();
+        PdfWriter.getInstance(document, new FileOutputStream(tempFile));
+        document.open();
 
-		Paragraph paragraph = new Paragraph("Esto es una prueba");
-		paragraph.setAlignment(Element.ALIGN_RIGHT);
-		document.add(paragraph);
-		document.close();
+        Paragraph paragraph = new Paragraph("Esto es una prueba");
+        paragraph.setAlignment(Element.ALIGN_RIGHT);
+        document.add(paragraph);
+        document.close();
 
-		return Files.readAllBytes(tempFile.toPath());
-	}
+        return Files.readAllBytes(tempFile.toPath());
+    }
 
-	public static X509Certificate generateV1Certificate(KeyPair pair)
-			throws InvalidKeyException, NoSuchProviderException, SignatureException {
-		BouncyCastleProvider prov = new BouncyCastleProvider();
-		Security.addProvider(prov);
+    public static X509Certificate generateV1Certificate(KeyPair pair)
+            throws InvalidKeyException, NoSuchProviderException, SignatureException {
+        BouncyCastleProvider prov = new BouncyCastleProvider();
+        Security.addProvider(prov);
 
-		// generate the certificate
-		X509V1CertificateGenerator certGen = new X509V1CertificateGenerator();
-		certGen.setSerialNumber(BigInteger.valueOf(System.currentTimeMillis()));
-		certGen.setIssuerDN(new X500Principal("CN=Test Certificate"));
-		certGen.setNotBefore(new Date(System.currentTimeMillis() - 50000));
-		certGen.setNotAfter(new Date(System.currentTimeMillis() + 50000));
-		certGen.setSubjectDN(new X500Principal("CN=Test Certificate"));
-		certGen.setPublicKey(pair.getPublic());
-		certGen.setSignatureAlgorithm("SHA256WithRSAEncryption");
-		return certGen.generateX509Certificate(pair.getPrivate());
-	}
+        // generate the certificate
+        X509V1CertificateGenerator certGen = new X509V1CertificateGenerator();
+        certGen.setSerialNumber(BigInteger.valueOf(System.currentTimeMillis()));
+        certGen.setIssuerDN(new X500Principal("CN=Test Certificate"));
+        certGen.setNotBefore(new Date(System.currentTimeMillis() - 50000));
+        certGen.setNotAfter(new Date(System.currentTimeMillis() + 50000));
+        certGen.setSubjectDN(new X500Principal("CN=Test Certificate"));
+        certGen.setPublicKey(pair.getPublic());
+        certGen.setSignatureAlgorithm("SHA256WithRSAEncryption");
+        return certGen.generateX509Certificate(pair.getPrivate());
+    }
 }

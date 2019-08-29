@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -14,21 +12,22 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
 package io.rubrica.sign.xades;
 
-/** Excepci&oacute;n relativa a los errores de firma de hojas de estilo XML. */
+/**
+ * Excepci&oacute;n relativa a los errores de firma de hojas de estilo XML.
+ */
 public abstract class StyleException extends Exception {
 
-	StyleException(final String msg) {
-		super(msg);
-	}
+    StyleException(final String msg) {
+        super(msg);
+    }
 
-	StyleException(final String msg, final Throwable e) {
-		super(msg, e);
-	}
+    StyleException(final String msg, final Throwable e) {
+        super(msg, e);
+    }
 
-	StyleException(final Throwable e) {
-		super(e);
-	}
+    StyleException(final Throwable e) {
+        super(e);
+    }
 }

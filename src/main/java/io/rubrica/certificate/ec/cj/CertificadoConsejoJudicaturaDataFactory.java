@@ -1,6 +1,4 @@
 /*
- * Copyright 2009-2018 Rubrica
- *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
@@ -30,7 +28,7 @@ import java.security.cert.X509Certificate;
  * Permite construir certificados tipo CertificadoConsejoJudicatura a partir de
  * certificados X509Certificate.
  *
- * @author Ricardo Arguello <ricardo.arguello@soportelibre.com>
+ * @author mfernandez
  */
 public class CertificadoConsejoJudicaturaDataFactory {
 
@@ -57,7 +55,6 @@ public class CertificadoConsejoJudicaturaDataFactory {
         } else if (certificateHasPolicy(certificado, OID_CERTIFICADO_DEPARTAMENTO_EMPRESA)) {
             return new CertificadoDepartamentoEmpresaConsejoJudicatura(certificado);
         } else {
-//            return new CertificadoPersonaNaturalConsejoJudicatura(certificado);
             throw new RuntimeException("Certificado del Consejo de la Judicatura de tipo desconocido!");
         }
     }
