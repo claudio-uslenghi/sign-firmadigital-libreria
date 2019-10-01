@@ -40,7 +40,7 @@ import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.TSAClient;
 
-import io.rubrica.certificate.ec.securitydata.SecurityDataSubCaCert;
+import io.rubrica.certificate.ec.securitydata.SecurityDataSubCaCert20112026;
 
 /**
  * Clase para firmar documentos PDF usando la libreria iText.
@@ -137,7 +137,7 @@ public class FirmaPDF {
 
             if (ocsp != null) {
                 try {
-                    X509Certificate cert = new SecurityDataSubCaCert();
+                    X509Certificate cert = new SecurityDataSubCaCert20112026();
 
                     boolean verifies = ocsp.isSignatureValid(new JcaContentVerifierProviderBuilder()
                             .setProvider(BouncyCastleProvider.PROVIDER_NAME).build(cert.getPublicKey()));

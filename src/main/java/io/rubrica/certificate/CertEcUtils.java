@@ -38,7 +38,7 @@ import io.rubrica.certificate.ec.cj.CertificadoPersonaNaturalConsejoJudicatura;
 import io.rubrica.certificate.ec.cj.ConsejoJudicaturaSubCaCert;
 import io.rubrica.certificate.ec.securitydata.CertificadoSecurityData;
 import io.rubrica.certificate.ec.securitydata.CertificadoSecurityDataFactory;
-import io.rubrica.certificate.ec.securitydata.SecurityDataSubCaCert;
+import io.rubrica.certificate.ec.securitydata.SecurityDataSubCaCert20112026;
 import io.rubrica.certificate.ec.securitydata.SecurityDataSubCaCert20192031;
 import io.rubrica.sign.cms.DatosUsuario;
 import java.security.cert.X509Certificate;
@@ -71,9 +71,9 @@ public class CertEcUtils {
             }
             case "Security Data": {
                 try {
-                    if (io.rubrica.utils.Utils.verifySignature(certificado, new SecurityDataSubCaCert())) {
+                    if (io.rubrica.utils.Utils.verifySignature(certificado, new SecurityDataSubCaCert20112026())) {
                         System.out.println("SecurityDataSubCaCert");
-                        return new SecurityDataSubCaCert();
+                        return new SecurityDataSubCaCert20112026();
                     }
                     if (io.rubrica.utils.Utils.verifySignature(certificado, new SecurityDataSubCaCert20192031())) {
                         System.out.println("SecurityDataSubCaCert 2019-2031");

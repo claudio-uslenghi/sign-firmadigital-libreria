@@ -44,18 +44,19 @@ import java.util.List;
 public class Main {
 
     // ARCHIVO
-//    private static final String ARCHIVO = "/home/mfernandez/Firmas/SecurityData/2019/MISAEL VLADIMIR FERNANDEZ CORREA 190819105700.p12";
-//    private static final String PASSWORD = "Security2019";
-    private static final String ARCHIVO = "/home/mfernandez/Firmas/BCE/2019/cn=misael_vladimir_fernandez_correa.p12";
-    private static final String PASSWORD = "Password#1";
+    private static final String ARCHIVO = "/home/mfernandez/Firmas/SecurityData/2019/MISAEL VLADIMIR FERNANDEZ CORREA 190819105700.p12";
+    private static final String PASSWORD = "Security2019";
+//    private static final String ARCHIVO = "/home/mfernandez/Firmas/BCE/2019/cn=misael_vladimir_fernandez_correa.p12";
+//    private static final String PASSWORD = "Password#1";
     private static final String FILE_XML = "/home/mfernandez/Test/facturaMovistar.xml";
-    private static final String FILE_PDF = "/home/mfernandez/Test/documento_blanco.pdf";
+    private static final String FILE_PDF = "/home/mfernandez/Test/1.pdf";
+//    private static final String FILE_PDF = "/home/mfernandez/Test/documento_blanco.pdf";
     private static final String FILE_P7M = "/home/mfernandez/Test/quipux_xls.p7m";
 
     public static void main(String args[]) throws KeyStoreException, Exception {
-//        firmarArchivoPDF();
+        firmarArchivoPDF();
 //        verificarPDF();
-        verificarXML();
+//        verificarXML();
 //        validarCertificado();
 //        verificarP7M();
     }

@@ -51,7 +51,7 @@ public class TestSecurityDataCertificate {
         }
 
         // new SecurityDataCaCert().getPublicKey()
-        ValidationResult result = CrlUtils.verifyCertificateCRLs(cert, new SecurityDataSubCaCert().getPublicKey(),
+        ValidationResult result = CrlUtils.verifyCertificateCRLs(cert, new SecurityDataSubCaCert20112026().getPublicKey(),
                 Arrays.asList(
                         "https://direct.securitydata.net.ec/~crl/autoridad_de_certificacion_sub_security_data_entidad_de_certificacion_de_informacion_curity_data_s.a._c_ec_crlfile.crl"));
         System.out.println("Validation result: " + result);
