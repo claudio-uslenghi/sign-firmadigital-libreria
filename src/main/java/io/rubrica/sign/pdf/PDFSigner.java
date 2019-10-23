@@ -29,7 +29,6 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import com.lowagie.text.DocumentException;
 import com.lowagie.text.Font;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Rectangle;
@@ -91,6 +90,7 @@ public class PDFSigner implements Signer {
      * <li><i>SHA256withRSA</i></li>
      * <li><i>SHA384withRSA</i></li>
      * <li><i>SHA512withRSA</i></li>
+     *
      * @param xParams
      * @throws io.rubrica.exceptions.RubricaException
      * @throws java.io.IOException
@@ -161,14 +161,17 @@ public class PDFSigner implements Signer {
         }
 
         // Leer el PDF
-        PdfReader pdfReader = new PdfReader(data);
+        PdfReader pdfReader = new PdfReader(data);        
+        if (pdfReader.isEncrypted()) {
+            logger.severe("Documento encriptado");
+            throw new RubricaException("Documento encriptado");
+        }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
         PdfStamper stp;
-
         try {
             stp = PdfStamper.createSignature(pdfReader, baos, '\0', null, true);
-        } catch (DocumentException e) {
+        } catch (com.lowagie.text.DocumentException e) {
             logger.severe("Error al crear la firma para estampar: " + e);
             throw new RubricaException("Error al crear la firma para estampar", e);
         }
@@ -316,9 +319,9 @@ public class PDFSigner implements Signer {
                     default: {
                     }
                 }
-            } catch (DocumentException e) {
-                logger.severe("Error al estampar la firma: " + e);
-                throw new RubricaException("Error al estampar la firma", e);
+            } catch (com.lowagie.text.DocumentException de) {
+                logger.severe("Error al estampar la firma: " + de);
+                throw new RubricaException("Error al estampar la firma", de);
             }
         }
 
@@ -327,11 +330,11 @@ public class PDFSigner implements Signer {
         try {
             stp.close();
         } catch (com.lowagie.text.ExceptionConverter ec) {
-            logger.severe("Problemas con el driver: " + ec);
-            throw new RubricaException("Problemas con el driver", ec);
-        } catch (DocumentException e) {
-            logger.severe("Error al estampar la firma: " + e);
-            throw new RubricaException("Error al estampar la firma", e);
+            logger.severe("Problemas con el driver\n" + ec);
+            throw new RubricaException("Problemas con el driver\n", ec);
+        } catch (com.lowagie.text.DocumentException | com.lowagie.text.exceptions.InvalidPdfException de) {
+            logger.severe("Error al estampar la firma\n" + de);
+            throw new RubricaException("Error al estampar la firma\n", de);
         }
 
         return baos.toByteArray();

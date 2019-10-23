@@ -72,13 +72,12 @@ public class FileUtils {
         }
     }
 
-    // TODO Crear clase para manejar esto
     public static String crearNombreFirmado(File documento, String extension) throws IOException {
-        String nombre = crearNombre(documento);
-        if (new File(nombre + "-signed" + extension).exists()) {
-            nombre += "-new";
+        String nombre = crearNombre(documento) + "-signed" + extension;
+        if (new File(nombre).exists()) {
+            nombre = crearNombreFirmado(new File(nombre + "_new"), extension);
         }
-        return nombre + "-signed" + extension;
+        return nombre;
     }
 
     public static String crearNombreVerificado(File documento, String extension) throws IOException {
