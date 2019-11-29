@@ -28,7 +28,6 @@ import io.rubrica.sign.cms.DatosUsuario;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.util.Date;
-import javax.swing.JOptionPane;
 
 /**
  * Validacion de cedula.
@@ -84,7 +83,7 @@ public class X509CertificateUtils {
             }
 
             if ((revocado != null) || caducado || desconocido) {
-                JOptionPane.showMessageDialog(null, PropertiesUtils.getMessages().getProperty("mensaje.error.certificado_invalido"), "Advertencia", JOptionPane.WARNING_MESSAGE);
+                javax.swing.JOptionPane.showMessageDialog(null, PropertiesUtils.getMessages().getProperty("mensaje.error.certificado_invalido"), "Advertencia", javax.swing.JOptionPane.WARNING_MESSAGE);
             } else {
                 retorno = true;
             }

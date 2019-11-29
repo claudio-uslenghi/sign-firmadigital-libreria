@@ -92,7 +92,7 @@ public class TiempoUtils {
                 }
             } else {
                 throw new RuntimeException(
-                        "Error al obtener fecha y hora del servidor");
+                        "Error al obtener fecha y hora del servidor\nIntente nuevamente");
             }
         }
     }

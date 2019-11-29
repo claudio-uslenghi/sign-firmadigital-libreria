@@ -475,7 +475,7 @@ public class Utils {
         }
     }
 
-    public static List<Certificado> verificarDocumento(File documento) throws IOException, KeyStoreException, OcspValidationException, SignatureException, InvalidFormatException, RubricaException, ConexionInvalidaOCSPException, HoraServidorException, CertificadoInvalidoException, EntidadCertificadoraNoValidaException, ConexionValidarCRLException, SignatureVerificationException, DocumentoException, CRLValidationException, Exception {
+    public static List<Certificado> verificarDocumento(File documento) throws IOException, KeyStoreException, OcspValidationException, SignatureException, RubricaException, ConexionInvalidaOCSPException, HoraServidorException, CertificadoInvalidoException, EntidadCertificadoraNoValidaException, ConexionValidarCRLException, SignatureVerificationException, DocumentoException, CRLValidationException, Exception {
         byte[] docByteArray = FileUtils.fileConvertToByteArray(documento);
         // para P7m, ya que p7m no tiene signer
         String extDocumento = FileUtils.getExtension(docByteArray);
@@ -493,9 +493,17 @@ public class Utils {
             if (extDocumento.toLowerCase().equals(".pdf")) {
                 return Utils.pdfToCertificados(docByteArray);
             } else {
-                String xml = leerXmlSRI(documento);
                 Signer docSigner = Utils.documentSigner(documento);
-                return Utils.signInfosToCertificados(docSigner.getSigners(xml.getBytes(StandardCharsets.UTF_8)));
+                List<Certificado> certificados = Utils.signInfosToCertificados(docSigner.getSigners(docByteArray));
+                //SRI
+                String xml = leerXmlSRI(documento);
+                List<Certificado> certificadosSRI = Utils.signInfosToCertificados(docSigner.getSigners(xml.getBytes(StandardCharsets.UTF_8)));
+                if (!certificadosSRI.isEmpty()) {
+                    javax.swing.JOptionPane.showMessageDialog(null, PropertiesUtils.getMessages().getProperty("mensaje.error.documento_sri"), "Advertencia", javax.swing.JOptionPane.WARNING_MESSAGE);
+                }
+                certificados.addAll(certificadosSRI);
+                //SRI
+                return certificados;
             }
         }
     }
