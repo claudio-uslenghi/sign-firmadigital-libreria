@@ -8,7 +8,6 @@ package io.rubrica.sign;
 import io.rubrica.certificate.CertEcUtils;
 import static io.rubrica.certificate.CertUtils.seleccionarAlias;
 import io.rubrica.certificate.Certificado;
-import io.rubrica.exceptions.InvalidFormatException;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -30,7 +29,6 @@ import io.rubrica.utils.UtilsCrlOcsp;
 import io.rubrica.utils.X509CertificateUtils;
 import io.rubrica.validaciones.Documento;
 import java.io.File;
-import java.security.SignatureException;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.time.temporal.TemporalAccessor;
@@ -48,22 +46,23 @@ public class Main {
     private static final String PASSWORD = "Security2019";
 //    private static final String ARCHIVO = "/home/mfernandez/Firmas/BCE/2019/cn=misael_vladimir_fernandez_correa.p12";
 //    private static final String PASSWORD = "Password#1";
-    private static final String FILE_XML = "/home/mfernandez/Descargas/1111201901099252674200120430030017228925486271312_A.xml";
+//    private static final String FILE = "/home/mfernandez/Descargas/1111201901099252674200120430030017228925486271312_A.xml";
 //    private static final String FILE_XML = "/home/mfernandez/Descargas/1111201901099252674200120430030017228925486271312_A-signed.txt.xml";
 //    private static final String FILE_XML = "/home/mfernandez/Test/facturaMovistar.xml";
-//    private static final String FILE_PDF = "/home/mfernandez/Test/hello_encrypted2.pdf";
-//    private static final String FILE_PDF = "/home/mfernandez/Test/Caballero.pdf";
-//    private static final String FILE_PDF = "/home/mfernandez/Test/1.pdf";
-    private static final String FILE_PDF = "/home/mfernandez/Test/firmadoEditado.pdf";
-//    private static final String FILE_PDF = "/home/mfernandez/Test/documento_blanco.pdf";
-    private static final String FILE_P7M = "/home/mfernandez/Test/quipux_xls.p7m";
+//    private static final String FILE = "/home/mfernandez/Test/hello_encrypted2.pdf";
+//    private static final String FILE = "/home/mfernandez/Test/Caballero.pdf";
+//    private static final String FILE = "/home/mfernandez/Test/test.pdf";
+//    private static final String FILE = "/home/mfernandez/Test/1.pdf";
+//    private static final String FILE = "/home/mfernandez/Test/firmadoEditado.pdf";
+//    private static final String FILE = "/home/mfernandez/Test/documento_blanco.pdf";
+//    private static final String FILE = "/home/mfernandez/Test/quipux_xls.p7m";
+    private static final String FILE = "/home/mfernandez/ARCOTEL.docx";
 
     public static void main(String args[]) throws KeyStoreException, Exception {
-//        firmarArchivoPDF();
-//        verificarPDF();
-        verificarXML();
+//        fechaHora(240);//espera en segundos
+        firmarDocumento(FILE);
 //        validarCertificado();
-//        verificarP7M();
+//        verificarDocumento(FILE);
     }
 
     private static Properties parametros() throws IOException {
@@ -118,10 +117,10 @@ public class Main {
         //params.setProperty(PdfUtil.POSITION_ON_PAGE_UPPER_RIGHT_Y, ury);
         return params;
     }
-
-    private static void firmarArchivoPDF() throws KeyStoreException, Exception {
+    
+    private static void firmarDocumento(String file) throws KeyStoreException, Exception {
         ////// LEER PDF:
-        byte[] pdf = Documento.loadFile(FILE_PDF);
+        byte[] docByteArry = Documento.loadFile(file);
 
         // ARCHIVO
         KeyStoreProvider ksp = new FileKeyStoreProvider(ARCHIVO);
@@ -129,34 +128,37 @@ public class Main {
         // TOKEN
         //KeyStore keyStore = KeyStoreProviderFactory.getKeyStore(PASSWORD);
 
-        byte[] signedPdf = null;
-        PDFSigner signer = new PDFSigner();
+        byte[] signed = null;
+        Signer signer = Utils.documentSigner(new File(file));
         String alias = seleccionarAlias(keyStore);
         PrivateKey key = (PrivateKey) keyStore.getKey(alias, PASSWORD.toCharArray());
 
         X509CertificateUtils x509CertificateUtils = new X509CertificateUtils();
         if (x509CertificateUtils.validarX509Certificate((X509Certificate) keyStore.getCertificate(alias))) {//validación de firmaEC
             Certificate[] certChain = keyStore.getCertificateChain(alias);
-            signedPdf = signer.sign(pdf, SignConstants.SIGN_ALGORITHM_SHA1WITHRSA, key, certChain, parametros());
+            signed = signer.sign(docByteArry, SignConstants.SIGN_ALGORITHM_SHA1WITHRSA, key, certChain, parametros());
             System.out.println("final firma\n-------");
-            ////// Permite guardar el archivo en el equipo sin abrir
-            //java.io.FileOutputStream fos = new java.io.FileOutputStream(io.rubrica.validaciones.Fichero.rutaPdf());
             ////// Permite guardar el archivo en el equipo y luego lo abre
-            String nombreDocumento = FileUtils.crearNombreFirmado(new File(FILE_PDF), FileUtils.getExtension(signedPdf));
+            String nombreDocumento = FileUtils.crearNombreFirmado(new File(file), FileUtils.getExtension(signed));
             java.io.FileOutputStream fos = new java.io.FileOutputStream(nombreDocumento);
-
+            //Abrir documento
             new java.util.Timer().schedule(new java.util.TimerTask() {
                 @Override
                 public void run() {
                     try {
                         FileUtils.abrirDocumento(nombreDocumento);
+                        System.out.println(nombreDocumento);
+                        verificarDocumento(nombreDocumento);
+                    } catch (java.lang.Exception ex) {
+                        ex.printStackTrace();
+                    }finally{
                         System.exit(0);
-                    } catch (IOException ex) {
                     }
                 }
             }, 3000); //espera 3 segundos
-            fos.write(signedPdf);
+            fos.write(signed);
             fos.close();
+            //Abrir documento
         } else {
             System.out.println("Entidad Certificadora no reconocida");
         }
@@ -193,27 +195,37 @@ public class Main {
         System.out.println("Certificado emitido por entidad certificadora acreditada? " + Utils.verifySignature(x509Certificate));
     }
 
-    private static void verificarPDF() throws IOException, InvalidFormatException, SignatureException, Exception {
-        byte[] pdf = Documento.loadFile(FILE_PDF);
-        List<Certificado> certificados = Utils.pdfToCertificados(pdf);
-        certificados.forEach((certificado) -> {
-            System.out.println(certificado.toString());
-        });
-    }
-
-    private static void verificarP7M() throws IOException, SignatureVerificationException, Exception {
-        File documento = new File(FILE_P7M);
+    private static void verificarDocumento(String file) throws IOException, SignatureVerificationException, Exception {
+        File documento = new File(file);
         List<Certificado> certificados = Utils.verificarDocumento(documento);
         certificados.forEach((certificado) -> {
             System.out.println(certificado.toString());
         });
     }
-
-    private static void verificarXML() throws IOException, SignatureVerificationException, Exception {
-        File documento = new File(FILE_XML);
-        List<Certificado> certificados = Utils.verificarDocumento(documento);
-        certificados.forEach((certificado) -> {
-            System.out.println(certificado.toString());
-        });
+   
+    //pruebas de fecha-hora
+    private static void fechaHora(int segundos) throws KeyStoreException, Exception {
+        tiempo(segundos);//espera en segundos
+        do {
+            try {
+                System.out.println("getFechaHora() " + TiempoUtils.getFechaHora());
+                System.out.println("getFechaHoraServidor() " + TiempoUtils.getFechaHoraServidor());
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+            }
+        } while (tiempo);
+        System.exit(0);
     }
+
+    private static boolean tiempo = true;
+
+    private static void tiempo(int segundos) {
+        new java.util.Timer().schedule(new java.util.TimerTask() {
+            @Override
+            public void run() {
+                tiempo = false;
+            }
+        }, segundos * 1000); //espera 3 segundos
+    }
+    //pruebas de fecha-hora
 }

@@ -49,7 +49,7 @@ public class TiempoUtils {
             LOGGER.severe("No se puede obtener la fecha del servidor: "
                     + e.getMessage());
             //return new Date();
-            throw new HoraServidorException("Error al obtener fecha y hora del servidor");
+            throw new HoraServidorException(PropertiesUtils.getMessages().getProperty("mensaje.error.fecha_hora"));
         }
 
         try {
@@ -91,8 +91,7 @@ public class TiempoUtils {
                     return response.toString();
                 }
             } else {
-                throw new RuntimeException(
-                        "Error al obtener fecha y hora del servidor\nIntente nuevamente");
+                throw new RuntimeException(PropertiesUtils.getMessages().getProperty("mensaje.error.fecha_hora"));
             }
         }
     }

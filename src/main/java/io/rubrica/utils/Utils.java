@@ -24,7 +24,6 @@ import io.rubrica.exceptions.ConexionInvalidaOCSPException;
 import io.rubrica.exceptions.ConexionValidarCRLException;
 import io.rubrica.exceptions.EntidadCertificadoraNoValidaException;
 import io.rubrica.exceptions.HoraServidorException;
-import io.rubrica.exceptions.InvalidFormatException;
 import io.rubrica.exceptions.OcspValidationException;
 import io.rubrica.exceptions.RubricaException;
 import io.rubrica.exceptions.SignatureVerificationException;
@@ -460,10 +459,10 @@ public class Utils {
         switch (extDocumento.toLowerCase()) {
             case "pdf":
                 return new PDFSigner();
-            case "docx":
-            case "xlsx":
-            case "pptx":
-                return new OOXMLSigner();
+//            case "docx":
+//            case "xlsx":
+//            case "pptx":
+//                return new OOXMLSigner();
             case "odt":
             case "ods":
             case "odp":
@@ -496,12 +495,12 @@ public class Utils {
                 Signer docSigner = Utils.documentSigner(documento);
                 List<Certificado> certificados = Utils.signInfosToCertificados(docSigner.getSigners(docByteArray));
                 //SRI
-                String xml = leerXmlSRI(documento);
-                List<Certificado> certificadosSRI = Utils.signInfosToCertificados(docSigner.getSigners(xml.getBytes(StandardCharsets.UTF_8)));
-                if (!certificadosSRI.isEmpty()) {
-                    javax.swing.JOptionPane.showMessageDialog(null, PropertiesUtils.getMessages().getProperty("mensaje.error.documento_sri"), "Advertencia", javax.swing.JOptionPane.WARNING_MESSAGE);
-                }
-                certificados.addAll(certificadosSRI);
+//                String xml = leerXmlSRI(documento);
+//                List<Certificado> certificadosSRI = Utils.signInfosToCertificados(docSigner.getSigners(xml.getBytes(StandardCharsets.UTF_8)));
+//                if (!certificadosSRI.isEmpty()) {
+//                    javax.swing.JOptionPane.showMessageDialog(null, PropertiesUtils.getMessages().getProperty("mensaje.error.documento_sri"), "Advertencia", javax.swing.JOptionPane.WARNING_MESSAGE);
+//                }
+//                certificados.addAll(certificadosSRI);
                 //SRI
                 return certificados;
             }
