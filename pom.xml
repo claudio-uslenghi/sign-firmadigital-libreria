@@ -100,12 +100,12 @@
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15on</artifactId>
-            <version>1.64</version> <!--(original 1.47)-->
+            <version>1.62</version> <!--no subir de 1.62 (original 1.47)-->
         </dependency>
         <dependency>
             <groupId>org.bouncycastle</groupId>
             <artifactId>bcpkix-jdk15on</artifactId>
-            <version>1.64</version> <!--(original 1.47)-->
+            <version>1.62</version> <!--no subir de 1.62 (original 1.47)-->
         </dependency>
         <dependency>
             <groupId>es.uji.crypto.xades</groupId>
