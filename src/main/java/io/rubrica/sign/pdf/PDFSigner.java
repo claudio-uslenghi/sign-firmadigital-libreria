@@ -331,7 +331,7 @@ public class PDFSigner implements Signer {
             stp.close();
         } catch (com.lowagie.text.ExceptionConverter ec) {
             logger.severe("Problemas con el driver\n" + ec);
-            throw new RubricaException("Problemas con el driver\n", ec);
+            throw new RubricaException(io.rubrica.utils.PropertiesUtils.getMessages().getProperty("mensaje.error.driver_problemas") + "\n", ec);
         } catch (com.lowagie.text.DocumentException | com.lowagie.text.exceptions.InvalidPdfException de) {
             logger.severe("Error al estampar la firma\n" + de);
             throw new RubricaException("Error al estampar la firma\n", de);
