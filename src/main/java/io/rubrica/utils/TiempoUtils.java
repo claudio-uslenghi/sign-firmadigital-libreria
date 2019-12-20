@@ -42,16 +42,12 @@ public class TiempoUtils {
 
     public static Date getFechaHora() throws HoraServidorException {
         String fechaHora;
-
         try {
             fechaHora = getFechaHoraServidor();
         } catch (IOException e) {
-            LOGGER.severe("No se puede obtener la fecha del servidor: "
-                    + e.getMessage());
-            //return new Date();
-            throw new HoraServidorException(PropertiesUtils.getMessages().getProperty("mensaje.error.fecha_hora"));
+            LOGGER.severe("No se puede obtener la fecha del servidor: " + e.getMessage());
+            throw new HoraServidorException(PropertiesUtils.getMessages().getProperty("mensaje.error.problema_red"));
         }
-
         try {
             TemporalAccessor accessor = DATE_TIME_FORMATTER.parse(fechaHora);
             return Date.from(Instant.from(accessor));
@@ -91,7 +87,7 @@ public class TiempoUtils {
                     return response.toString();
                 }
             } else {
-                throw new RuntimeException(PropertiesUtils.getMessages().getProperty("mensaje.error.fecha_hora"));
+                throw new RuntimeException(PropertiesUtils.getMessages().getProperty("mensaje.error.problema_red"));
             }
         }
     }
