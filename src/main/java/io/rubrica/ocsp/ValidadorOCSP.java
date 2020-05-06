@@ -57,7 +57,7 @@ import java.text.SimpleDateFormat;
  */
 public class ValidadorOCSP {
 
-    private static final int TIME_OUT = 2000; //set timeout to 2 seconds
+    private static final int TIME_OUT = 5000; //set timeout to 5 seconds
 
     public static String ValidarOCSP(X509Certificate checkCert, X509Certificate rootCert, String ocspURL) throws IOException, RubricaException {
         OCSPReq request;

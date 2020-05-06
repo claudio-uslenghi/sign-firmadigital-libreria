@@ -40,6 +40,7 @@ import io.rubrica.certificate.ec.securitydata.CertificadoSecurityData;
 import io.rubrica.certificate.ec.securitydata.CertificadoSecurityDataFactory;
 import io.rubrica.certificate.ec.securitydata.SecurityDataSubCaCert20112026;
 import io.rubrica.certificate.ec.securitydata.SecurityDataSubCaCert20192031;
+import io.rubrica.certificate.ec.securitydata.SecurityDataSubCaCert20202039;
 import io.rubrica.sign.cms.DatosUsuario;
 import java.security.cert.X509Certificate;
 
@@ -78,6 +79,10 @@ public class CertEcUtils {
                     if (io.rubrica.utils.Utils.verifySignature(certificado, new SecurityDataSubCaCert20192031())) {
                         System.out.println("SecurityDataSubCaCert 2019-2031");
                         return new SecurityDataSubCaCert20192031();
+                    }
+                    if (io.rubrica.utils.Utils.verifySignature(certificado, new SecurityDataSubCaCert20202039())) {
+                        System.out.println("SecurityDataSubCaCert 2020-2032");
+                        return new SecurityDataSubCaCert20202039();
                     }
                     return null;
                 } catch (java.security.InvalidKeyException ex) {

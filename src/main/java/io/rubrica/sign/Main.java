@@ -42,21 +42,18 @@ import java.util.List;
 public class Main {
 
     // ARCHIVO
-    private static final String ARCHIVO = "/home/mfernandez/Firmas/SecurityData/2019/MISAEL VLADIMIR FERNANDEZ CORREA 190819105700.p12";
-    private static final String PASSWORD = "Security2019";
-//    private static final String ARCHIVO = "/home/mfernandez/Firmas/BCE/2019/cn=misael_vladimir_fernandez_correa.p12";
-//    private static final String PASSWORD = "Password#1";
+    private static final String ARCHIVO = "/home/mfernandez/Firmas/BCE/2019/cn=misael_vladimir_fernandez_correa.p12";
+    private static final String PASSWORD = "Password";
 //    private static final String FILE = "/home/mfernandez/Descargas/1111201901099252674200120430030017228925486271312_A.xml";
 //    private static final String FILE_XML = "/home/mfernandez/Descargas/1111201901099252674200120430030017228925486271312_A-signed.txt.xml";
 //    private static final String FILE_XML = "/home/mfernandez/Test/facturaMovistar.xml";
 //    private static final String FILE = "/home/mfernandez/Test/hello_encrypted2.pdf";
 //    private static final String FILE = "/home/mfernandez/Test/Caballero.pdf";
-//    private static final String FILE = "/home/mfernandez/Test/test.pdf";
+    private static final String FILE = "/home/mfernandez/Test/test.pdf";
 //    private static final String FILE = "/home/mfernandez/Test/1.pdf";
 //    private static final String FILE = "/home/mfernandez/Test/firmadoEditado.pdf";
 //    private static final String FILE = "/home/mfernandez/Test/documento_blanco.pdf";
 //    private static final String FILE = "/home/mfernandez/Test/quipux_xls.p7m";
-    private static final String FILE = "/home/mfernandez/ARCOTEL.docx";
 
     public static void main(String args[]) throws KeyStoreException, Exception {
 //        fechaHora(240);//espera en segundos

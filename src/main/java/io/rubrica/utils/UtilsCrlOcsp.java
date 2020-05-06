@@ -49,7 +49,7 @@ import java.util.logging.Logger;
  */
 public class UtilsCrlOcsp {
 
-    private static final int TIME_OUT = 2000; //set timeout to 2 seconds
+    private static final int TIME_OUT = 5000; //set timeout to 5 seconds
     private static final Logger LOGGER = Logger.getLogger(UtilsCrlOcsp.class.getName());
 
     public UtilsCrlOcsp() {
