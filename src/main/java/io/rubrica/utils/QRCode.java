@@ -35,7 +35,6 @@ public class QRCode {
         String text = "Nombre firmante: MISAEL VLADIMIR FERNANDEZ CORREA\n"
                 + "Razón: Firmado digitalmente con RUBRICA\n" + "Fecha firmado: 2018-05-31T11:39:47.247-05:00\n"
                 + "Firmado digitalmente con RUBRICA\n" + "https://minka.gob.ec/rubrica/rubrica";
-//        String text = "";
 
         try {
 
