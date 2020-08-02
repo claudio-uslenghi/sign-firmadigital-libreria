@@ -114,7 +114,7 @@ public class Main {
         //params.setProperty(PdfUtil.POSITION_ON_PAGE_UPPER_RIGHT_Y, ury);
         return params;
     }
-    
+
     private static void firmarDocumento(String file) throws KeyStoreException, Exception {
         ////// LEER PDF:
         byte[] docByteArry = Documento.loadFile(file);
@@ -148,7 +148,7 @@ public class Main {
                         verificarDocumento(nombreDocumento);
                     } catch (java.lang.Exception ex) {
                         ex.printStackTrace();
-                    }finally{
+                    } finally {
                         System.exit(0);
                     }
                 }
@@ -199,7 +199,7 @@ public class Main {
             System.out.println(certificado.toString());
         });
     }
-   
+
     //pruebas de fecha-hora
     private static void fechaHora(int segundos) throws KeyStoreException, Exception {
         tiempo(segundos);//espera en segundos

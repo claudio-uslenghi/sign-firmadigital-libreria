@@ -16,17 +16,17 @@ package io.rubrica.certificate.ec.anfac;
 
 import java.security.cert.X509Certificate;
 
-import io.rubrica.certificate.ec.CertificadoPersonaJuridica;
+import io.rubrica.certificate.ec.CertificadoFuncionarioPublico;
 
 /**
- * Certificado de Persona Juridica por emitido por ANf AC Ecuador
- *
+ * Certificado de Funcionario Publico emitido por ANf AC Ecuador
+ * 
  * @author mfernandez
  */
-public class CertificadoPersonaJuridicaAnfAc extends CertificadoAnfAc
-        implements CertificadoPersonaJuridica {
+public class CertificadoFuncionarioPublicoAnfAc18332 extends CertificadoAnfAc18332
+        implements CertificadoFuncionarioPublico {
 
-    public CertificadoPersonaJuridicaAnfAc(X509Certificate certificado) {
+    public CertificadoFuncionarioPublicoAnfAc18332(X509Certificate certificado) {
         super(certificado);
     }
 }

@@ -17,30 +17,16 @@ package io.rubrica.sign.pdf;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.PrivateKey;
-import java.security.SignatureException;
 import java.security.cert.Certificate;
-import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.logging.Logger;
-
-import org.bouncycastle.cert.ocsp.BasicOCSPResp;
-import org.bouncycastle.cert.ocsp.OCSPException;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.operator.OperatorCreationException;
-import org.bouncycastle.operator.jcajce.JcaContentVerifierProviderBuilder;
-import org.bouncycastle.tsp.TimeStampToken;
 
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Rectangle;
-import com.lowagie.text.pdf.AcroFields;
-import com.lowagie.text.pdf.PdfPKCS7;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.TSAClient;
 
-import io.rubrica.certificate.ec.securitydata.SecurityDataSubCaCert20112026;
 
 /**
  * Clase para firmar documentos PDF usando la libreria iText.
@@ -91,72 +77,5 @@ public class FirmaPDF {
         } // catch (GeneralSecurityException e) {
         // throw new RuntimeException(e);
         // }
-    }
-
-    /**
-     * TODO: Mas de dos firmas?
-     *
-     * @param pdf
-     * @throws IOException
-     * @throws SignatureException
-     */
-    public static boolean verificar(byte[] pdf) throws IOException, SignatureException {
-
-        PdfReader reader = new PdfReader(pdf);
-        AcroFields af = reader.getAcroFields();
-        ArrayList<String> names = af.getSignatureNames();
-
-        for (String name : names) {
-            System.out.println("Signature name: " + name);
-            System.out.println("Signature covers whole document: " + af.signatureCoversWholeDocument(name));
-            System.out.println("Document revision: " + af.getRevision(name) + " of " + af.getTotalRevisions());
-
-            PdfPKCS7 pk = af.verifySignature(name);
-            Calendar cal = pk.getSignDate();
-            Certificate[] pkc = pk.getCertificates();
-            TimeStampToken ts = pk.getTimeStampToken();
-
-            if (ts != null) {
-                cal = pk.getTimeStampDate();
-            }
-
-            // System.out.println("Subject: " +
-            // CertificateInfo.getSubjectFields(pk.getSigningCertificate()));
-            System.out.println("Document modified: " + !pk.verify());
-
-            // KeyStore kall = KeyStoreUtil.loadCacertsKeyStore();
-            // Object fails[] = CertificateVerification.verifyCertificates(pkc,
-            // kall, null, cal);
-            // if (fails == null) {
-            // System.out.println("Certificates verified against the KeyStore");
-            // } else {
-            // System.out.println("Certificate failed: " + fails[0]);
-            // return false;
-            // }
-            BasicOCSPResp ocsp = pk.getOcsp();
-
-            if (ocsp != null) {
-                try {
-                    X509Certificate cert = new SecurityDataSubCaCert20112026();
-
-                    boolean verifies = ocsp.isSignatureValid(new JcaContentVerifierProviderBuilder()
-                            .setProvider(BouncyCastleProvider.PROVIDER_NAME).build(cert.getPublicKey()));
-
-                    System.out.println("OCSP signature verifies: " + verifies);
-
-                    System.out.println("OCSP revocation refers to this certificate: " + pk.isRevocationValid());
-
-                    return verifies;
-                } catch (OperatorCreationException e) {
-                    throw new SignatureException(e);
-                } catch (OCSPException e) {
-                    throw new SignatureException(e);
-                }
-            } else {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

@@ -14,6 +14,8 @@
  */
 package io.rubrica.utils;
 
+import com.lowagie.text.pdf.PdfName;
+import com.lowagie.text.pdf.PdfPKCS7;
 import com.lowagie.text.pdf.PdfReader;
 import io.rubrica.certificate.CertEcUtils;
 import io.rubrica.certificate.Certificado;
@@ -33,7 +35,6 @@ import io.rubrica.sign.Signer;
 import io.rubrica.sign.cms.DatosUsuario;
 import io.rubrica.sign.cms.VerificadorCMS;
 import io.rubrica.sign.odf.ODFSigner;
-import io.rubrica.sign.ooxml.OOXMLSigner;
 import io.rubrica.sign.pdf.PDFSigner;
 import io.rubrica.sign.xades.XAdESSigner;
 import java.io.BufferedInputStream;
@@ -44,7 +45,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
@@ -384,9 +384,12 @@ public class Utils {
                     java.util.List<String> signatureNames = pdfReader.getAcroFields().getSignatureNames();
                     for (String signatureName : signatureNames) {
                         if (signInfo.getSigningTime().equals(pdfReader.getAcroFields().verifySignature(signatureName).getSignDate().getTime())) {
-                            if (pdfReader.getAcroFields().verifySignature(signatureName).getSigningCertificate().equals(signInfo.getCerts()[0])) {
-                                certificado.setDocReason(pdfReader.getAcroFields().verifySignature(signatureName).getReason());
-                                certificado.setDocVerify(pdfReader.getAcroFields().verifySignature(signatureName).verify());
+                            for (X509Certificate certificate : signInfo.getCerts()) {
+                                if (pdfReader.getAcroFields().verifySignature(signatureName).getSigningCertificate().equals(certificate)) {
+                                    certificado.setDocReason(pdfReader.getAcroFields().verifySignature(signatureName).getReason());
+                                    certificado.setDocVerify(pdfReader.getAcroFields().verifySignature(signatureName).verify());
+                                    break;
+                                }
                             }
                         }
                     }
@@ -396,10 +399,45 @@ public class Utils {
                 certificados.add(certificado);
             }
         }
-
         return certificados;
-    }
 
+//        PdfReader pdfReader = new PdfReader(pdf);
+//        for (String signatureName : pdfReader.getAcroFields().getSignatureNames()) {
+//            String name = signatureName;
+//            System.out.println("----------------------------");
+//            System.out.println("Subject: " + PdfPKCS7.getSubjectFields(pdfReader.getAcroFields().verifySignature(name).getSigningCertificate()));
+//            System.out.println("Document modified: " + !pdfReader.getAcroFields().verifySignature(name).verify());
+//            System.out.println("Document revision: " + pdfReader.getAcroFields().getRevision(name));
+//            System.out.println("Document total revision: " + pdfReader.getAcroFields().getTotalRevisions());
+//            System.out.println("pdfReader: " + hashPdf(pdfReader));
+//
+//            InputStream revisionStream = pdfReader.getAcroFields().extractRevision(name);
+//            PdfReader pdfReaderRevision = new PdfReader(revisionStream);
+//            for (String signatureNameRevision : pdfReaderRevision.getAcroFields().getSignatureNames()) {
+//                String nameRevision = signatureNameRevision;
+//                System.out.println("++++++++++++++++++++++++++++");
+//                System.out.println("Subject: " + PdfPKCS7.getSubjectFields(pdfReaderRevision.getAcroFields().verifySignature(nameRevision).getSigningCertificate()));
+//                System.out.println("Document modified: " + !pdfReaderRevision.getAcroFields().verifySignature(nameRevision).verify());
+//                System.out.println("Document revision: " + pdfReaderRevision.getAcroFields().getRevision(nameRevision));
+//                System.out.println("Document total revision: " + pdfReaderRevision.getAcroFields().getTotalRevisions());
+//                System.out.println("pdfReaderRevision: " + hashPdf(pdfReaderRevision));
+//                System.out.println("++++++++++++++++++++++++++++");
+//            }
+//            System.out.println("----------------------------");
+//        }
+    }
+//    public static byte[] hashPdf(PdfReader pdfReader) throws NoSuchAlgorithmException, IOException {
+//        java.security.MessageDigest messageDigest = java.security.MessageDigest.getInstance("MD5");
+//        int pageCount = pdfReader.getNumberOfPages();
+//        System.out.println("******************************");
+//        for (int i = 1; i <= pageCount; i++) {
+//            byte[] buf = pdfReader.getPageContent(i);
+//            System.out.println("buf: "+buf);
+//            messageDigest.update(buf, 0, buf.length);
+//        }
+//        System.out.println("******************************");
+//        return messageDigest.digest();
+//    }
     public static List<Certificado> signInfosToCertificados(List<SignInfo> signInfos) throws DocumentoException, CertificadoInvalidoException, IOException {
         List<Certificado> certificados = new ArrayList<>();
         if (signInfos == null || signInfos.isEmpty()) {

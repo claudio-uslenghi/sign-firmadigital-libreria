@@ -14,10 +14,6 @@
  */
 package io.rubrica.certificate.ec.anfac;
 
-import static io.rubrica.certificate.ec.anfac.CertificadoAnfAc.OID_CEDULA_PASAPORTE;
-import static io.rubrica.certificate.ec.anfac.CertificadoAnfAc.OID_CERTIFICADO_FUNCIONARIO_PUBLICO;
-import static io.rubrica.certificate.ec.anfac.CertificadoAnfAc.OID_CERTIFICADO_PERSONA_JURIDICA;
-import static io.rubrica.certificate.ec.anfac.CertificadoAnfAc.OID_CERTIFICADO_PERSONA_NATURAL;
 import static io.rubrica.utils.BouncyCastleUtils.certificateHasPolicy;
 
 import java.security.cert.X509Certificate;
@@ -28,24 +24,24 @@ import java.security.cert.X509Certificate;
  * 
  * @author mfernandez
  */
-public class CertificadoAnfAcFactory {
+public class CertificadoAnfAc18332Factory {
 
-    public static boolean esCertificadoDeAnfAc(X509Certificate certificado) {
-        byte[] valor = certificado.getExtensionValue(OID_CEDULA_PASAPORTE);
+    public static boolean esCertificadoDeAnfAc18332(X509Certificate certificado) {
+        byte[] valor = certificado.getExtensionValue(CertificadoAnfAc18332.OID_CEDULA_PASAPORTE);
         return (valor != null);
     }
 
-    public static CertificadoAnfAc construir(X509Certificate certificado) {
-        if (!esCertificadoDeAnfAc(certificado)) {
+    public static CertificadoAnfAc18332 construir(X509Certificate certificado) {
+        if (!esCertificadoDeAnfAc18332(certificado)) {
             throw new IllegalStateException("Este no es un certificado emitido por ANF AC Ecuador");
         }
 
-        if (certificateHasPolicy(certificado, OID_CERTIFICADO_PERSONA_NATURAL)) {
-            return new CertificadoPersonaNaturalAnfAc(certificado);
-        } else if (certificateHasPolicy(certificado, OID_CERTIFICADO_PERSONA_JURIDICA)) {
-            return new CertificadoPersonaJuridicaAnfAc(certificado);
-        } else if (certificateHasPolicy(certificado, OID_CERTIFICADO_FUNCIONARIO_PUBLICO)) {
-            return new CertificadoFuncionarioPublicoAnfAc(certificado);
+        if (certificateHasPolicy(certificado, CertificadoAnfAc18332.OID_CERTIFICADO_PERSONA_NATURAL)) {
+            return new CertificadoPersonaNaturalAnfAc18332(certificado);
+        } else if (certificateHasPolicy(certificado, CertificadoAnfAc18332.OID_CERTIFICADO_PERSONA_JURIDICA)) {
+            return new CertificadoPersonaJuridicaAnfAc18332(certificado);
+        } else if (certificateHasPolicy(certificado, CertificadoAnfAc18332.OID_CERTIFICADO_FUNCIONARIO_PUBLICO)) {
+            return new CertificadoFuncionarioPublicoAnfAc18332(certificado);
         } else {
             throw new RuntimeException("Certificado ANF AC Ecuador de tipo desconocido!");
         }

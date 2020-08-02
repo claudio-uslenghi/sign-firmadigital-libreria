@@ -20,9 +20,12 @@ import io.rubrica.certificate.ec.CertificadoMiembroEmpresa;
 import io.rubrica.certificate.ec.CertificadoPersonaJuridica;
 import io.rubrica.certificate.ec.CertificadoPersonaNatural;
 import io.rubrica.certificate.ec.CertificadoRepresentanteLegal;
-import io.rubrica.certificate.ec.anfac.AnfAcSubCaCert;
-import io.rubrica.certificate.ec.anfac.CertificadoAnfAc;
-import io.rubrica.certificate.ec.anfac.CertificadoAnfAcFactory;
+import io.rubrica.certificate.ec.anfac.AnfAc18332SubCaCert20162032;
+import io.rubrica.certificate.ec.anfac.AnfAc37442SubCaCert20192029;
+import io.rubrica.certificate.ec.anfac.CertificadoAnfAc18332;
+import io.rubrica.certificate.ec.anfac.CertificadoAnfAc18332Factory;
+import io.rubrica.certificate.ec.anfac.CertificadoAnfAc37442;
+import io.rubrica.certificate.ec.anfac.CertificadoAnfAc37442Factory;
 import io.rubrica.certificate.ec.bce.BceSubCaCert20112021;
 import io.rubrica.certificate.ec.bce.BceSubCaCert20192029;
 import io.rubrica.certificate.ec.bce.CertificadoBancoCentral;
@@ -92,7 +95,19 @@ public class CertEcUtils {
             case "Consejo de la Judicatura":
                 return new ConsejoJudicaturaSubCaCert();
             case "Anf AC":
-                return new AnfAcSubCaCert();
+                try{
+                    if (io.rubrica.utils.Utils.verifySignature(certificado, new AnfAc18332SubCaCert20162032())) {
+                        System.out.println("Anf 2016-2032");
+                        return new AnfAc18332SubCaCert20162032();
+                    }
+                    if (io.rubrica.utils.Utils.verifySignature(certificado, new AnfAc37442SubCaCert20192029())) {
+                        System.out.println("Anf 2019-2029");
+                        return new AnfAc37442SubCaCert20192029();
+                    }
+                    return null;
+                } catch (java.security.InvalidKeyException ex) {
+                    //TODO
+                }
             default:
                 throw new EntidadCertificadoraNoValidaException("Entidad Certificadora no reconocida");
         }
@@ -265,10 +280,10 @@ public class CertEcUtils {
             return datosUsuario;
         }
 
-        if (CertificadoAnfAcFactory.esCertificadoDeAnfAc(certificado)) {
-            CertificadoAnfAc certificadoAnfAc = CertificadoAnfAcFactory.construir(certificado);
-            if (certificadoAnfAc instanceof CertificadoFuncionarioPublico) {
-                CertificadoFuncionarioPublico certificadoFuncionarioPublico = (CertificadoFuncionarioPublico) certificadoAnfAc;
+        if (CertificadoAnfAc18332Factory.esCertificadoDeAnfAc18332(certificado)) {
+            CertificadoAnfAc18332 certificadoAnfAc18332 = CertificadoAnfAc18332Factory.construir(certificado);
+            if (certificadoAnfAc18332 instanceof CertificadoFuncionarioPublico) {
+                CertificadoFuncionarioPublico certificadoFuncionarioPublico = (CertificadoFuncionarioPublico) certificadoAnfAc18332;
 
                 datosUsuario.setCedula(certificadoFuncionarioPublico.getCedulaPasaporte());
                 datosUsuario.setNombre(certificadoFuncionarioPublico.getNombres());
@@ -278,8 +293,8 @@ public class CertEcUtils {
                 datosUsuario.setInstitucion(certificadoFuncionarioPublico.getInstitucion());
                 datosUsuario.setSerial(certificado.getSerialNumber().toString());
             }
-            if (certificadoAnfAc instanceof CertificadoPersonaJuridica) {
-                CertificadoPersonaJuridica certificadoPersonaJuridica = (CertificadoPersonaJuridica) certificadoAnfAc;
+            if (certificadoAnfAc18332 instanceof CertificadoPersonaJuridica) {
+                CertificadoPersonaJuridica certificadoPersonaJuridica = (CertificadoPersonaJuridica) certificadoAnfAc18332;
                 datosUsuario.setCedula(certificadoPersonaJuridica.getCedulaPasaporte());
                 datosUsuario.setNombre(certificadoPersonaJuridica.getNombres());
                 datosUsuario.setApellido(certificadoPersonaJuridica.getPrimerApellido() + " "
@@ -288,8 +303,43 @@ public class CertEcUtils {
                 datosUsuario.setSerial(certificado.getSerialNumber().toString());
             }
 
-            if (certificadoAnfAc instanceof CertificadoPersonaNatural) {
-                CertificadoPersonaNatural certificadoPersonaNatural = (CertificadoPersonaNatural) certificadoAnfAc;
+            if (certificadoAnfAc18332 instanceof CertificadoPersonaNatural) {
+                CertificadoPersonaNatural certificadoPersonaNatural = (CertificadoPersonaNatural) certificadoAnfAc18332;
+                datosUsuario.setCedula(certificadoPersonaNatural.getCedulaPasaporte());
+                datosUsuario.setNombre(certificadoPersonaNatural.getNombres());
+                datosUsuario.setApellido(certificadoPersonaNatural.getPrimerApellido() + " "
+                        + certificadoPersonaNatural.getSegundoApellido());
+                datosUsuario.setSerial(certificado.getSerialNumber().toString());
+            }
+            datosUsuario.setEntidadCertificadora("Anf AC");
+            return datosUsuario;
+        }
+        
+        if (CertificadoAnfAc37442Factory.esCertificadoDeAnfAc37442(certificado)) {
+            CertificadoAnfAc37442 certificadoAnfAc37442 = CertificadoAnfAc37442Factory.construir(certificado);
+            if (certificadoAnfAc37442 instanceof CertificadoFuncionarioPublico) {
+                CertificadoFuncionarioPublico certificadoFuncionarioPublico = (CertificadoFuncionarioPublico) certificadoAnfAc37442;
+
+                datosUsuario.setCedula(certificadoFuncionarioPublico.getCedulaPasaporte());
+                datosUsuario.setNombre(certificadoFuncionarioPublico.getNombres());
+                datosUsuario.setApellido(certificadoFuncionarioPublico.getPrimerApellido() + " "
+                        + certificadoFuncionarioPublico.getSegundoApellido());
+                datosUsuario.setCargo(certificadoFuncionarioPublico.getCargo());
+                datosUsuario.setInstitucion(certificadoFuncionarioPublico.getInstitucion());
+                datosUsuario.setSerial(certificado.getSerialNumber().toString());
+            }
+            if (certificadoAnfAc37442 instanceof CertificadoPersonaJuridica) {
+                CertificadoPersonaJuridica certificadoPersonaJuridica = (CertificadoPersonaJuridica) certificadoAnfAc37442;
+                datosUsuario.setCedula(certificadoPersonaJuridica.getCedulaPasaporte());
+                datosUsuario.setNombre(certificadoPersonaJuridica.getNombres());
+                datosUsuario.setApellido(certificadoPersonaJuridica.getPrimerApellido() + " "
+                        + certificadoPersonaJuridica.getSegundoApellido());
+                datosUsuario.setCargo(certificadoPersonaJuridica.getCargo());
+                datosUsuario.setSerial(certificado.getSerialNumber().toString());
+            }
+
+            if (certificadoAnfAc37442 instanceof CertificadoPersonaNatural) {
+                CertificadoPersonaNatural certificadoPersonaNatural = (CertificadoPersonaNatural) certificadoAnfAc37442;
                 datosUsuario.setCedula(certificadoPersonaNatural.getCedulaPasaporte());
                 datosUsuario.setNombre(certificadoPersonaNatural.getNombres());
                 datosUsuario.setApellido(certificadoPersonaNatural.getPrimerApellido() + " "
