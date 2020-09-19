@@ -387,6 +387,7 @@ public class Utils {
                             for (X509Certificate certificate : signInfo.getCerts()) {
                                 if (pdfReader.getAcroFields().verifySignature(signatureName).getSigningCertificate().equals(certificate)) {
                                     certificado.setDocReason(pdfReader.getAcroFields().verifySignature(signatureName).getReason());
+                                    certificado.setDocLocation(pdfReader.getAcroFields().verifySignature(signatureName).getLocation());
                                     certificado.setDocVerify(pdfReader.getAcroFields().verifySignature(signatureName).verify());
                                     break;
                                 }

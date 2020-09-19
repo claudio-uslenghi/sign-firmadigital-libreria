@@ -99,7 +99,7 @@ public class Main {
         //String ury = String.valueOf(Integer.parseInt(lly) - 36);
 
         Properties params = new Properties();
-        params.setProperty(PDFSigner.SIGNING_LOCATION, "");
+        params.setProperty(PDFSigner.SIGNING_LOCATION, "12345678901234567890");
         params.setProperty(PDFSigner.SIGNING_REASON, "Firmado digitalmente con RUBRICA");
         params.setProperty(PDFSigner.SIGN_TIME, TiempoUtils.getFechaHoraServidor());
         params.setProperty(PDFSigner.LAST_PAGE, "1");

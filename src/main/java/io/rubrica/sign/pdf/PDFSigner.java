@@ -42,33 +42,24 @@ import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
 import com.lowagie.text.pdf.PdfTemplate;
+import io.rubrica.certificate.CertEcUtils;
 
 import io.rubrica.exceptions.RubricaException;
 import io.rubrica.exceptions.InvalidFormatException;
 import io.rubrica.sign.SignInfo;
 import io.rubrica.sign.Signer;
+import io.rubrica.sign.cms.DatosUsuario;
 import io.rubrica.utils.BouncyCastleUtils;
 import io.rubrica.utils.Utils;
 
 public class PDFSigner implements Signer {
 
+    private static final Logger logger = Logger.getLogger(PDFSigner.class.getName());
+    
     private static final String PDF_FILE_HEADER = "%PDF-";
     private static final PdfName PDFNAME_ETSI_RFC3161 = new PdfName("ETSI.RFC3161");
     private static final PdfName PDFNAME_DOCTIMESTAMP = new PdfName("DocTimeStamp");
-
-    /**
-     * Referencia a la &uacute;ltima p&aacute;gina del documento PDF.
-     */
-    private static final Logger logger = Logger.getLogger(PDFSigner.class.getName());
-
-    /**
-     * Razón por la que se realiza la firma.
-     */
     public static final String SIGNING_REASON = "signingReason";
-
-    /**
-     * Localización en la que se realiza la firma.
-     */
     public static final String SIGNING_LOCATION = "signingLocation";
     public static final String SIGN_TIME = "signTime";
     public static final String SIGNATURE_PAGE = "signingPage";
@@ -184,7 +175,7 @@ public class PDFSigner implements Signer {
             sap.setReason(reason);
         }
 
-        // Localizacion en donde se produce la firma
+        // Localización en donde se produce la firma
         if (location != null) {
             sap.setLocation(location);
         }
@@ -206,7 +197,8 @@ public class PDFSigner implements Signer {
         if (signaturePositionOnPage != null) {
             sap.setVisibleSignature(signaturePositionOnPage, page, null);
             String informacionCertificado = x509Certificate.getSubjectDN().getName();
-            String nombreFirmante = (Utils.getCN(x509Certificate)).toUpperCase();
+            DatosUsuario datosUsuario = CertEcUtils.getDatosUsuarios(x509Certificate);
+            String nombreFirmante = (datosUsuario.getNombre()+ " " + datosUsuario.getApellido()).toUpperCase();
             try {
                 // Creating the appearance for layer 0
                 PdfTemplate pdfTemplate = sap.getLayer(0);
@@ -247,6 +239,7 @@ public class PDFSigner implements Signer {
                         // QR
                         String text = "FIRMADO POR: " + nombreFirmante.trim() + "\n";
                         text = text + "RAZON: " + reason + "\n";
+                        text = text + "LOCALIZACION: " + location + "\n";
                         text = text + "FECHA: " + signTime + "\n";
                         text = text + infoQR;
                         try {
@@ -279,7 +272,7 @@ public class PDFSigner implements Signer {
                         PdfTemplate pdfTemplate2 = sap.getLayer(2);
                         Font font2 = new Font(Font.ITALIC, fontSize, Font.NORMAL, Color.DARK_GRAY);
                         Paragraph paragraph2 = new Paragraph(fontLeading, "Nombre de reconocimiento "
-                                + informacionCertificado.trim() + "\nRazón: " + reason + "\nFecha: " + signTime, font2);
+                                + informacionCertificado.trim() + "\nRazón: " + reason + "\nLocalización: " + location + "\nFecha: " + signTime, font2);
                         paragraph2.setAlignment(Paragraph.ALIGN_LEFT);
                         ColumnText columnText2 = new ColumnText(pdfTemplate2);
                         columnText2.setSimpleColumn((width / 2) + 1, 0, width, height);
@@ -298,7 +291,7 @@ public class PDFSigner implements Signer {
                         nombreFirmante = nombreFirmante.replace(" ", "*");
                         width = baseFont.getWidthPoint(nombreFirmante, font.getSize());
                         nombreFirmante = nombreFirmante.replace("*", " ");
-                        height = font.getSize() * 3;
+                        height = font.getSize() * 5;
                         sap.setVisibleSignature(new Rectangle(x, y, x + width, y - height), page, null);
                         pdfTemplate = sap.getLayer(0);
                         pdfTemplate.rectangle(0, 0, width, height);
@@ -307,6 +300,10 @@ public class PDFSigner implements Signer {
                         Paragraph paragraph = new Paragraph(fontLeading, "Firmado digitalmente por:\n",
                                 new Font(Font.HELVETICA, fontSize / 1.5f, Font.NORMAL, Color.BLACK));
                         paragraph.add(new Paragraph(fontLeading, nombreFirmante, font));
+                        paragraph.add(new Paragraph(fontLeading, "Razón: " + reason,
+                                new Font(Font.HELVETICA, fontSize / 1.5f, Font.NORMAL, Color.BLACK)));
+                        paragraph.add(new Paragraph(fontLeading, "Localizción: " + location,
+                                new Font(Font.HELVETICA, fontSize / 1.5f, Font.NORMAL, Color.BLACK)));
                         paragraph.add(new Paragraph(fontLeading, "Fecha: " + signTime,
                                 new Font(Font.HELVETICA, fontSize / 1.5f, Font.NORMAL, Color.BLACK)));
                         paragraph.setAlignment(Paragraph.ALIGN_LEFT);

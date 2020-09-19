@@ -34,6 +34,7 @@ public class Certificado {
     private DatosUsuario datosUsuario;
     private Boolean docVerify;
     private String docReason;
+    private String docLocation;
 
     public Certificado() {
     }
@@ -124,6 +125,14 @@ public class Certificado {
     public void setDocReason(String docReason) {
         this.docReason = docReason;
     }
+    
+    public String getDocLocation() {
+        return docLocation;
+    }
+    
+    public void setDocLocation(String docLocation) {
+        this.docLocation = docLocation;
+    }
 
     public void setDatosUsuario(DatosUsuario datosUsuario) {
         this.datosUsuario = datosUsuario;
@@ -141,6 +150,7 @@ public class Certificado {
                 + "\tvalidated=" + validated + "\n"
                 + "\tdocVerify=" + docVerify + "\n"
                 + "\tdocReason=" + docReason + "\n"
+                + "\tdocLocation=" + docLocation + "\n"
                 + "\t" + (datosUsuario == null ? "\tDatosUsuario[Sin información de usuario]" : datosUsuario.toString()) + "\n"
                 + "\t]"
                 + "\n----------";
