@@ -302,7 +302,7 @@ public class PDFSigner implements Signer {
                         paragraph.add(new Paragraph(fontLeading, nombreFirmante, font));
                         paragraph.add(new Paragraph(fontLeading, "Razón: " + reason,
                                 new Font(Font.HELVETICA, fontSize / 1.5f, Font.NORMAL, Color.BLACK)));
-                        paragraph.add(new Paragraph(fontLeading, "Localizción: " + location,
+                        paragraph.add(new Paragraph(fontLeading, "Localización: " + location,
                                 new Font(Font.HELVETICA, fontSize / 1.5f, Font.NORMAL, Color.BLACK)));
                         paragraph.add(new Paragraph(fontLeading, "Fecha: " + signTime,
                                 new Font(Font.HELVETICA, fontSize / 1.5f, Font.NORMAL, Color.BLACK)));
