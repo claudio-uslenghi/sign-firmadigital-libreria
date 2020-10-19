@@ -7,7 +7,9 @@ package io.rubrica.sign;
 
 import io.rubrica.certificate.CertEcUtils;
 import static io.rubrica.certificate.CertUtils.seleccionarAlias;
-import io.rubrica.certificate.Certificado;
+import io.rubrica.certificate.to.Certificado;
+import io.rubrica.certificate.to.Documento;
+import io.rubrica.exceptions.InvalidFormatException;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
@@ -27,7 +29,7 @@ import io.rubrica.utils.TiempoUtils;
 import io.rubrica.utils.Utils;
 import io.rubrica.utils.UtilsCrlOcsp;
 import io.rubrica.utils.X509CertificateUtils;
-import io.rubrica.validaciones.Documento;
+import io.rubrica.validaciones.DocumentoUtils;
 import java.io.File;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
@@ -42,14 +44,40 @@ import java.util.List;
 public class Main {
 
     // ARCHIVO
-    private static final String ARCHIVO = "/home/mfernandez/Firmas/BCE/2019/cn=misael_vladimir_fernandez_correa.p12";
-    private static final String PASSWORD = "Password";
+    private static final String ARCHIVO = "/home/mfernandez/prueba.p12";
+    private static final String PASSWORD = "123456";
 //    private static final String FILE = "/home/mfernandez/Descargas/1111201901099252674200120430030017228925486271312_A.xml";
 //    private static final String FILE_XML = "/home/mfernandez/Descargas/1111201901099252674200120430030017228925486271312_A-signed.txt.xml";
 //    private static final String FILE_XML = "/home/mfernandez/Test/facturaMovistar.xml";
 //    private static final String FILE = "/home/mfernandez/Test/hello_encrypted2.pdf";
 //    private static final String FILE = "/home/mfernandez/Test/Caballero.pdf";
-    private static final String FILE = "/home/mfernandez/Test/test.pdf";
+//    private static final String FILE = "/home/mfernandez/CompartidoWindows/Aplicaciones Windows/caso firma/1.7_Porcentaje_Cero_Papeles_Quipux_Agosto_2020_editado_3.pdf";
+//    private static final String FILE = "/home/mfernandez/CompartidoWindows/Aplicaciones Windows/caso firma/1.7_Porcentaje_Cero_Papeles_Quipux_Agosto_2020_ok.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 01 - Imagen.jpg";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 02 - Aparenta ser PDF.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 03 - Sin firma.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 04 - 1F Consejo Judicatura.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 05 - FIrma EC_CESAR.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 06 - PDF Firmado - Una firma - BCE - segundo ejemplo.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 07 - Archivo de prueba-signedKT.pdf";
+    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 08 - PDF Firmado - Una firma - Entidad Extranjera.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 09 - PDF Firmado - Tres firmas - CJ - CJ - CJ.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 10 - Acta 50 firmas.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 11 - 1F BCE NO VIGENTE.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 12 - 1F ALTERADO.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 14 - Archivo-prueba-sello-tiempo-PAdES-LTV.PDF";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 15 - FIRMADO_sellotiempoCJ-yfirma.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 16 - Archivo-prueba-sello-tiempo MODIFICADO.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 17 - 2F ENTIDAD NO AUTORIZADA y AUTORIZADA.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 18 - PDF Firmado - Una firma - Entidad Extranjera y una ecuatoriana.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 19 - PDF Firmado - Una firma - Entidad Extranjera y una ecuatoriana MODIF.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 20 - 3F BCE - SECURITY - ACCV.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 21 - PDF Firmado - Una firma - caducado.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 22 - PDF Firmado - Una firma - revocado.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 23 - PDF Firmado - Una firma - caducado y modificado.pdf";
+//    private static final String FILE = "/home/mfernandez/Test/Editados/Paz y salvo - rige el 2020 Diego Saud DF-signed-signed.pdf";
+//    private static final String FILE = "/home/mfernandez/Test/documento_blanco-signed.pdf";
+//    private static final String FILE = "/home/mfernandez/documento_blanco.pdf";
 //    private static final String FILE = "/home/mfernandez/Test/1.pdf";
 //    private static final String FILE = "/home/mfernandez/Test/firmadoEditado.pdf";
 //    private static final String FILE = "/home/mfernandez/Test/documento_blanco.pdf";
@@ -57,9 +85,9 @@ public class Main {
 
     public static void main(String args[]) throws KeyStoreException, Exception {
 //        fechaHora(240);//espera en segundos
-        firmarDocumento(FILE);
+//        firmarDocumento(FILE);
 //        validarCertificado();
-//        verificarDocumento(FILE);
+        verificarDocumento(FILE);
     }
 
     private static Properties parametros() throws IOException {
@@ -103,9 +131,9 @@ public class Main {
         params.setProperty(PDFSigner.SIGNING_REASON, "Firmado digitalmente con RUBRICA");
         params.setProperty(PDFSigner.SIGN_TIME, TiempoUtils.getFechaHoraServidor());
         params.setProperty(PDFSigner.LAST_PAGE, "1");
-        params.setProperty(PDFSigner.TYPE_SIG, "QR");
-        params.setProperty(PDFSigner.INFO_QR, "Firmado digitalmente con RUBRICA\nhttps://minka.gob.ec/rubrica/rubrica");
-        //params.setProperty(PDFSigner.TYPE_SIG, "information2");
+//        params.setProperty(PDFSigner.TYPE_SIG, "QR");
+//        params.setProperty(PDFSigner.INFO_QR, "Firmado digitalmente con RUBRICA\nhttps://minka.gob.ec/rubrica/rubrica");
+        params.setProperty(PDFSigner.TYPE_SIG, "information2");
         //params.setProperty(PDFSigner.FONT_SIZE, "4.5");
         // Posicion firma
         params.setProperty(PdfUtil.POSITION_ON_PAGE_LOWER_LEFT_X, llx);
@@ -117,7 +145,7 @@ public class Main {
 
     private static void firmarDocumento(String file) throws KeyStoreException, Exception {
         ////// LEER PDF:
-        byte[] docByteArry = Documento.loadFile(file);
+        byte[] docByteArry = DocumentoUtils.loadFile(file);
 
         // ARCHIVO
         KeyStoreProvider ksp = new FileKeyStoreProvider(ARCHIVO);
@@ -193,11 +221,16 @@ public class Main {
     }
 
     private static void verificarDocumento(String file) throws IOException, SignatureVerificationException, Exception {
-        File documento = new File(file);
-        List<Certificado> certificados = Utils.verificarDocumento(documento);
-        certificados.forEach((certificado) -> {
-            System.out.println(certificado.toString());
-        });
+        File document = new File(file);
+        Documento documento = Utils.verificarDocumento(document);
+        System.out.println("Documento: " + documento);
+        if (documento.getCertificados() != null) {
+            documento.getCertificados().forEach((certificado) -> {
+                System.out.println(certificado.toString());
+            });
+        } else {
+            throw new InvalidFormatException("Documento no soportado");
+        }
     }
 
     //pruebas de fecha-hora

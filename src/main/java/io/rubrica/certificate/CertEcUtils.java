@@ -44,7 +44,7 @@ import io.rubrica.certificate.ec.securitydata.CertificadoSecurityDataFactory;
 import io.rubrica.certificate.ec.securitydata.SecurityDataSubCaCert20112026;
 import io.rubrica.certificate.ec.securitydata.SecurityDataSubCaCert20192031;
 import io.rubrica.certificate.ec.securitydata.SecurityDataSubCaCert20202039;
-import io.rubrica.sign.cms.DatosUsuario;
+import io.rubrica.certificate.to.DatosUsuario;
 import java.security.cert.X509Certificate;
 
 /**
@@ -181,6 +181,7 @@ public class CertEcUtils {
                 datosUsuario.setSerial(certificado.getSerialNumber().toString());
             }
             datosUsuario.setEntidadCertificadora("Banco Central del Ecuador");
+            datosUsuario.setCertificadoDigitalValido(true);
             return datosUsuario;
         }
 
@@ -242,6 +243,7 @@ public class CertEcUtils {
                 datosUsuario.setSerial(certificado.getSerialNumber().toString());
             }
             datosUsuario.setEntidadCertificadora("Consejo de la Judicatura");
+            datosUsuario.setCertificadoDigitalValido(true);
             return datosUsuario;
         }
 
@@ -277,6 +279,7 @@ public class CertEcUtils {
                 datosUsuario.setSerial(certificado.getSerialNumber().toString());
             }
             datosUsuario.setEntidadCertificadora("Security Data");
+            datosUsuario.setCertificadoDigitalValido(true);
             return datosUsuario;
         }
 
@@ -312,6 +315,7 @@ public class CertEcUtils {
                 datosUsuario.setSerial(certificado.getSerialNumber().toString());
             }
             datosUsuario.setEntidadCertificadora("Anf AC");
+            datosUsuario.setCertificadoDigitalValido(true);
             return datosUsuario;
         }
         
@@ -347,6 +351,7 @@ public class CertEcUtils {
                 datosUsuario.setSerial(certificado.getSerialNumber().toString());
             }
             datosUsuario.setEntidadCertificadora("Anf AC");
+            datosUsuario.setCertificadoDigitalValido(true);
             return datosUsuario;
         }
         return null;

@@ -14,6 +14,7 @@
  */
 package io.rubrica.sign.cms;
 
+import io.rubrica.certificate.to.DatosUsuario;
 import io.rubrica.certificate.CertEcUtils;
 import java.security.GeneralSecurityException;
 import java.security.cert.X509Certificate;

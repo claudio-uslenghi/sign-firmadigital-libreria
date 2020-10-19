@@ -24,7 +24,7 @@ import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.cert.X509Certificate;
 
-import io.rubrica.sign.cms.DatosUsuario;
+import io.rubrica.certificate.to.DatosUsuario;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.util.Date;

@@ -21,7 +21,6 @@ import io.rubrica.certificate.CertEcUtils;
 import io.rubrica.certificate.CrlUtils;
 import io.rubrica.certificate.ValidationResult;
 import io.rubrica.exceptions.RubricaException;
-import io.rubrica.crl.ServicioCRL;
 import io.rubrica.exceptions.ConexionApiException;
 import io.rubrica.exceptions.EntidadCertificadoraNoValidaException;
 
@@ -116,7 +115,7 @@ public class UtilsCrlOcsp {
         return fechaRevocado;
     }
 
-    private static String validarOCSP(X509Certificate cert) throws IOException, RubricaException, EntidadCertificadoraNoValidaException {
+    public static String validarOCSP(X509Certificate cert) throws IOException, RubricaException, EntidadCertificadoraNoValidaException {
         List<String> ocspUrls = CertificateUtils.getAuthorityInformationAccess(cert);
         ocspUrls.forEach((ocsp) -> {
             System.out.println("OCSP=" + ocsp);
@@ -127,33 +126,28 @@ public class UtilsCrlOcsp {
 //        ValidateCertUseOCSP.validadorOCSP(cert, certRoot, ocspUrls.get(0));
     }
 
-    private static String validarCRL(X509Certificate cert) throws IOException, EntidadCertificadoraNoValidaException, RubricaException, ConexionValidarCRLException, CRLValidationException {
-        String nombreCA = CertEcUtils.getNombreCA(cert);
-
-        String urlCrl = obtenerUrlCRL(CertificateUtils.getCrlDistributionPoints(cert));
-        ValidationResult result = null;
-
-        if (nombreCA.toLowerCase().equals("banco central del ecuador")) {
-            urlCrl = ServicioCRL.BCE_CRL;
-        }
-        if (nombreCA.toLowerCase().equals("security data")) {
-            urlCrl = ServicioCRL.SD_CRL;
-        }
-        if (nombreCA.toLowerCase().equals("consejo de la judicatura")) {
-            urlCrl = ServicioCRL.CJ_CRL;
-        }
-        if (nombreCA.toLowerCase().equals("anf ac")) {
-            urlCrl = ServicioCRL.ANFAC_CRL;
-        }
-
+    public static String validarCRL(X509Certificate cert) throws IOException, EntidadCertificadoraNoValidaException, RubricaException, ConexionValidarCRLException, CRLValidationException {
         X509Certificate root = CertEcUtils.getRootCertificate(cert);
         CrlUtils crlUtils = new CrlUtils();
-        result = crlUtils.verifyCertificateCRLs(cert, root.getPublicKey(),
-                Arrays.asList(urlCrl));
+        String urlCrl = obtenerUrlCRL(CertificateUtils.getCrlDistributionPoints(cert));
+        ValidationResult result = CrlUtils.verifyCertificateCRLs(cert, root.getPublicKey(), Arrays.asList(urlCrl));
+
+//        String nombreCA = CertEcUtils.getNombreCA(cert);
+//        if (nombreCA.toLowerCase().equals("banco central del ecuador")) {
+//            urlCrl = ServicioCRL.BCE_CRL;
+//        }
+//        if (nombreCA.toLowerCase().equals("security data")) {
+//            urlCrl = ServicioCRL.SD_CRL;
+//        }
+//        if (nombreCA.toLowerCase().equals("consejo de la judicatura")) {
+//            urlCrl = ServicioCRL.CJ_CRL;
+//        }
+//        if (nombreCA.toLowerCase().equals("anf ac")) {
+//            urlCrl = ServicioCRL.ANFAC_CRL;
+//        }
         if (result == result.CANNOT_DOWNLOAD_CRL) {
             throw new ConexionValidarCRLException("No se puede validar contra la lista de revocación:" + urlCrl);
         }
-
         // Si el certificado no es valido lanzamos exception
         if (!result.isValid()) {
             throw new CRLValidationException("Certificado Inválido");

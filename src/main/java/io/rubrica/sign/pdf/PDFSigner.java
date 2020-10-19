@@ -48,7 +48,7 @@ import io.rubrica.exceptions.RubricaException;
 import io.rubrica.exceptions.InvalidFormatException;
 import io.rubrica.sign.SignInfo;
 import io.rubrica.sign.Signer;
-import io.rubrica.sign.cms.DatosUsuario;
+import io.rubrica.certificate.to.DatosUsuario;
 import io.rubrica.utils.BouncyCastleUtils;
 import io.rubrica.utils.Utils;
 
