@@ -1,16 +1,19 @@
 /*
+ * Copyright (C) 2020 
+ * Authors: Ricardo Arguello, Misael Fernández
+ *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.*
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package io.rubrica.certificate;
 
@@ -20,6 +23,7 @@ import io.rubrica.certificate.ec.CertificadoMiembroEmpresa;
 import io.rubrica.certificate.ec.CertificadoPersonaJuridica;
 import io.rubrica.certificate.ec.CertificadoPersonaNatural;
 import io.rubrica.certificate.ec.CertificadoRepresentanteLegal;
+import io.rubrica.certificate.ec.CertificadoSelladoTiempo;
 import io.rubrica.certificate.ec.anfac.AnfAc18332SubCaCert20162032;
 import io.rubrica.certificate.ec.anfac.AnfAc37442SubCaCert20192029;
 import io.rubrica.certificate.ec.anfac.CertificadoAnfAc18332;
@@ -48,7 +52,7 @@ import io.rubrica.certificate.to.DatosUsuario;
 import java.security.cert.X509Certificate;
 
 /**
- * Validar diferentes certificados digitales
+ * Validar diferentes certificados digitales acreditados por ARCOTEL
  *
  * @author mfernandez
  */
@@ -133,6 +137,7 @@ public class CertEcUtils {
     //TODO poner los nombres como constantes
     public static DatosUsuario getDatosUsuarios(X509Certificate certificado) {
         DatosUsuario datosUsuario = new DatosUsuario();
+        datosUsuario.setSelladoTiempo(false);
         if (CertificadoBancoCentralFactory.esCertificadoDelBancoCentral(certificado)) {
             CertificadoBancoCentral certificadoBancoCentral = CertificadoBancoCentralFactory.construir(certificado);
             if (certificadoBancoCentral instanceof CertificadoFuncionarioPublico) {
@@ -178,6 +183,9 @@ public class CertEcUtils {
                 datosUsuario.setApellido(certificadoRepresentanteLegal.getPrimerApellido() + " "
                         + certificadoRepresentanteLegal.getSegundoApellido());
                 datosUsuario.setCargo(certificadoRepresentanteLegal.getCargo());
+                datosUsuario.setSerial(certificado.getSerialNumber().toString());
+            }
+            if (certificadoBancoCentral instanceof CertificadoSelladoTiempo) {
                 datosUsuario.setSerial(certificado.getSerialNumber().toString());
             }
             datosUsuario.setEntidadCertificadora("Banco Central del Ecuador");
@@ -242,6 +250,9 @@ public class CertEcUtils {
                         + certificadoPersonaNaturalConsejoJudicatura.getSegundoApellido());
                 datosUsuario.setSerial(certificado.getSerialNumber().toString());
             }
+            if (certificadoConsejoJudicatura instanceof CertificadoSelladoTiempo) {
+                datosUsuario.setSerial(certificado.getSerialNumber().toString());
+            }
             datosUsuario.setEntidadCertificadora("Consejo de la Judicatura");
             datosUsuario.setCertificadoDigitalValido(true);
             return datosUsuario;
@@ -251,7 +262,6 @@ public class CertEcUtils {
             CertificadoSecurityData certificadoSecurityData = CertificadoSecurityDataFactory.construir(certificado);
             if (certificadoSecurityData instanceof CertificadoFuncionarioPublico) {
                 CertificadoFuncionarioPublico certificadoFuncionarioPublico = (CertificadoFuncionarioPublico) certificadoSecurityData;
-
                 datosUsuario.setCedula(certificadoFuncionarioPublico.getCedulaPasaporte());
                 datosUsuario.setNombre(certificadoFuncionarioPublico.getNombres());
                 datosUsuario.setApellido(certificadoFuncionarioPublico.getPrimerApellido() + " "
@@ -276,6 +286,9 @@ public class CertEcUtils {
                 datosUsuario.setNombre(certificadoPersonaNatural.getNombres());
                 datosUsuario.setApellido(certificadoPersonaNatural.getPrimerApellido() + " "
                         + certificadoPersonaNatural.getSegundoApellido());
+                datosUsuario.setSerial(certificado.getSerialNumber().toString());
+            }
+            if (certificadoSecurityData instanceof CertificadoSelladoTiempo) {
                 datosUsuario.setSerial(certificado.getSerialNumber().toString());
             }
             datosUsuario.setEntidadCertificadora("Security Data");
@@ -314,6 +327,9 @@ public class CertEcUtils {
                         + certificadoPersonaNatural.getSegundoApellido());
                 datosUsuario.setSerial(certificado.getSerialNumber().toString());
             }
+            if (certificadoAnfAc18332 instanceof CertificadoSelladoTiempo) {
+                datosUsuario.setSerial(certificado.getSerialNumber().toString());
+            }
             datosUsuario.setEntidadCertificadora("Anf AC");
             datosUsuario.setCertificadoDigitalValido(true);
             return datosUsuario;
@@ -348,6 +364,9 @@ public class CertEcUtils {
                 datosUsuario.setNombre(certificadoPersonaNatural.getNombres());
                 datosUsuario.setApellido(certificadoPersonaNatural.getPrimerApellido() + " "
                         + certificadoPersonaNatural.getSegundoApellido());
+                datosUsuario.setSerial(certificado.getSerialNumber().toString());
+            }
+            if (certificadoAnfAc37442 instanceof CertificadoSelladoTiempo) {
                 datosUsuario.setSerial(certificado.getSerialNumber().toString());
             }
             datosUsuario.setEntidadCertificadora("Anf AC");

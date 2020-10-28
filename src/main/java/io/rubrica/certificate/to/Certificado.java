@@ -1,20 +1,24 @@
-/* 
+/*
+ * Copyright (C) 2020 
+ * Authors: Ricardo Arguello, Misael Fernández
+ *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.*
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package io.rubrica.certificate.to;
 
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Objeto para acceder informacion legible del certificado digital
@@ -33,7 +37,7 @@ public class Certificado {
     private String keyUsages;//llaves de uso
     private DatosUsuario datosUsuario;
     private Boolean signVerify;//Integridad Firma
-    private Boolean docTimeStamp;//Estampa de tiempo
+    private Date docTimeStamp;//Estampa de tiempo
     private String docReason;//Razón del documento
     private String docLocation;//Localización del documento
 
@@ -128,11 +132,11 @@ public class Certificado {
         this.signVerify = signVerify;
     }
 
-    public Boolean getDocTimeStamp() {
+    public Date getDocTimeStamp() {
         return docTimeStamp;
     }
 
-    public void setDocTimeStamp(Boolean docTimeStamp) {
+    public void setDocTimeStamp(Date docTimeStamp) {
         this.docTimeStamp = docTimeStamp;
     }
 

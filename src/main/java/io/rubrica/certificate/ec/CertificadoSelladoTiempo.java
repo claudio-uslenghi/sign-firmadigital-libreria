@@ -15,22 +15,13 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.rubrica.sign.xades;
+package io.rubrica.certificate.ec;
 
 /**
- * Excepci&oacute;n relativa a los errores de firma de hojas de estilo XML.
+ * Certificado de sellado de tiempo
+ *
+ * @author Ricardo Arguello <ricardo.arguello@soportelibre.com>
  */
-public abstract class StyleException extends Exception {
+public interface CertificadoSelladoTiempo {
 
-    StyleException(final String msg) {
-        super(msg);
-    }
-
-    StyleException(final String msg, final Throwable e) {
-        super(msg, e);
-    }
-
-    StyleException(final Throwable e) {
-        super(e);
-    }
 }

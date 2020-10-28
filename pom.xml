@@ -11,8 +11,8 @@
     <url>http://rubrica.io</url>
     <licenses>
         <license>
-            <name>GNU Lesser General Public License, Version 3</name>
-            <url>https://www.gnu.org/licenses/lgpl-3.0.txt</url>
+            <name>GNU AFFERO GENERAL PUBLIC LICENSE, Version 3 (AGPL-3.0)</name>
+            <url>https://www.gnu.org/licenses/agpl-3.0.txt</url>
         </license>
     </licenses>
 
@@ -28,6 +28,12 @@
             <email>misael.fernandez@mintel.gob.ec</email>
             <organization>Ministerio de Telecomunicaciones y de la Sociedad de la Información</organization>
             <organizationUrl>https://www.telecomunicaciones.gob.ec</organizationUrl>
+        </developer>
+        <developer>
+            <name>Efraín Rodríguez López</name>
+            <email>efrain.rodriguez@sercop.gob.ec</email>
+            <organization>Servicio Nacional de Contratación Pública</organization>
+            <organizationUrl>https://portal.compraspublicas.gob.ec/sercop/</organizationUrl>
         </developer>
     </developers>
 
@@ -92,6 +98,13 @@
             <artifactId>javase</artifactId>
             <version>3.4.0</version>
         </dependency>
+        <!-- add all iText 7 modules -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itext7-core</artifactId>
+            <version>7.1.12</version>
+            <type>pom</type>
+        </dependency>
         <dependency>
             <groupId>com.github.librepdf</groupId>
             <artifactId>openpdf</artifactId>
@@ -136,6 +149,12 @@
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>kernel</artifactId>
+            <version>7.1.12</version>
+            <type>jar</type>
         </dependency>
     </dependencies>
     <build>
