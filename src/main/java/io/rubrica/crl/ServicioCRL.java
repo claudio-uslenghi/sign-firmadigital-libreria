@@ -30,12 +30,12 @@ import java.security.cert.X509CRL;
 public class ServicioCRL {
 
     public static final String BCE_CRL = "http://www.eci.bce.ec/CRL/eci_bce_ec_crlfilecomb.crl";
-    public static final String SD_CRL = "https://direct.securitydata.net.ec/~crl/autoridad_de_certificacion_sub_security_data_entidad_de_certificacion_de_informacion_curity_data_s.a._c_ec_crlfile.crl";
     public static final String SD_CRL1 = "https://direct.securitydata.net.ec/~crl/autoridad_de_certificacion_sub_security_data_entidad_de_certificacion_de_informacion_curity_data_s.a._c_ec_crlfile.crl";
     public static final String SD_CRL2 = "https://portal-operador.securitydata.net.ec/ejbca/publicweb/webdist/certdist?cmd=crl&issuer=CN%3DAUTORIDAD+DE+CERTIFICACION+SUBCA-1+SECURITY+DATA%2COU%3DENTIDAD+DE+CERTIFICACION+DE+INFORMACION%2CO%3DSECURITY+DATA+S.A.+1%2CC%3DEC";
     public static final String SD_CRL3 = "https://portal-operador.securitydata.net.ec/ejbca/publicweb/webdist/certdist?cmd=deltacrl&issuer=CN%3DAUTORIDAD+DE+CERTIFICACION+SUBCA-1+SECURITY+DATA%2COU%3DENTIDAD+DE+CERTIFICACION+DE+INFORMACION%2CO%3DSECURITY+DATA+S.A.+1%2CC%3DEC";
     public static final String SD_CRL4 = "https://portal-operador2.securitydata.net.ec/ejbca/publicweb/webdist/certdist?cmd=crl&issuer=CN%3DAUTORIDAD+DE+CERTIFICACION+SUBCA-2+SECURITY+DATA%2COU%3DENTIDAD+DE+CERTIFICACION+DE+INFORMACION%2CO%3DSECURITY+DATA+S.A.+2%2CC%3DEC";
     public static final String SD_CRL5 = "https://portal-operador2.securitydata.net.ec/ejbca/publicweb/webdist/certdist?cmd=deltacrl&issuer=CN%3DAUTORIDAD+DE+CERTIFICACION+SUBCA-2+SECURITY+DATA%2COU%3DENTIDAD+DE+CERTIFICACION+DE+INFORMACION%2CO%3DSECURITY+DATA+S.A.+2%2CC%3DEC";
+    public static final String CJ_CRL = "https://www.icert.fje.gob.ec/crl/icert.crl";
     public static final String ANFAC_CRL = "http://www.anf.es/crl/ANF_Ecuador_CA1_SHA256.crl";
 
     public static X509CRL downloadCrl(String url) throws Exception {
