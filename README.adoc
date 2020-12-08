@@ -36,7 +36,7 @@ Para usarlo como una dependencia en Maven (pom.xml):
 
 == Licencia
 
-https://www.gnu.org/licenses/lgpl-3.0.txt[GNU Lesser General Public License (LGPL) v3.0]
+https://www.gnu.org/licenses/agpl-3.0.txt[GNU AFFERO GENERAL PUBLIC LICENSE, Version 3 (AGPL-3.0)]
 
 
 == Contacto

@@ -1,16 +1,19 @@
 /*
+ * Copyright (C) 2020 
+ * Authors: Ricardo Arguello, Misael Fernández
+ *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU Lesser General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.*
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package io.rubrica.sign.pdf;
 
@@ -18,7 +21,6 @@ import java.awt.Color;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
@@ -33,11 +35,8 @@ import com.lowagie.text.Font;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.Rectangle;
 import com.lowagie.text.exceptions.BadPasswordException;
-import com.lowagie.text.pdf.AcroFields;
 import com.lowagie.text.pdf.ColumnText;
-import com.lowagie.text.pdf.PdfDictionary;
 import com.lowagie.text.pdf.PdfName;
-import com.lowagie.text.pdf.PdfPKCS7;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfSignatureAppearance;
 import com.lowagie.text.pdf.PdfStamper;
@@ -48,14 +47,15 @@ import io.rubrica.exceptions.RubricaException;
 import io.rubrica.exceptions.InvalidFormatException;
 import io.rubrica.sign.SignInfo;
 import io.rubrica.sign.Signer;
-import io.rubrica.sign.cms.DatosUsuario;
+import io.rubrica.certificate.to.DatosUsuario;
 import io.rubrica.utils.BouncyCastleUtils;
+import io.rubrica.utils.FileUtils;
 import io.rubrica.utils.Utils;
 
 public class PDFSigner implements Signer {
 
     private static final Logger logger = Logger.getLogger(PDFSigner.class.getName());
-    
+
     private static final String PDF_FILE_HEADER = "%PDF-";
     private static final PdfName PDFNAME_ETSI_RFC3161 = new PdfName("ETSI.RFC3161");
     private static final PdfName PDFNAME_DOCTIMESTAMP = new PdfName("DocTimeStamp");
@@ -152,7 +152,7 @@ public class PDFSigner implements Signer {
         }
 
         // Leer el PDF
-        PdfReader pdfReader = new PdfReader(data);        
+        PdfReader pdfReader = new PdfReader(data);
         if (pdfReader.isEncrypted()) {
             logger.severe("Documento encriptado");
             throw new RubricaException("Documento encriptado");
@@ -198,7 +198,7 @@ public class PDFSigner implements Signer {
             sap.setVisibleSignature(signaturePositionOnPage, page, null);
             String informacionCertificado = x509Certificate.getSubjectDN().getName();
             DatosUsuario datosUsuario = CertEcUtils.getDatosUsuarios(x509Certificate);
-            String nombreFirmante = (datosUsuario.getNombre()+ " " + datosUsuario.getApellido()).toUpperCase();
+            String nombreFirmante = (datosUsuario.getNombre() + " " + datosUsuario.getApellido()).toUpperCase();
             try {
                 // Creating the appearance for layer 0
                 PdfTemplate pdfTemplate = sap.getLayer(0);
@@ -378,19 +378,20 @@ public class PDFSigner implements Signer {
             throw new InvalidFormatException("El archivo no es un PDF");
         }
 
-        PdfReader pdfReader;
+        com.itextpdf.kernel.pdf.PdfReader pdfReader;
 
         try {
-            pdfReader = new PdfReader(sign);
+            pdfReader = new com.itextpdf.kernel.pdf.PdfReader(FileUtils.byteArrayConvertToFile(sign));
         } catch (Exception e) {
             logger.severe("No se ha podido leer el PDF: " + e);
             throw new InvalidFormatException("No se ha podido leer el PDF", e);
         }
 
-        AcroFields af;
+        com.itextpdf.signatures.SignatureUtil signatureUtil;
 
         try {
-            af = pdfReader.getAcroFields();
+            com.itextpdf.kernel.pdf.PdfDocument pdfDocument = new com.itextpdf.kernel.pdf.PdfDocument(pdfReader);
+            signatureUtil = new com.itextpdf.signatures.SignatureUtil(pdfDocument);
         } catch (Exception e) {
             logger.severe(
                     "No se ha podido obtener la informacion de los firmantes del PDF, se devolvera un arbol vacio: "
@@ -399,25 +400,15 @@ public class PDFSigner implements Signer {
         }
 
         @SuppressWarnings("unchecked")
-        List<String> names = af.getSignatureNames();
+        List<String> names = signatureUtil.getSignatureNames();
 
-        Object pkcs1Object = null;
         List<SignInfo> signInfos = new ArrayList<>();
 
         for (String signatureName : names) {
-            // Comprobamos si es una firma o un sello
-            PdfDictionary pdfDictionary = af.getSignatureDictionary(signatureName);
-
-            if (PDFNAME_ETSI_RFC3161.equals(pdfDictionary.get(PdfName.SUBFILTER))
-                    || PDFNAME_DOCTIMESTAMP.equals(pdfDictionary.get(PdfName.SUBFILTER))) {
-                // Ignoramos los sellos
-                continue;
-            }
-
-            PdfPKCS7 pcks7;
+            com.itextpdf.signatures.PdfPKCS7 pdfPKCS7;
 
             try {
-                pcks7 = af.verifySignature(signatureName);
+                pdfPKCS7 = signatureUtil.readSignatureData(signatureName);
             } catch (Exception e) {
                 e.printStackTrace();
                 logger.severe("El PDF contiene una firma corrupta o con un formato desconocido (" + signatureName
@@ -425,32 +416,14 @@ public class PDFSigner implements Signer {
                 continue;
             }
 
-            Certificate[] signCertificateChain = pcks7.getSignCertificateChain();
+            Certificate[] signCertificateChain = pdfPKCS7.getSignCertificateChain();
             X509Certificate[] certChain = new X509Certificate[signCertificateChain.length];
 
             for (int i = 0; i < certChain.length; i++) {
                 certChain[i] = (X509Certificate) signCertificateChain[i];
             }
 
-            SignInfo signInfo = new SignInfo(certChain, pcks7.getSignDate().getTime());
-
-            // Extraemos el PKCS1 de la firma
-            try {
-                // iText antiguo
-                Field digestField = Class.forName("com.lowagie.text.pdf.PdfPKCS7").getDeclaredField("digest");
-                digestField.setAccessible(true);
-                pkcs1Object = digestField.get(pcks7);
-
-                if (pkcs1Object instanceof byte[]) {
-                    signInfo.setPkcs1((byte[]) pkcs1Object);
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-                logger.severe(
-                        "No se ha podido obtener informacion de una de las firmas del PDF, se continuara con la siguiente: "
-                        + e);
-                continue;
-            }
+            SignInfo signInfo = new SignInfo(certChain, pdfPKCS7.getSignDate().getTime());
 
             signInfos.add(signInfo);
         }

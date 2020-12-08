@@ -15,22 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package io.rubrica.sign.xades;
+package io.rubrica.exceptions;
 
 /**
- * Excepci&oacute;n relativa a los errores de firma de hojas de estilo XML.
+ * Excepcion que se lanza en caso de que problemas con el documento
+ * 
+ * @author jdc
  */
-public abstract class StyleException extends Exception {
+public class DocumentoException extends Exception {
 
-    StyleException(final String msg) {
+    private static final long serialVersionUID = 1L;
+
+    public DocumentoException(String msg) {
         super(msg);
-    }
-
-    StyleException(final String msg, final Throwable e) {
-        super(msg, e);
-    }
-
-    StyleException(final Throwable e) {
-        super(e);
     }
 }

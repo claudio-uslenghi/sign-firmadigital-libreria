@@ -1,16 +1,19 @@
-/* 
+/*
+ * Copyright (C) 2020 
+ * Authors: Ricardo Arguello, Misael Fernández
+ *
  * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
+ * it under the terms of the GNU Affero General Public License as
+ * published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.*
  *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ * GNU Affero General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 package io.rubrica.utils;
 
@@ -32,7 +35,8 @@ import org.apache.tika.mime.MimeType;
 import org.apache.tika.mime.MimeTypeException;
 
 /**
- *
+ * Utilidades para Archivos
+ * 
  * @author jdc
  */
 public class FileUtils {
@@ -50,7 +54,26 @@ public class FileUtils {
         Path documentoPath = Paths.get(file.getAbsolutePath());
         return Files.readAllBytes(documentoPath);
     }
-
+    
+    /**
+     * Crea un fichero temporal con los datos.
+     *
+     * @param data Datos del fichero.
+     * @return Fichero generado.
+     * @throws IOException Cuando se produce un error durante la
+     * generaci&oacute;n.
+     */
+    public static File byteArrayConvertToFile(byte[] data) throws IOException {
+        // Genera el archivo temporal a partir del InputStream de entrada
+        final File file = File.createTempFile("temp", null);
+        try (final FileOutputStream fos = new FileOutputStream(file);) {
+            fos.write(data);
+            fos.flush();
+        }
+        file.deleteOnExit();
+        return file;
+    }
+    
     public static void saveByteArrayToDisc(byte[] archivo, String rutaNombre) throws FileNotFoundException, IOException {
         // TODO validar si hay otro archivo de momento lo sobre escribe
         FileOutputStream fos = new FileOutputStream(rutaNombre);
