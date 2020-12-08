@@ -3,7 +3,7 @@
 
 == Introducción
 
-Rubrica es una librería Java para aplicaciones de firma digital licenciada como software libre mediante una licencia LGPL v3.
+Rubrica es una librería Java para aplicaciones de firma digital licenciada como software libre mediante una licencia AGPL v3.
 
 
 == Dependencias

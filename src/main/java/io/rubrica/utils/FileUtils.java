@@ -69,6 +69,7 @@ public class FileUtils {
         try (final FileOutputStream fos = new FileOutputStream(file);) {
             fos.write(data);
             fos.flush();
+            fos.close();
         }
         file.deleteOnExit();
         return file;
