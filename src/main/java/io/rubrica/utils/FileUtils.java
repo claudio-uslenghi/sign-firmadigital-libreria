@@ -95,6 +95,15 @@ public class FileUtils {
         }
     }
 
+    public static String crearNombreTemporal(File documento, String extension) throws IOException {
+        String hora = (TiempoUtils.getFechaHoraServidor().replace(":", "").replace(" ", "").replace(".", "").replace("-", "")).substring(0, 20);
+        String nombre = crearNombre(documento);
+        if (new File(nombre).exists()) {
+            nombre = crearNombreTemporal(new File(nombre + "_new"), extension);
+        }
+        return nombre + hora + extension;
+    }
+    
     public static String crearNombreFirmado(File documento, String extension) throws IOException {
         String nombre = crearNombre(documento) + "-signed" + extension;
         if (new File(nombre).exists()) {

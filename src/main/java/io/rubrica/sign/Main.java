@@ -34,7 +34,7 @@ import io.rubrica.exceptions.SignatureVerificationException;
 import io.rubrica.keystore.FileKeyStoreProvider;
 import io.rubrica.keystore.KeyStoreProvider;
 import io.rubrica.keystore.KeyStoreProviderFactory;
-import io.rubrica.sign.pdf.PDFSigner;
+import io.rubrica.sign.pdf.PDFSignerItext;
 import io.rubrica.sign.pdf.PdfUtil;
 import io.rubrica.utils.FileUtils;
 import io.rubrica.utils.TiempoUtils;
@@ -50,7 +50,7 @@ import java.util.Date;
 
 /**
  * Metodo de pruebas funcionales
- * 
+ *
  * @author mfernandez
  */
 public class Main {
@@ -72,7 +72,12 @@ public class Main {
 //    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 05 - FIrma EC_CESAR.pdf";
 //    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 06 - PDF Firmado - Una firma - BCE - segundo ejemplo.pdf";
 //    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 07 - Archivo de prueba-signedKT.pdf";
-    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 08 - PDF Firmado - Una firma - Entidad Extranjera.pdf";
+//    private static final String FILE = "/home/mfernandez/CompartidoWindows/%AplicacionesWindows/caso firma/ordenanza documento word presupuesto final 12-signed-signed-signed.pdf";
+//    private static final String FILE = "/home/mfernandez/Descargas/1_17315-2020-00785_20201214_ESCRITO_DINARDAP-DGR-2020-4638-OF_31265_.pdf";
+//    private static final String FILE = "/home/mfernandez/Descargas/OFERTA USHAY CONVALIDACION.pdf";
+//    private static final String FILE = "/home/mfernandez/Descargas/1_Estudio_Previo.pdf";
+//    private static final String FILE = "/home/mfernandez/Descargas/TEST_estudio_previo_software_diseño-FIRMADO.pdf";
+//    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 08 - PDF Firmado - Una firma - Entidad Extranjera.pdf";
 //    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 09 - PDF Firmado - Tres firmas - CJ - CJ - CJ.pdf";
 //    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 10 - Acta 50 firmas.pdf";
 //    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 11 - 1F BCE NO VIGENTE.pdf";
@@ -88,7 +93,7 @@ public class Main {
 //    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 22 - PDF Firmado - Una firma - revocado.pdf";
 //    private static final String FILE = "/home/efra/repos/mintel/archivos/ArchivosFirma/Caso 23 - PDF Firmado - Una firma - caducado y modificado.pdf";
 //    private static final String FILE = "/home/mfernandez/Test/Editados/Paz y salvo - rige el 2020 Diego Saud DF-signed-signed.pdf";
-//    private static final String FILE = "/home/mfernandez/Test/documento_blanco-signed.pdf";
+    private static final String FILE = "/home/mfernandez/Test/3/documento_blanco.pdf";
 //    private static final String FILE = "/home/mfernandez/documento_blanco.pdf";
 //    private static final String FILE = "/home/mfernandez/Test/1.pdf";
 //    private static final String FILE = "/home/mfernandez/Test/firmadoEditado.pdf";
@@ -97,19 +102,21 @@ public class Main {
 
     public static void main(String args[]) throws KeyStoreException, Exception {
 //        fechaHora(240);//espera en segundos
-//        firmarDocumento(FILE);
+        firmarDocumento(FILE);
 //        validarCertificado();
-        verificarDocumento(FILE);
+//        verificarDocumento(FILE);
     }
 
     private static Properties parametros() throws IOException {
+        //PageSize.A4.getWidth();//595.0
+        //PageSize.A4.getHeight();//842.0
         //QR
         //SUPERIOR IZQUIERDA
-        String llx = "10";
-        String lly = "830";
+//        String llx = "10";
+//        String lly = "830";
         //INFERIOR IZQUIERDA
-        //String llx = "100";
-        //String lly = "91";
+        String llx = "100";
+        String lly = "91";
         //INFERIOR DERECHA
         //String llx = "419";
         //String lly = "91";
@@ -139,13 +146,13 @@ public class Main {
         //String ury = String.valueOf(Integer.parseInt(lly) - 36);
 
         Properties params = new Properties();
-        params.setProperty(PDFSigner.SIGNING_LOCATION, "12345678901234567890");
-        params.setProperty(PDFSigner.SIGNING_REASON, "Firmado digitalmente con RUBRICA");
-        params.setProperty(PDFSigner.SIGN_TIME, TiempoUtils.getFechaHoraServidor());
-        params.setProperty(PDFSigner.LAST_PAGE, "1");
-//        params.setProperty(PDFSigner.TYPE_SIG, "QR");
-//        params.setProperty(PDFSigner.INFO_QR, "Firmado digitalmente con RUBRICA\nhttps://minka.gob.ec/rubrica/rubrica");
-        params.setProperty(PDFSigner.TYPE_SIG, "information2");
+        params.setProperty(PDFSignerItext.SIGNING_LOCATION, "Teletrabajo");
+        params.setProperty(PDFSignerItext.SIGNING_REASON, "Firmado digitalmente con RUBRICA");
+        params.setProperty(PDFSignerItext.SIGN_TIME, TiempoUtils.getFechaHoraServidor());
+        params.setProperty(PDFSignerItext.LAST_PAGE, "1");
+        params.setProperty(PDFSignerItext.TYPE_SIG, "QR");
+        params.setProperty(PDFSignerItext.INFO_QR, "Firmado digitalmente con RUBRICA\nhttps://minka.gob.ec/rubrica/rubrica");
+//        params.setProperty(PDFSigner.TYPE_SIG, "information2");
         //params.setProperty(PDFSigner.FONT_SIZE, "4.5");
         // Posicion firma
         params.setProperty(PdfUtil.POSITION_ON_PAGE_LOWER_LEFT_X, llx);
@@ -173,29 +180,32 @@ public class Main {
         X509CertificateUtils x509CertificateUtils = new X509CertificateUtils();
         if (x509CertificateUtils.validarX509Certificate((X509Certificate) keyStore.getCertificate(alias))) {//validación de firmaEC
             Certificate[] certChain = keyStore.getCertificateChain(alias);
-            signed = signer.sign(docByteArry, SignConstants.SIGN_ALGORITHM_SHA1WITHRSA, key, certChain, parametros());
+            Properties properties = parametros();
+            properties.setProperty(PDFSignerItext.PATH, file);
+            PDFSignerItext pDFSignerItext=new PDFSignerItext();
+            signed = pDFSignerItext.sign(docByteArry, "SHA256", key, certChain, properties);
             System.out.println("final firma\n-------");
-            ////// Permite guardar el archivo en el equipo y luego lo abre
-            String nombreDocumento = FileUtils.crearNombreFirmado(new File(file), FileUtils.getExtension(signed));
-            java.io.FileOutputStream fos = new java.io.FileOutputStream(nombreDocumento);
-            //Abrir documento
-            new java.util.Timer().schedule(new java.util.TimerTask() {
-                @Override
-                public void run() {
-                    try {
-                        FileUtils.abrirDocumento(nombreDocumento);
-                        System.out.println(nombreDocumento);
-                        verificarDocumento(nombreDocumento);
-                    } catch (java.lang.Exception ex) {
-                        ex.printStackTrace();
-                    } finally {
-                        System.exit(0);
-                    }
-                }
-            }, 3000); //espera 3 segundos
-            fos.write(signed);
-            fos.close();
-            //Abrir documento
+//            ////// Permite guardar el archivo en el equipo y luego lo abre
+//            String nombreDocumento = FileUtils.crearNombreFirmado(new File(file), FileUtils.getExtension(signed));
+//            java.io.FileOutputStream fos = new java.io.FileOutputStream(nombreDocumento);
+//            //Abrir documento
+//            new java.util.Timer().schedule(new java.util.TimerTask() {
+//                @Override
+//                public void run() {
+//                    try {
+//                        FileUtils.abrirDocumento(nombreDocumento);
+//                        System.out.println(nombreDocumento);
+//                        verificarDocumento(nombreDocumento);
+//                    } catch (java.lang.Exception ex) {
+//                        ex.printStackTrace();
+//                    } finally {
+//                        System.exit(0);
+//                    }
+//                }
+//            }, 3000); //espera 3 segundos
+//            fos.write(signed);
+//            fos.close();
+//            //Abrir documento
         } else {
             System.out.println("Entidad Certificadora no reconocida");
         }

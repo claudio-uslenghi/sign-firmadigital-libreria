@@ -538,32 +538,34 @@ public class Utils {
     private static String validacionKeyUsages(X509Certificate signCert) throws CertificateParsingException {
         String keyUsages = "";
         boolean[] keyUsage = signCert.getKeyUsage();
-        if (keyUsage[0]) {
-            keyUsages += "Firma Electrónica, ";// digitalSignature
-        }
-        if (keyUsage[1]) {
-            keyUsages += "No Repudio, "; // nonRepudiation
-        }
-        if (keyUsage[2]) {
-            keyUsages += "Cifrado de llave, ";// keyEncipherment
-        }
-        if (keyUsage[3]) {
-            keyUsages += "Cifrado de datos, ";// dataEncipherment
-        }
-        if (keyUsage[4]) {
-            keyUsages += "Acuerdo de llaves, "; // keyAgreement
-        }
-        if (keyUsage[5]) {
-            keyUsages += "Firma y certificado de llave, ";// keyCertSign
-        }
-        if (keyUsage[6]) {
-            keyUsages += "Firma de CRL, ";// cRLSign
-        }
-        if (keyUsage[7]) {
-            keyUsages += "Solo cifrado, ";// encipherOnly
-        }
-        if (keyUsage[8]) {
-            keyUsages += "Solo descifrado"; // decipherOnly
+        if (keyUsage != null) {
+            if (keyUsage[0]) {
+                keyUsages += "Firma Electrónica, ";// digitalSignature
+            }
+            if (keyUsage[1]) {
+                keyUsages += "No Repudio, "; // nonRepudiation
+            }
+            if (keyUsage[2]) {
+                keyUsages += "Cifrado de llave, ";// keyEncipherment
+            }
+            if (keyUsage[3]) {
+                keyUsages += "Cifrado de datos, ";// dataEncipherment
+            }
+            if (keyUsage[4]) {
+                keyUsages += "Acuerdo de llaves, "; // keyAgreement
+            }
+            if (keyUsage[5]) {
+                keyUsages += "Firma y certificado de llave, ";// keyCertSign
+            }
+            if (keyUsage[6]) {
+                keyUsages += "Firma de CRL, ";// cRLSign
+            }
+            if (keyUsage[7]) {
+                keyUsages += "Solo cifrado, ";// encipherOnly
+            }
+            if (keyUsage[8]) {
+                keyUsages += "Solo descifrado"; // decipherOnly
+            }
         }
         return keyUsages;
     }
