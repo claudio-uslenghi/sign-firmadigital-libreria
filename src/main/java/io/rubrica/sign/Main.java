@@ -102,9 +102,9 @@ public class Main {
 
     public static void main(String args[]) throws KeyStoreException, Exception {
 //        fechaHora(240);//espera en segundos
-        firmarDocumento(FILE);
+//        firmarDocumento(FILE);
 //        validarCertificado();
-//        verificarDocumento(FILE);
+        verificarDocumento(FILE);
     }
 
     private static Properties parametros() throws IOException {
@@ -112,11 +112,11 @@ public class Main {
         //PageSize.A4.getHeight();//842.0
         //QR
         //SUPERIOR IZQUIERDA
-//        String llx = "10";
-//        String lly = "830";
+        String llx = "10";
+        String lly = "830";
         //INFERIOR IZQUIERDA
-        String llx = "100";
-        String lly = "91";
+//        String llx = "100";
+//        String lly = "91";
         //INFERIOR DERECHA
         //String llx = "419";
         //String lly = "91";
@@ -148,11 +148,11 @@ public class Main {
         Properties params = new Properties();
         params.setProperty(PDFSignerItext.SIGNING_LOCATION, "Teletrabajo");
         params.setProperty(PDFSignerItext.SIGNING_REASON, "Firmado digitalmente con RUBRICA");
-        params.setProperty(PDFSignerItext.SIGN_TIME, TiempoUtils.getFechaHoraServidor());
+        params.setProperty(PDFSignerItext.SIGN_TIME, TiempoUtils.getFechaHoraServidor(null));
         params.setProperty(PDFSignerItext.LAST_PAGE, "1");
         params.setProperty(PDFSignerItext.TYPE_SIG, "QR");
         params.setProperty(PDFSignerItext.INFO_QR, "Firmado digitalmente con RUBRICA\nhttps://minka.gob.ec/rubrica/rubrica");
-//        params.setProperty(PDFSigner.TYPE_SIG, "information2");
+        //params.setProperty(PDFSigner.TYPE_SIG, "information2");
         //params.setProperty(PDFSigner.FONT_SIZE, "4.5");
         // Posicion firma
         params.setProperty(PdfUtil.POSITION_ON_PAGE_LOWER_LEFT_X, llx);
@@ -178,11 +178,11 @@ public class Main {
         PrivateKey key = (PrivateKey) keyStore.getKey(alias, PASSWORD.toCharArray());
 
         X509CertificateUtils x509CertificateUtils = new X509CertificateUtils();
-        if (x509CertificateUtils.validarX509Certificate((X509Certificate) keyStore.getCertificate(alias))) {//validación de firmaEC
+        if (x509CertificateUtils.validarX509Certificate((X509Certificate) keyStore.getCertificate(alias), null)) {//validación de firmaEC
             Certificate[] certChain = keyStore.getCertificateChain(alias);
             Properties properties = parametros();
             properties.setProperty(PDFSignerItext.PATH, file);
-            PDFSignerItext pDFSignerItext=new PDFSignerItext();
+            PDFSignerItext pDFSignerItext = new PDFSignerItext();
             signed = pDFSignerItext.sign(docByteArry, "SHA256", key, certChain, properties);
             System.out.println("final firma\n-------");
 //            ////// Permite guardar el archivo en el equipo y luego lo abre
@@ -228,11 +228,11 @@ public class Main {
         System.out.println("ISSUER: " + x509Certificate.getIssuerX500Principal().getName());
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
-        TemporalAccessor accessor = dateTimeFormatter.parse(TiempoUtils.getFechaHoraServidor());
+        TemporalAccessor accessor = dateTimeFormatter.parse(TiempoUtils.getFechaHoraServidor(null));
         Date fechaHoraISO = Date.from(Instant.from(accessor));
 
         //Validad certificado revocado
-        Date fechaRevocado = UtilsCrlOcsp.validarFechaRevocado(x509Certificate);
+        Date fechaRevocado = UtilsCrlOcsp.validarFechaRevocado(x509Certificate, null);
         if (fechaRevocado != null && fechaRevocado.compareTo(fechaHoraISO) <= 0) {
             System.out.println("Certificado revocado: " + fechaRevocado);
         }
@@ -260,8 +260,8 @@ public class Main {
         tiempo(segundos);//espera en segundos
         do {
             try {
-                System.out.println("getFechaHora() " + TiempoUtils.getFechaHora());
-                System.out.println("getFechaHoraServidor() " + TiempoUtils.getFechaHoraServidor());
+                System.out.println("getFechaHora() " + TiempoUtils.getFechaHora(null));
+                System.out.println("getFechaHoraServidor() " + TiempoUtils.getFechaHoraServidor(null));
             } catch (IOException ioe) {
                 ioe.printStackTrace();
             }

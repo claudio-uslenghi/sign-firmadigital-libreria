@@ -374,7 +374,7 @@ public class Utils {
                     dateToCalendar(temp.getNotBefore()),
                     dateToCalendar(temp.getNotAfter()),
                     dateToCalendar(fechaFirmado),
-                    dateToCalendar(UtilsCrlOcsp.validarFechaRevocado(temp)),
+                    dateToCalendar(UtilsCrlOcsp.validarFechaRevocado(temp, null)),
                     esValido(temp, fechaFirmado),
                     datosUsuario);
 
@@ -638,7 +638,7 @@ public class Utils {
                 dateToCalendar(signInfo.getCerts()[0].getNotBefore()),
                 dateToCalendar(signInfo.getCerts()[0].getNotAfter()),
                 dateToCalendar(signInfo.getSigningTime()),
-                dateToCalendar(UtilsCrlOcsp.validarFechaRevocado(signInfo.getCerts()[0])),
+                dateToCalendar(UtilsCrlOcsp.validarFechaRevocado(signInfo.getCerts()[0], null)),
                 esValido(signInfo.getCerts()[0], signInfo.getSigningTime()),
                 datosUsuario);
         return certificado;

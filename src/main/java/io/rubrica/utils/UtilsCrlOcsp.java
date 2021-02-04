@@ -70,11 +70,11 @@ public class UtilsCrlOcsp {
      * @throws io.rubrica.exceptions.EntidadCertificadoraNoValidaException
      * @throws io.rubrica.exceptions.ConexionValidarCRLException
      */
-    public static String validarCertificado(X509Certificate cert) throws EntidadCertificadoraNoValidaException, IOException, RubricaException, ConexionValidarCRLException, CRLValidationException {
+    public static String validarCertificado(X509Certificate cert, String apiUrl) throws EntidadCertificadoraNoValidaException, IOException, RubricaException, ConexionValidarCRLException, CRLValidationException {
         String fechaRevocado = null;
         try {
             BigInteger serial = cert.getSerialNumber();
-            fechaRevocado = validarCrlServidorAPI(serial);
+            fechaRevocado = validarCrlServidorAPI(serial, apiUrl);
             if (fechaRevocado != null) {
                 System.out.println("Fallo la validacion por el servicio del API, Ahora intentamos por OCSP");
                 fechaRevocado = validarOCSP(cert);
@@ -108,10 +108,10 @@ public class UtilsCrlOcsp {
         return date;
     }
 
-    public static Date validarFechaRevocado(X509Certificate cert) throws CertificadoInvalidoException, IOException {
+    public static Date validarFechaRevocado(X509Certificate cert, String apiUrl) throws CertificadoInvalidoException, IOException {
         Date fechaRevocado = null;
         try {
-            fechaRevocado = fechaString_Date(validarCertificado(cert));
+            fechaRevocado = fechaString_Date(validarCertificado(cert, apiUrl));
         } catch (ParseException | RubricaException | ConexionValidarCRLException | CRLValidationException | EntidadCertificadoraNoValidaException ex) {
             LOGGER.getLogger(UtilsCrlOcsp.class.getName()).log(Level.SEVERE, null, ex);
 //            throw new ConexionFirmadorApiException("Fallo la validacion por el servicio del API");
@@ -159,8 +159,8 @@ public class UtilsCrlOcsp {
         return crlUtils.getRevocationDate();
     }
 
-    private static String validarCrlServidorAPI(BigInteger serial) throws IOException, ConexionApiException {
-        String certificado_revocado_url = PropertiesUtils.getConfig().getProperty("certificado_revocado_url");
+    private static String validarCrlServidorAPI(BigInteger serial, String apiUrl) throws IOException, ConexionApiException {
+        String certificado_revocado_url = apiUrl != null ? PropertiesUtils.getConfig().getProperty("certificado_revocado_url") : apiUrl;
         System.out.println("certificado_revocado_url: " + certificado_revocado_url);
         if (!certificado_revocado_url.isEmpty()) {
             URL url = new URL(certificado_revocado_url + "/" + serial);

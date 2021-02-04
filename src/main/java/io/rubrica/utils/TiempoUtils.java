@@ -44,10 +44,10 @@ public class TiempoUtils {
 
     private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
-    public static Date getFechaHora() throws HoraServidorException {
+    public static Date getFechaHora(String apiUrl) throws HoraServidorException {
         String fechaHora;
         try {
-            fechaHora = getFechaHoraServidor();
+            fechaHora = getFechaHoraServidor(apiUrl);
         } catch (IOException e) {
             LOGGER.severe("No se puede obtener la fecha del servidor: " + e.getMessage());
             throw new HoraServidorException(PropertiesUtils.getMessages().getProperty("mensaje.error.problema_red"));
@@ -61,8 +61,8 @@ public class TiempoUtils {
         }
     }
 
-    public static String getFechaHoraServidor() throws IOException {
-        String fecha_hora_url = PropertiesUtils.getConfig().getProperty("fecha_hora_url");
+    public static String getFechaHoraServidor(String apiUrl) throws IOException {
+        String fecha_hora_url = apiUrl != null ? PropertiesUtils.getConfig().getProperty("fecha_hora_url") : apiUrl;
         System.out.println("fecha_hora_url: " + fecha_hora_url);
         if (fecha_hora_url.isEmpty()) {
             // La fecha actual en formato ISO-8601 (2017-08-27T17:54:43.562-05:00)
@@ -72,6 +72,7 @@ public class TiempoUtils {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
             con.setConnectTimeout(TIME_OUT);
+            con.setReadTimeout(TIME_OUT);
             int responseCode = con.getResponseCode();
             LOGGER.fine("GET Response Code: " + responseCode);
             System.out.println("GET Response Code: " + responseCode);

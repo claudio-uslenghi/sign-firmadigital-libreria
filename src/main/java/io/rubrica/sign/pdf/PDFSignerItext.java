@@ -83,18 +83,36 @@ public class PDFSignerItext {
         BouncyCastleUtils.initializeBouncyCastle();
     }
 
+    // ETSI TS 102 778-1 V1.1.1 (2009-07)
+    // PAdES Basic - Profile based on ISO 32000-1
+    /**
+     * @param data
+     * @param algorithm
+     * @param key
+     * @param certChain
+     * @param xParams
+     * @return
+     * @throws java.io.IOException
+     * @throws java.security.GeneralSecurityException
+     * @throws io.rubrica.exceptions.RubricaException
+     */
 //    BadPasswordException,
     public byte[] sign(byte[] data, String algorithm, PrivateKey key, Certificate[] certChain, Properties xParams) throws IOException, GeneralSecurityException, RubricaException {
         File file = new File(xParams.getProperty(PATH));
         file.mkdirs();
 
-        String rutaDocumentoTemporal = FileUtils.crearNombreTemporal(file, "");
+        String rutaDocumentoTemporal = FileUtils.crearNombreTemporal(file, ".rubrica.firmadigital");
         String rutaDocumentoFirmado = FileUtils.crearNombreFirmado(file, ".pdf");
 
-        String fieldName = emptySignature(file.getPath(), rutaDocumentoTemporal, certChain, xParams);
-        createSignature(rutaDocumentoTemporal, rutaDocumentoFirmado, fieldName, key, certChain, algorithm);
-        File fileTmp = new File(rutaDocumentoTemporal);
-        fileTmp.delete();
+        try {
+            String fieldName = emptySignature(file.getPath(), rutaDocumentoTemporal, certChain, xParams);
+            createSignature(rutaDocumentoTemporal, rutaDocumentoFirmado, fieldName, key, certChain, algorithm);
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            File fileTmp = new File(rutaDocumentoTemporal);
+            fileTmp.delete();
+        }
         return null;
     }
 
@@ -178,72 +196,133 @@ public class PDFSignerItext {
             DatosUsuario datosUsuario = CertEcUtils.getDatosUsuarios(x509Certificate);
             String nombreFirmante = (datosUsuario.getNombre() + " " + datosUsuario.getApellido()).toUpperCase();
 
-            // Imagen
-            java.awt.image.BufferedImage bufferedImage = null;
-            // QR
-            String text = "FIRMADO POR: " + nombreFirmante.trim() + "\n";
-            text = text + "RAZON: " + reason + "\n";
-            text = text + "LOCALIZACION: " + location + "\n";
-            text = text + "FECHA: " + signTime + "\n";
-            text = text + infoQR;
-            try {
-                bufferedImage = io.rubrica.utils.QRCode.generateQR(text, (int) signaturePositionOnPage.getHeight(), (int) signaturePositionOnPage.getHeight());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            // QR
             PdfFormXObject layer2 = signatureAppearance.getLayer2();
             PdfCanvas canvas = new PdfCanvas(layer2, pdfSigner.getDocument());
 
-            float MARGIN = 2;
-            Rectangle dataRect = new Rectangle(MARGIN, MARGIN, signaturePositionOnPage.getWidth() / 1 - MARGIN, signaturePositionOnPage.getHeight() - 1 * MARGIN);
-            Rectangle signatureRect = new Rectangle(signaturePositionOnPage.getWidth() / 3 + 3, 0, signaturePositionOnPage.getWidth(), signaturePositionOnPage.getHeight());
-            
-            // <editor-fold defaultstate="collapsed" desc="Tested Code">
-            // Signature at left and image at right
-//            Rectangle dataRect = new Rectangle(signaturePositionOnPage.getWidth() / 2 + MARGIN / 2, MARGIN, signaturePositionOnPage.getWidth() / 2 - MARGIN, signaturePositionOnPage.getHeight() - 2 * MARGIN);
-//            Rectangle signatureRect = new Rectangle(MARGIN, MARGIN, signaturePositionOnPage.getWidth() / 2 - 2 * MARGIN, signaturePositionOnPage.getHeight() - 2 * MARGIN);
-            // Signature at right and image at left
-//            Rectangle dataRect = new Rectangle(MARGIN, MARGIN, signaturePositionOnPage.getWidth() / 2 - MARGIN, signaturePositionOnPage.getHeight() - 2 * MARGIN);
-//            Rectangle signatureRect = new Rectangle(signaturePositionOnPage.getWidth() / 2 + MARGIN / 2, MARGIN, signaturePositionOnPage.getWidth() / 2 - 2 * MARGIN, signaturePositionOnPage.getHeight() - 2 * MARGIN);
-            // Signature at top and image at bottom
-//            Rectangle dataRect = new Rectangle(MARGIN, MARGIN, signaturePositionOnPage.getWidth() - 2 * MARGIN, signaturePositionOnPage.getHeight() / 2 - MARGIN);
-//            Rectangle signatureRect = new Rectangle(MARGIN, signaturePositionOnPage.getHeight() / 2 + MARGIN, signaturePositionOnPage.getWidth() - 2 * MARGIN, signaturePositionOnPage.getHeight() / 2 - MARGIN);
-            // Signature at bottom and image at top
-//            Rectangle dataRect = new Rectangle(MARGIN, signaturePositionOnPage.getHeight() / 2 + MARGIN, signaturePositionOnPage.getWidth() - 2 * MARGIN, signaturePositionOnPage.getHeight() / 2 - MARGIN);
-//            Rectangle signatureRect = new Rectangle(MARGIN, MARGIN, signaturePositionOnPage.getWidth() - 2 * MARGIN, signaturePositionOnPage.getHeight() / 2 - MARGIN);
-            // </editor-fold>
             PdfFont fontCourier = PdfFontFactory.createFont(FontConstants.COURIER);
             PdfFont fontCourierBold = PdfFontFactory.createFont(FontConstants.COURIER_BOLD);
+            PdfFont fontHelvetica = PdfFontFactory.createFont(FontConstants.HELVETICA);
 
-            Div textDiv = new Div();
-            textDiv.setHeight(signatureRect.getHeight());
-            textDiv.setWidth(signatureRect.getWidth()-signaturePositionOnPage.getWidth() / 3);
-            textDiv.setVerticalAlignment(VerticalAlignment.MIDDLE);
-            textDiv.setHorizontalAlignment(HorizontalAlignment.LEFT);
-            Text texto = new Text("Firmado electrónicamente por:\n");
+            switch (typeSig) {
+                case "QR": {
+                    // Imagen
+                    java.awt.image.BufferedImage bufferedImage = null;
+                    // QR
+                    String text = "FIRMADO POR: " + nombreFirmante.trim() + "\n";
+                    text = text + "RAZON: " + reason + "\n";
+                    text = text + "LOCALIZACION: " + location + "\n";
+                    text = text + "FECHA: " + signTime + "\n";
+                    text = text + infoQR;
+                    try {
+                        bufferedImage = io.rubrica.utils.QRCode.generateQR(text, (int) signaturePositionOnPage.getHeight(), (int) signaturePositionOnPage.getHeight());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    // QR
+                    Rectangle dataRect = new Rectangle(0, 0, signaturePositionOnPage.getWidth(), signaturePositionOnPage.getHeight());
+                    Rectangle signatureRect = new Rectangle(signaturePositionOnPage.getWidth() / 3, 0, signaturePositionOnPage.getWidth(), signaturePositionOnPage.getHeight());
+                    // <editor-fold defaultstate="collapsed" desc="Tested Code">
+                    // Signature at left and image at right
+//            Rectangle dataRect = new Rectangle(signaturePositionOnPage.getWidth() / 2 + MARGIN / 2, MARGIN, signaturePositionOnPage.getWidth() / 2 - MARGIN, signaturePositionOnPage.getHeight() - 2 * MARGIN);
+//            Rectangle signatureRect = new Rectangle(MARGIN, MARGIN, signaturePositionOnPage.getWidth() / 2 - 2 * MARGIN, signaturePositionOnPage.getHeight() - 2 * MARGIN);
+                    // Signature at right and image at left
+//            Rectangle dataRect = new Rectangle(MARGIN, MARGIN, signaturePositionOnPage.getWidth() / 2 - MARGIN, signaturePositionOnPage.getHeight() - 2 * MARGIN);
+//            Rectangle signatureRect = new Rectangle(signaturePositionOnPage.getWidth() / 2 + MARGIN / 2, MARGIN, signaturePositionOnPage.getWidth() / 2 - 2 * MARGIN, signaturePositionOnPage.getHeight() - 2 * MARGIN);
+                    // Signature at top and image at bottom
+//            Rectangle dataRect = new Rectangle(MARGIN, MARGIN, signaturePositionOnPage.getWidth() - 2 * MARGIN, signaturePositionOnPage.getHeight() / 2 - MARGIN);
+//            Rectangle signatureRect = new Rectangle(MARGIN, signaturePositionOnPage.getHeight() / 2 + MARGIN, signaturePositionOnPage.getWidth() - 2 * MARGIN, signaturePositionOnPage.getHeight() / 2 - MARGIN);
+                    // Signature at bottom and image at top
+//            Rectangle dataRect = new Rectangle(MARGIN, signaturePositionOnPage.getHeight() / 2 + MARGIN, signaturePositionOnPage.getWidth() - 2 * MARGIN, signaturePositionOnPage.getHeight() / 2 - MARGIN);
+//            Rectangle signatureRect = new Rectangle(MARGIN, MARGIN, signaturePositionOnPage.getWidth() - 2 * MARGIN, signaturePositionOnPage.getHeight() / 2 - MARGIN);
+                    // </editor-fold>
+                    Div imageDiv = new Div();
+                    imageDiv.setHeight(dataRect.getHeight());
+                    imageDiv.setWidth(dataRect.getWidth());
+                    imageDiv.setVerticalAlignment(VerticalAlignment.MIDDLE);
+                    imageDiv.setHorizontalAlignment(HorizontalAlignment.CENTER);
+                    Image image = new Image(ImageDataFactory.create(bufferedImage, null));
+                    image.setAutoScale(true);
+                    imageDiv.add(image);
+                    Canvas imageLayoutCanvas = new Canvas(canvas, pdfSigner.getDocument(), dataRect);
+                    imageLayoutCanvas.add(imageDiv);
+                    imageLayoutCanvas.close();
+                    Div textDiv = new Div();
+                    textDiv.setHeight(signatureRect.getHeight());
+                    textDiv.setWidth(signatureRect.getWidth() - signaturePositionOnPage.getWidth() / 3);
+                    textDiv.setVerticalAlignment(VerticalAlignment.MIDDLE);
+                    textDiv.setHorizontalAlignment(HorizontalAlignment.LEFT);
+                    Text texto = new Text("Firmado electrónicamente por:\n");
 //            Text contenido = new Text("Simón José Antonio de la Santísima Trinidad Bolívar y Palacios Ponte-Andrade y Blanco");
-            Text contenido = new Text(nombreFirmante.trim());
-            Paragraph paragraph = new Paragraph().add(texto).setFont(fontCourier).setMargin(0).setMultipliedLeading(0.9f).setFontSize(3.25f);
-            textDiv.add(paragraph);
-            paragraph = new Paragraph().add(contenido).setFont(fontCourierBold).setMargin(0).setMultipliedLeading(0.9f).setFontSize(6.25f);
+                    Paragraph paragraph = new Paragraph().add(texto).setFont(fontCourier).setMargin(0).setMultipliedLeading(0.9f).setFontSize(3.25f);
+                    textDiv.add(paragraph);
+                    Text contenido = new Text(nombreFirmante.trim());
+                    paragraph = new Paragraph().add(contenido).setFont(fontCourierBold).setMargin(0).setMultipliedLeading(0.9f).setFontSize(6.25f);
 //            paragraph.setBackgroundColor(DeviceGray.BLACK);
-            textDiv.add(paragraph);
-            Canvas textLayoutCanvas = new Canvas(canvas, pdfSigner.getDocument(), signatureRect);
-            textLayoutCanvas.add(textDiv);
-            textLayoutCanvas.close();
-
-            Div imageDiv = new Div();
-            imageDiv.setHeight(dataRect.getHeight());
-            imageDiv.setWidth(dataRect.getWidth());
-            imageDiv.setVerticalAlignment(VerticalAlignment.MIDDLE);
-            imageDiv.setHorizontalAlignment(HorizontalAlignment.CENTER);
-            Image image = new Image(ImageDataFactory.create(bufferedImage, null));
-            image.setAutoScale(true);
-            imageDiv.add(image);
-            Canvas imageLayoutCanvas = new Canvas(canvas, pdfSigner.getDocument(), dataRect);
-            imageLayoutCanvas.add(imageDiv);
-            imageLayoutCanvas.close();
+                    textDiv.add(paragraph);
+                    Canvas textLayoutCanvas = new Canvas(canvas, pdfSigner.getDocument(), signatureRect);
+                    textLayoutCanvas.add(textDiv);
+                    textLayoutCanvas.close();
+                    break;
+                }
+                case "information1": {
+                    Rectangle signatureRect = new Rectangle(0, 0, signaturePositionOnPage.getWidth(), signaturePositionOnPage.getHeight());
+                    Div textDiv = new Div();
+                    textDiv.setHeight(signatureRect.getHeight());
+                    textDiv.setWidth(signatureRect.getWidth());
+                    textDiv.setVerticalAlignment(VerticalAlignment.MIDDLE);
+                    textDiv.setHorizontalAlignment(HorizontalAlignment.LEFT);
+                    Text contenido = new Text(nombreFirmante.trim());
+                    Paragraph paragraph = new Paragraph().add(contenido).setFont(fontHelvetica).setMargin(0).setMultipliedLeading(0.9f).setFontSize(6.25f);
+                    textDiv.add(paragraph);
+                    contenido = new Text("Nombre de reconocimiento " + informacionCertificado.trim());
+                    paragraph = new Paragraph().add(contenido).setFont(fontHelvetica).setMargin(0).setMultipliedLeading(0.9f).setFontSize(3.25f);
+                    textDiv.add(paragraph);
+                    contenido = new Text("Razón: " + reason);
+                    paragraph = new Paragraph().add(contenido).setFont(fontHelvetica).setMargin(0).setMultipliedLeading(0.9f).setFontSize(3.25f);
+                    textDiv.add(paragraph);
+                    contenido = new Text("Localización: " + location);
+                    paragraph = new Paragraph().add(contenido).setFont(fontHelvetica).setMargin(0).setMultipliedLeading(0.9f).setFontSize(3.25f);
+                    textDiv.add(paragraph);
+                    contenido = new Text("Fecha: " + signTime);
+                    paragraph = new Paragraph().add(contenido).setFont(fontHelvetica).setMargin(0).setMultipliedLeading(0.9f).setFontSize(3.25f);
+                    textDiv.add(paragraph);
+                    Canvas textLayoutCanvas = new Canvas(canvas, pdfSigner.getDocument(), signatureRect);
+                    textLayoutCanvas.add(textDiv);
+                    textLayoutCanvas.close();
+                    break;
+                }
+                case "information2": {
+                    // Creating the appearance for layer 2
+                    // ETSI TS 102 778-6 V1.1.1 (2010-07)
+                    Rectangle signatureRect = new Rectangle(0, 0, signaturePositionOnPage.getWidth(), signaturePositionOnPage.getHeight());
+                    Div textDiv = new Div();
+                    textDiv.setHeight(signatureRect.getHeight());
+                    textDiv.setWidth(signatureRect.getWidth());
+                    textDiv.setVerticalAlignment(VerticalAlignment.MIDDLE);
+                    textDiv.setHorizontalAlignment(HorizontalAlignment.LEFT);
+                    Text texto = new Text("Firmado electrónicamente por:\n");
+                    Paragraph paragraph = new Paragraph().add(texto).setFont(fontHelvetica).setMargin(0).setMultipliedLeading(0.9f).setFontSize(3.25f);
+                    textDiv.add(paragraph);
+                    Text contenido = new Text(nombreFirmante.trim());
+                    paragraph = new Paragraph().add(contenido).setFont(fontHelvetica).setMargin(0).setMultipliedLeading(0.9f).setFontSize(6.25f);
+                    textDiv.add(paragraph);
+                    contenido = new Text("Razón: " + reason);
+                    paragraph = new Paragraph().add(contenido).setFont(fontHelvetica).setMargin(0).setMultipliedLeading(0.9f).setFontSize(4.25f);
+                    textDiv.add(paragraph);
+                    contenido = new Text("Localización: " + location);
+                    paragraph = new Paragraph().add(contenido).setFont(fontHelvetica).setMargin(0).setMultipliedLeading(0.9f).setFontSize(4.25f);
+                    textDiv.add(paragraph);
+                    contenido = new Text("Fecha: " + signTime);
+                    paragraph = new Paragraph().add(contenido).setFont(fontHelvetica).setMargin(0).setMultipliedLeading(0.9f).setFontSize(4.25f);
+                    textDiv.add(paragraph);
+                    Canvas textLayoutCanvas = new Canvas(canvas, pdfSigner.getDocument(), signatureRect);
+                    textLayoutCanvas.add(textDiv);
+                    textLayoutCanvas.close();
+                    break;
+                }
+                default: {
+                }
+            }
         }
 
         // Razon de firma
@@ -264,16 +343,26 @@ public class PDFSignerItext {
             pdfSigner.setSignDate(calendar);
         }
 
-        /* ExternalBlankSignatureContainer constructor will create the PdfDictionary for the signature
-         * information and will insert the /Filter and /SubFilter values into this dictionary.
-         * It will leave just a blank placeholder for the signature that is to be inserted later.
-         */
-        IExternalSignatureContainer external = new ExternalBlankSignatureContainer(PdfName.Adobe_PPKLite,
-                PdfName.Adbe_pkcs7_detached);
+        try {
+            /* ExternalBlankSignatureContainer constructor will create the PdfDictionary for the signature
+                * information and will insert the /Filter and /SubFilter values into this dictionary.
+                * It will leave just a blank placeholder for the signature that is to be inserted later.
+             */
+            IExternalSignatureContainer external = new ExternalBlankSignatureContainer(PdfName.Adobe_PPKLite,
+                    PdfName.Adbe_pkcs7_detached);
 
-        // Sign the document using an external container.
-        // 8192 is the size of the empty signature placeholder.
-        pdfSigner.signExternalContainer(external, 8192);
+            // Sign the document using an external container.
+            // 8192 is the size of the empty signature placeholder.
+            pdfSigner.signExternalContainer(external, 8192);
+//            } catch (ExceptionConverter ec) {
+//                logger.severe("Problemas con el driver\n" + ec);
+//                throw new RubricaException(io.rubrica.utils.PropertiesUtils.getMessages().getProperty("mensaje.error.driver_problemas") + "\n", ec);
+//            } catch (DocumentException | InvalidPdfException de) {
+//                logger.severe("Error al estampar la firma\n" + de);
+//                throw new RubricaException("Error al estampar la firma\n", de);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return pdfSigner.getFieldName();
     }
 

@@ -67,13 +67,19 @@ public class X509CertificateUtils {
         }
     }
 
-    public boolean validarX509Certificate(X509Certificate x509Certificate) throws RubricaException, KeyStoreException, EntidadCertificadoraNoValidaException, InvalidKeyException, CertificadoInvalidoException, IOException, HoraServidorException {
+    public boolean validarX509Certificate(X509Certificate x509Certificate, String apiUrl) throws RubricaException, KeyStoreException, EntidadCertificadoraNoValidaException, InvalidKeyException, CertificadoInvalidoException, IOException, HoraServidorException {
         boolean retorno = false;
         int diasAnticipacion = 30;
         if (x509Certificate != null) {
-            Date fechaHora = TiempoUtils.getFechaHora();
+            String apiUrlFecha = null;
+            String apiUrlRevocado = null;
+            if (apiUrl != null) {
+                apiUrlFecha = apiUrl + "/fecha-hora";
+                apiUrlRevocado = apiUrl + "/certificado/fechaRevocado";
+            }
+            Date fechaHora = TiempoUtils.getFechaHora(apiUrlFecha);
 
-            Date fechaRevocado = UtilsCrlOcsp.validarFechaRevocado(x509Certificate);
+            Date fechaRevocado = UtilsCrlOcsp.validarFechaRevocado(x509Certificate, apiUrlRevocado);
             if (fechaRevocado != null && fechaRevocado.compareTo(fechaHora) <= 0) {
                 revocado = fechaRevocado.toString();
             }

@@ -4,7 +4,7 @@
 == Introducción
 
 Rubrica es una librería Java para aplicaciones de firma digital licenciada como software libre mediante una licencia AGPL v3.
-
+Revisar LICENSE para detalles.
 
 == Dependencias
 

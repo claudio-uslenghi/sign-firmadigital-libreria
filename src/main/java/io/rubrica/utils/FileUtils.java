@@ -96,7 +96,7 @@ public class FileUtils {
     }
 
     public static String crearNombreTemporal(File documento, String extension) throws IOException {
-        String hora = (TiempoUtils.getFechaHoraServidor().replace(":", "").replace(" ", "").replace(".", "").replace("-", "")).substring(0, 20);
+        String hora = (TiempoUtils.getFechaHoraServidor(null).replace(":", "").replace(" ", "").replace(".", "").replace("-", "")).substring(0, 20);
         String nombre = crearNombre(documento);
         if (new File(nombre).exists()) {
             nombre = crearNombreTemporal(new File(nombre + "_new"), extension);
@@ -113,7 +113,7 @@ public class FileUtils {
     }
 
     public static String crearNombreVerificado(File documento, String extension) throws IOException {
-        String hora = (TiempoUtils.getFechaHoraServidor().replace(":", "").replace(" ", "").replace(".", "").replace("-", "")).substring(0, 20);
+        String hora = (TiempoUtils.getFechaHoraServidor(null).replace(":", "").replace(" ", "").replace(".", "").replace("-", "")).substring(0, 20);
         String nombre = crearNombre(documento);
         if (extension.isEmpty()) {
             extension = getExtension(nombre);
