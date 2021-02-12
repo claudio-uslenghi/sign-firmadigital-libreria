@@ -24,11 +24,7 @@ import java.io.IOException;
 import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 import java.util.logging.Logger;
 
 import com.lowagie.text.Font;
@@ -67,6 +63,7 @@ public class PDFSigner implements Signer {
     public static final String FONT_SIZE = "3";
     public static final String TYPE_SIG = "information1";
     public static final String INFO_QR = "";
+    public static final String METADATA = "metadata";
 
     static {
         BouncyCastleUtils.initializeBouncyCastle();
@@ -158,10 +155,15 @@ public class PDFSigner implements Signer {
             throw new RubricaException("Documento encriptado");
         }
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        Map<String, String> info = pdfReader.getInfo();
+        if (extraParams.getProperty(METADATA) != null) {
+            info.put("CUSTOM", extraParams.getProperty(METADATA));
+        }
 
         PdfStamper stp;
         try {
             stp = PdfStamper.createSignature(pdfReader, baos, '\0', null, true);
+            stp.setMoreInfo((HashMap) info);
         } catch (com.lowagie.text.DocumentException e) {
             logger.severe("Error al crear la firma para estampar: " + e);
             throw new RubricaException("Error al crear la firma para estampar", e);
@@ -197,8 +199,9 @@ public class PDFSigner implements Signer {
         if (signaturePositionOnPage != null) {
             sap.setVisibleSignature(signaturePositionOnPage, page, null);
             String informacionCertificado = x509Certificate.getSubjectDN().getName();
-            DatosUsuario datosUsuario = CertEcUtils.getDatosUsuarios(x509Certificate);
-            String nombreFirmante = (datosUsuario.getNombre() + " " + datosUsuario.getApellido()).toUpperCase();
+            //DatosUsuario datosUsuario = CertEcUtils.getDatosUsuarios(x509Certificate);
+            //String nombreFirmante = (datosUsuario.getNombre() + " " + datosUsuario.getApellido()).toUpperCase();
+            String nombreFirmante = (Utils.getCN(x509Certificate)).toUpperCase();
             try {
                 // Creating the appearance for layer 0
                 PdfTemplate pdfTemplate = sap.getLayer(0);
